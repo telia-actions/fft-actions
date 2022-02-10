@@ -1,0 +1,83 @@
+name: Preview
+inputs:
+  package_name:
+    required: true
+    type: string
+  project_folder:
+    required: true
+    type: string
+  port_number:
+    required: true
+    type: string
+  deploy_scenario:
+    type: string
+    default: preview
+    required: false
+  dockerfile:
+    type: string
+    default: rigs/next-rig/Dockerfile
+    required: false
+  artifactory_url:
+    type: string
+    default: tseexp-docker-dev.jfrog.teliacompany.io
+    required: false
+  RUSH_BUILD_CACHE_WRITE_CREDENTIAL:
+    type: string
+    required: true
+  AWS_ACCESS_KEY_ID:
+    type: string
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    type: string
+    required: true
+  AWS_SESSION_TOKEN:
+    type: string
+    required: true
+  JFROG_USERNAME:
+    type: string
+    required: true
+  JFROG_TOKEN:
+    type: string
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v2
+    - name: Setup node
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+    - name: Install dependencies
+      shell: bash
+      run: node common/scripts/install-run-rush.js install --to ${{ inputs.package_name }}
+    - name: Build dependencies
+      shell: bash
+      run: node common/scripts/install-run-rush.js build --to-except ${{ inputs.package_name }}
+      env:
+        RUSH_BUILD_CACHE_WRITE_CREDENTIAL: ${{ inputs.RUSH_BUILD_CACHE_WRITE_CREDENTIAL }}
+    - name: Build preview app
+      shell: bash
+      run: node common/scripts/install-run-rush.js build:preview --only ${{ inputs.package_name }} --disable-build-cache
+    - name: Docker login to JFrog
+      shell: bash
+      run: echo ${{ inputs.JFROG_TOKEN }} | docker login -u ${{ inputs.JFROG_USERNAME }} --password-stdin ${{ inputs.artifactory_url }}
+    - name: Rush deploy
+      shell: bash
+      run: node common/scripts/install-run-rush.js deploy --project ${{ inputs.package_name }} --scenario ${{ inputs.deploy_scenario }}
+    - name: Build Docker image
+      shell: bash
+      run: docker build common/deploy -t ${{ inputs.project_folder }} -f ${{ inputs.dockerfile }} --build-arg APP_NAME=${{ inputs.project_folder }} --build-arg PORT=${{ inputs.port_number }}
+    - name: Docker tag
+      shell: bash
+      run: docker tag ${{ inputs.project_folder }}:latest ${{ inputs.artifactory_url }}/${{ inputs.project_folder }}:latest
+    - name: Docker push
+      shell: bash
+      run: docker push ${{ inputs.artifactory_url }}/${{ inputs.project_folder }}:latest
+    - name: Update Image in Fargate
+      shell: bash
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+        AWS_SESSION_TOKEN: ${{ inputs.AWS_SESSION_TOKEN }}
+      run: aws ecs update-service --cluster preview-fargate-task-cluster --service preview-fargate-task --force-new-deployment --region eu-north-1

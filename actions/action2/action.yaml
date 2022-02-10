@@ -1,5 +1,0 @@
-runs:
-  using: "composite"
-  steps:
-    - run: echo Action2
-      shell: bash
