@@ -1,0 +1,18 @@
+name: Get preview env config
+description: Get preview environment configuration
+inputs:
+  configFilePath:
+    description: Path to a valid preview environment config file.
+    required: false
+    default: './static/configuration/preview-environment.json'
+  staticAppName:
+    description: Application name to get specific configuration.
+    required: false
+outputs:
+  config:
+    description: Full configuration
+  staticApp:
+    description: Configuration for specific static app
+runs:
+  using: node12
+  main: dist/index.js
