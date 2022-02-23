@@ -1,0 +1,51 @@
+name: Test Upload packages to JFrog action
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "actions/upload-packages-to-jfrog/**"
+      - ".github/workflows/upload-packages-to-jfrog.yaml"
+jobs:
+  create_and_upload_files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Upload artifacts
+        uses: ./actions/upload-packages-to-jfrog
+        with:
+          repository-url: https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing
+          username: ${{ secrets.JFROG_USERNAME }}
+          password: ${{ secrets.JFROG_TOKEN }}
+          build-identifier: ${{ github.ref_name }}/${{ github.run_id }}
+          rush-projects: |
+            [
+              {
+                "packageName": "app-1",
+                "projectFolder": "actions/upload-packages-to-jfrog/__mocks__/packages/app-1"
+              },
+              {
+                "packageName": "app-2",
+                "projectFolder": "actions/upload-packages-to-jfrog/__mocks__/packages/app-2"
+              }
+            ]
+  download_and_unpack_jfrog:
+    needs: [create_and_upload_files]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download compressed files from Artifactory
+        run: |
+          time curl -u "${{ secrets.JFROG_USERNAME }}:${{ secrets.JFROG_TOKEN }}" -O "https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing/app-1/${{ github.ref_name }}/${{ github.run_id }}.tar.gz" --fail
+          time curl -u "${{ secrets.JFROG_USERNAME }}:${{ secrets.JFROG_TOKEN }}" -O "https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing/app-2/${{ github.ref_name }}/${{ github.run_id }}.tar.gz" --fail
+      - name: Unpack compressed JFrog files
+        run: |
+          mkdir app-1
+          mkdir app-2
+          time tar -xf ${{ github.run_id }}.tar.gz --directory app-1
+          time tar -xf ${{ github.run_id }}.tar.gz --directory app-2
+      - name: Show extracted files
+        run: ls -R

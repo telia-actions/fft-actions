@@ -1,0 +1,22 @@
+name: Upload Packages to Artifactory
+description: Upload to generic JFrog Artifactory repository
+inputs:
+  rush-projects:
+    description: A JSON array of { packageName, projectFolder} objects to upload
+    required: true
+  repository-url:
+    description: URL of the Artifactory repository to use, including an optional prefix path for the uploads
+    required: true
+  username:
+    description: User / Token name for JFrog authentication
+    required: true
+  password:
+    description: Password / Token for JFrog authentication
+    required: true
+  build-identifier:
+    description: A unique string to identify this build, used to organize artifacts and prevent overwriting
+    required: false
+    default: ''
+runs:
+  using: node16
+  main: dist/index.js
