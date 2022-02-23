@@ -1,0 +1,49 @@
+name: Test Upload packages to JFrog action
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "actions/upload-packages-to-jfrog/**"
+jobs:
+  create_and_upload_files:
+    runs-on: [self-hosted, small, telia-managed, Linux, X64]
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Upload artifacts
+        uses: ./actions/upload-packages-to-artifactory
+        with:
+          repository-url: https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing
+          api-key: ${{ secrets.JFROG_API_KEY }}
+          build-identifier: ${{ github.ref_name }}/${{ github.run_id}}
+          rush-projects: |
+            [
+              {
+                "packageName": "app-1",
+                "projectFolder": "actions/upload-packages-to-artifactory/__mocks__/packages/app-1"
+              },
+              {
+                "packageName": "app-2",
+                "projectFolder": "actions/upload-packages-to-artifactory/__mocks__/packages/app-2"
+              }
+            ]
+  download_and_unpack_jfrog:
+    needs: [create_and_upload_files]
+    runs-on: [self-hosted, large, telia-managed, Linux, X64]
+    steps:
+      - name: Download compressed files from Artifactory
+        run: |
+          time curl -H "X-JFrog-Art-Api:${{secrets.JFROG_API_KEY}}" -O "https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing/app-1/${{ github.ref_name }}/${{ github.run_id}}/app-1.tar.gz"
+          time curl -H "X-JFrog-Art-Api:${{secrets.JFROG_API_KEY}}" -O "https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing/app-2/${{ github.ref_name }}/${{ github.run_id}}/app-2.tar.gz"
+      - name: Unpack compressed JFrog files
+        run: |
+          mkdir app-1
+          mkdir app-2
+          time tar -xf app-1.tar.gz --directory app-1
+          time tar -xf app-2.tar.gz --directory app-2
+      - name: Show extracted files
+        run: ls -R
