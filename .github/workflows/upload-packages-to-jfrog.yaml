@@ -45,7 +45,7 @@ jobs:
         run: |
           mkdir app-1
           mkdir app-2
-          time tar -xf app-1.tar.gz --directory app-1
-          time tar -xf app-2.tar.gz --directory app-2
+          time tar -xf ${{ github.run_id }}.tar.gz --directory app-1
+          time tar -xf ${{ github.run_id }}.tar.gz --directory app-2
       - name: Show extracted files
         run: ls -R
