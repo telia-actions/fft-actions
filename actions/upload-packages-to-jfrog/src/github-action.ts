@@ -1,9 +1,9 @@
-import { archiveArtifact } from './util/tar/archive-artifact';
 import { exec } from '@actions/exec';
+import { setFailed } from '@actions/core';
+import { archiveArtifact } from './util/tar/archive-artifact';
 import { getInputs } from './util/github/get-inputs';
 import { planArtifactUpload } from './lib/upload-planner/upload-planner';
 import { uploadArtifact } from './util/jfrog/upload-artifact';
-import core from '@actions/core';
 
 export async function run(): Promise<void> {
   try {
@@ -26,6 +26,6 @@ export async function run(): Promise<void> {
       })
     );
   } catch (error) {
-    core.setFailed(error as Error);
+    setFailed(error as Error);
   }
 }

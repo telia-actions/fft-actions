@@ -7341,17 +7341,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
-const archive_artifact_1 = __nccwpck_require__(2615);
 const exec_1 = __nccwpck_require__(1514);
+const core_1 = __nccwpck_require__(2186);
+const archive_artifact_1 = __nccwpck_require__(2615);
 const get_inputs_1 = __nccwpck_require__(8967);
 const upload_planner_1 = __nccwpck_require__(3566);
 const upload_artifact_1 = __nccwpck_require__(621);
-const core_1 = __importDefault(__nccwpck_require__(2186));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -7370,7 +7367,7 @@ function run() {
             })));
         }
         catch (error) {
-            core_1.default.setFailed(error);
+            (0, core_1.setFailed)(error);
         }
     });
 }
@@ -7422,21 +7419,18 @@ exports.planArtifactUpload = planArtifactUpload;
 /***/ }),
 
 /***/ 8967:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getInputs = void 0;
-const core_1 = __importDefault(__nccwpck_require__(2186));
+const core_1 = __nccwpck_require__(2186);
 function getInputs() {
-    const rushProjects = JSON.parse(core_1.default.getInput('rush-projects'));
-    const repositoryUrl = core_1.default.getInput('repository-url');
-    const apiKey = core_1.default.getInput('api-key');
-    const buildIdentifier = core_1.default.getInput('build-identifier');
+    const rushProjects = JSON.parse((0, core_1.getInput)('rush-projects'));
+    const repositoryUrl = (0, core_1.getInput)('repository-url');
+    const apiKey = (0, core_1.getInput)('api-key');
+    const buildIdentifier = (0, core_1.getInput)('build-identifier');
     return {
         rushProjects,
         repositoryUrl,
