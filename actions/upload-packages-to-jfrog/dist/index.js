@@ -7352,7 +7352,7 @@ const upload_artifact_1 = __nccwpck_require__(621);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { apiKey, repositoryUrl, rushProjects, buildIdentifier } = (0, get_inputs_1.getInputs)();
+            const { username, password, repositoryUrl, rushProjects, buildIdentifier } = (0, get_inputs_1.getInputs)();
             const tempFolderLocation = 'temp/artifactory-upload';
             const plan = yield (0, upload_planner_1.planArtifactUpload)({
                 rushProjects,
@@ -7362,7 +7362,8 @@ function run() {
             yield (0, exec_1.exec)('mkdir', ['-p', tempFolderLocation]);
             yield Promise.all(plan.uploads.map((artifact) => __awaiter(this, void 0, void 0, function* () {
                 yield (0, archive_artifact_1.archiveArtifact)(artifact);
-                return (0, upload_artifact_1.uploadArtifact)(Object.assign({ apiKey,
+                return (0, upload_artifact_1.uploadArtifact)(Object.assign({ username,
+                    password,
                     repositoryUrl }, artifact));
             })));
         }
@@ -7429,12 +7430,14 @@ const core_1 = __nccwpck_require__(2186);
 function getInputs() {
     const rushProjects = JSON.parse((0, core_1.getInput)('rush-projects'));
     const repositoryUrl = (0, core_1.getInput)('repository-url');
-    const apiKey = (0, core_1.getInput)('api-key');
+    const username = (0, core_1.getInput)('username');
+    const password = (0, core_1.getInput)('password');
     const buildIdentifier = (0, core_1.getInput)('build-identifier');
     return {
         rushProjects,
         repositoryUrl,
-        apiKey,
+        username,
+        password,
         buildIdentifier,
     };
 }
@@ -7460,11 +7463,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.uploadArtifact = void 0;
 const exec_1 = __nccwpck_require__(1514);
-function uploadArtifact({ repositoryUrl, apiKey, tarfile, destination, }) {
+function uploadArtifact({ repositoryUrl, username, password, tarfile, destination, }) {
     return __awaiter(this, void 0, void 0, function* () {
         const exitCode = yield (0, exec_1.exec)('curl', [
-            '-H',
-            `X-JFrog-Art-Api:${apiKey}`,
+            '-u',
+            `${username}:${password}`,
             '-T',
             tarfile,
             `${repositoryUrl}/${destination}`,

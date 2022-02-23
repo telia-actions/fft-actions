@@ -7,7 +7,7 @@ import { uploadArtifact } from './util/jfrog/upload-artifact';
 
 export async function run(): Promise<void> {
   try {
-    const { apiKey, repositoryUrl, rushProjects, buildIdentifier } = getInputs();
+    const { username, password, repositoryUrl, rushProjects, buildIdentifier } = getInputs();
     const tempFolderLocation = 'temp/artifactory-upload';
     const plan = await planArtifactUpload({
       rushProjects,
@@ -19,7 +19,8 @@ export async function run(): Promise<void> {
       plan.uploads.map(async (artifact) => {
         await archiveArtifact(artifact);
         return uploadArtifact({
-          apiKey,
+          username,
+          password,
           repositoryUrl,
           ...artifact,
         });

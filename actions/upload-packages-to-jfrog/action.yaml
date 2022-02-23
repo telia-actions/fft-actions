@@ -7,8 +7,11 @@ inputs:
   repository-url:
     description: URL of the Artifactory repository to use, including an optional prefix path for the uploads
     required: true
-  api-key:
-    description: Authentication key for JFrog
+  username:
+    description: User / Token name for JFrog authentication
+    required: true
+  password:
+    description: Password / Token for JFrog authentication
     required: true
   build-identifier:
     description: A unique string to identify this build, used to organize artifacts and prevent overwriting

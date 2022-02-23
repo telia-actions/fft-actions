@@ -19,8 +19,9 @@ jobs:
         uses: ./actions/upload-packages-to-jfrog
         with:
           repository-url: https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing
-          api-key: ${{ secrets.JFROG_API_KEY }}
-          build-identifier: ${{ github.ref_name }}/${{ github.run_id}}
+          username: ${{ secrets.JFROG_USERNAME }}
+          password: ${{ secrets.JFROG_TOKEN }}
+          build-identifier: ${{ github.ref_name }}/${{ github.run_id }}
           rush-projects: |
             [
               {
@@ -38,8 +39,8 @@ jobs:
     steps:
       - name: Download compressed files from Artifactory
         run: |
-          time curl -H "X-JFrog-Art-Api:${{secrets.JFROG_API_KEY}}" -O "https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing/app-1/${{ github.ref_name }}/${{ github.run_id}}/app-1.tar.gz" --fail
-          time curl -H "X-JFrog-Art-Api:${{secrets.JFROG_API_KEY}}" -O "https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing/app-2/${{ github.ref_name }}/${{ github.run_id}}/app-2.tar.gz" --fail
+          time curl -u "${{ secrets.JFROG_USERNAME }}:${{ secrets.JFROG_TOKEN }}" -O "https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing/app-1/${{ github.ref_name }}/${{ github.run_id }}/app-1.tar.gz" --fail
+          time curl -u "${{ secrets.JFROG_USERNAME }}:${{ secrets.JFROG_TOKEN }}" -O "https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing/app-2/${{ github.ref_name }}/${{ github.run_id }}/app-2.tar.gz" --fail
       - name: Unpack compressed JFrog files
         run: |
           mkdir app-1

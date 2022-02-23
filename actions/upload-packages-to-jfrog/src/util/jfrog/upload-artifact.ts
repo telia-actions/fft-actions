@@ -3,13 +3,14 @@ import { UploadInputs } from '@src/types';
 
 export async function uploadArtifact({
   repositoryUrl,
-  apiKey,
+  username,
+  password,
   tarfile,
   destination,
 }: UploadInputs) {
   const exitCode = await exec('curl', [
-    '-H',
-    `X-JFrog-Art-Api:${apiKey}`,
+    '-u',
+    `${username}:${password}`,
     '-T',
     tarfile,
     `${repositoryUrl}/${destination}`,

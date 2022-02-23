@@ -1,7 +1,8 @@
 export interface Inputs {
   rushProjects: ProjectInput[];
   repositoryUrl: string;
-  apiKey: string;
+  username: string;
+  password: string;
   buildIdentifier: string;
 }
 
@@ -16,5 +17,5 @@ export interface ProjectPlan extends ProjectInput {
   files: string[];
 }
 
-export type UploadInputs = Pick<Inputs, 'repositoryUrl' | 'apiKey'> &
+export type UploadInputs = Pick<Inputs, 'repositoryUrl' | 'username' | 'password'> &
   Pick<ProjectPlan, 'tarfile' | 'destination'>;
