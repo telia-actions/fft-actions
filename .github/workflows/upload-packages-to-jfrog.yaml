@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 16
       - name: Upload artifacts
-        uses: ./actions/upload-packages-to-artifactory
+        uses: ./actions/upload-packages-to-jfrog
         with:
           repository-url: https://jfrog.teliacompany.io/artifactory/tsefe-modules-and-static-sites/testing
           api-key: ${{ secrets.JFROG_API_KEY }}
@@ -25,11 +25,11 @@ jobs:
             [
               {
                 "packageName": "app-1",
-                "projectFolder": "actions/upload-packages-to-artifactory/__mocks__/packages/app-1"
+                "projectFolder": "actions/upload-packages-to-jfrog/__mocks__/packages/app-1"
               },
               {
                 "packageName": "app-2",
-                "projectFolder": "actions/upload-packages-to-artifactory/__mocks__/packages/app-2"
+                "projectFolder": "actions/upload-packages-to-jfrog/__mocks__/packages/app-2"
               }
             ]
   download_and_unpack_jfrog:
