@@ -34,7 +34,7 @@ jobs:
             ]
   download_and_unpack_jfrog:
     needs: [create_and_upload_files]
-    runs-on: [self-hosted, large, telia-managed, Linux, X64]
+    runs-on: ubuntu-latest
     steps:
       - name: Download compressed files from Artifactory
         run: |
