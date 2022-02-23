@@ -13,6 +13,7 @@ export async function uploadArtifact({
     '-T',
     tarfile,
     `${repositoryUrl}/${destination}`,
+    '--fail',
   ]);
   if (exitCode !== 0) {
     throw new Error(`Artifactory upload failed with exit code ${exitCode} for artifact ${tarfile}`);
