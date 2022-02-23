@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "actions/upload-packages-to-jfrog/**"
+      - ".github/workflows/upload-packages-to-jfrog.yaml"
 jobs:
   create_and_upload_files:
     runs-on: ubuntu-latest
