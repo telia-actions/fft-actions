@@ -6,7 +6,7 @@ on:
       - "actions/upload-packages-to-jfrog/**"
 jobs:
   create_and_upload_files:
-    runs-on: [self-hosted, small, telia-managed, Linux, X64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v2
