@@ -7407,7 +7407,7 @@ function planArtifactUpload({ rushProjects, tempFolderLocation, buildIdentifier,
                     packageName,
                     projectFolder,
                     tarfile: `${tempFolderLocation}/${packageName.replace('/', '__')}.tar.gz`,
-                    destination: `${packageName}/${buildIdentifier}/${packageName}.tar.gz`.replace('//', '/'),
+                    destination: `${packageName}/${buildIdentifier}.tar.gz`.replace('//', '/'),
                     files,
                 };
             });
