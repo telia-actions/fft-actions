@@ -22,7 +22,7 @@ runs:
     - name: Set npm auth
       run: |
         curl -u ${{ inputs.npmUsername }}:${{ inputs.npmPassword }} https://jfrog.teliacompany.io/artifactory/api/npm/auth > ~/.npmrc
-        curl -u ${{ inputs.npmUsername }}:${{ inputs.npmPassword }} https://jfrog.teliacompany.io/artifactory/api/npm/tseexp-npm-dev/auth/telia >> ~/.npmrc
+        curl -u ${{ inputs.npmUsername }}:${{ inputs.npmPassword }} https://jfrog.teliacompany.io/artifactory/api/npm/auth/telia >> ~/.npmrc
       shell: bash
     - name: Publish
       run: |
