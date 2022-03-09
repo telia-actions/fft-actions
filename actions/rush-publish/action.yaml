@@ -11,8 +11,6 @@ inputs:
   targetBranch:
     required: false
     default: main
-env:
-
 runs:
   using: "composite"
   steps:
@@ -21,12 +19,13 @@ runs:
         git config --local user.name "${{ inputs.authorName }}"
         git config --local user.email "${{ inputs.authorEmail }}"
       shell: bash
+    - name: Set npm auth
+      run: |
+        curl -u ${{ inputs.npmUsername }}:${{ inputs.npmPassword }} https://jfrog.teliacompany.io/artifactory/api/npm/auth > ~/.npmrc
+      shell: bash
     - name: Publish
       run: |
-        node common/scripts/install-run-rush.js version --bump --target-branch ${{ inputs.targetBranch }}
         node common/scripts/install-run-rush.js publish --publish --include-all
       shell: bash
       env:
         NPM_CONFIG_NOPROXY: jfrog.teliacompany.io
-        JFROG_TOKEN: ${{ inputs.npmPassword }}
-        JFROG_USERNAME: ${{ inputs.npmUsername }}
