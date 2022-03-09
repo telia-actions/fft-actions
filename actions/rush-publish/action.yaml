@@ -22,16 +22,12 @@ runs:
     - name: Set npm auth
       run: |
         curl -u ${{ inputs.npmUsername }}:${{ inputs.npmPassword }} https://jfrog.teliacompany.io/artifactory/api/npm/auth > ~/.npmrc
-        more ~/.npmrc
-      shell: bash
-    - name: hack
-      run: |
-        echo ${{ toJson(inputs.npmPassword) }} > test.json
-        more test.json
       shell: bash
     - name: Publish
       run: |
         node common/scripts/install-run-rush.js publish --publish --include-all
       shell: bash
       env:
+        NPM_ALWAYS_AUTH: true
+        NPM_CONFIG_REGISTRY: https://jfrog.teliacompany.io/artifactory/api/npm/dcse-npm/
         NPM_CONFIG_NOPROXY: jfrog.teliacompany.io
