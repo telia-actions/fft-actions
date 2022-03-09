@@ -1,4 +1,4 @@
-name: 'rush publish'
+name: "rush publish"
 inputs:
   authorName:
     required: true
@@ -19,13 +19,15 @@ runs:
         git config --local user.name "${{ inputs.authorName }}"
         git config --local user.email "${{ inputs.authorEmail }}"
       shell: bash
-    - name: Set npm auth
-      run: |
-        curl -u ${{ inputs.npmUsername }}:${{ inputs.npmPassword }} https://jfrog.teliacompany.io/artifactory/api/npm/auth > ~/.npmrc
+    - name: Get npm auth
+      id: npm_auth
+      run: echo "::set-output name=token::$(echo ${{ inputs.npmUsername }}:${{ inputs.npmPassword }} | base64 -w 0)"
       shell: bash
     - name: Publish
       run: |
+        node common/scripts/install-run-rush.js version --bump --target-branch ${{ inputs.targetBranch }}
         node common/scripts/install-run-rush.js publish --publish --include-all
       shell: bash
       env:
         NPM_CONFIG_NOPROXY: jfrog.teliacompany.io
+        NPM_CONFIG__AUTH: ${{ steps.npm_auth.outputs.token }}
