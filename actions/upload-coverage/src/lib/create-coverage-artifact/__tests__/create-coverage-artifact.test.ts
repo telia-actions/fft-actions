@@ -7,7 +7,7 @@ import * as fileClient from '@src/util/file-client';
 import * as artifactClient from '@src/util/artifact-client';
 import * as collectTestCoverage from '@telia/collect-test-coverage';
 import { RushPackage } from '@src/types';
-import { CoverageReport, PackageCoverage } from '@telia/collect-test-coverage/types/types';
+import { CoverageReport, PackageCoverage } from '@telia/collect-test-coverage';
 
 jest.mock('@telia/collect-test-coverage');
 jest.mock('@src/util/file-client');

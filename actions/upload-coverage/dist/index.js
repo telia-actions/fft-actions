@@ -3120,6 +3120,28 @@ exports.checkBypass = checkBypass;
 
 /***/ }),
 
+/***/ 6043:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__webpack_require__(3969), exports);
+__exportStar(__webpack_require__(3257), exports);
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
 /***/ 3969:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -3185,6 +3207,16 @@ function getCoverageForPackage(pkg) {
 }
 exports.getCoverageForPackage = getCoverageForPackage;
 //# sourceMappingURL=lib.js.map
+
+/***/ }),
+
+/***/ 3257:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+//# sourceMappingURL=types.js.map
 
 /***/ }),
 
@@ -8131,7 +8163,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createCoverageArtifact = exports.COVERAGE_FILE_NAME = exports.COVERAGE_ARTIFACT_NAME = void 0;
-const collect_test_coverage_1 = __webpack_require__(3969);
+const collect_test_coverage_1 = __webpack_require__(6043);
 const artifact_client_1 = __webpack_require__(8236);
 const file_client_1 = __webpack_require__(8528);
 exports.COVERAGE_ARTIFACT_NAME = 'coverage';

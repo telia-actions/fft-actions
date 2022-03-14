@@ -15,7 +15,7 @@
   "dependencies": {
     "@actions/artifact": "^1.0.0",
     "@actions/core": "^1.2.6",
-    "@telia/collect-test-coverage": "^0.1.2"
+    "@telia/collect-test-coverage": "^0.1.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
