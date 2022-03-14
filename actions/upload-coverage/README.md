@@ -1,2 +1,2 @@
-# get-preview-env-config
-Github action to get preview environment configuration
+# upload-coverage
+Github action to upload test coverage files as artifact
