@@ -1,0 +1,8 @@
+{
+  "prop1": "prop1",
+  // Inline comment
+  "prop2": "prop2"
+  /*
+   * Multi line comment
+   */
+}

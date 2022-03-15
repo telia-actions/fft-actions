@@ -1,0 +1,9 @@
+name: Upload coverage
+description: Collect and upload test coverage data
+inputs:
+  rushProjects:
+    description: A JSON array of { packageName, projectFolder } objects to collect coverage from
+    required: true
+runs:
+  using: node12
+  main: dist/index.js
