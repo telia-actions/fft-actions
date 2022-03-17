@@ -13,9 +13,6 @@ inputs:
   pullRequestNumber:
     description: Pull request number
     required: true
-  title:
-    description: A pull request title to validate
-    required: true
 runs:
   using: node12
   main: dist/index.js

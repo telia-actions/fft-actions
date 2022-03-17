@@ -1,35 +1,49 @@
 import * as actionsCore from '@actions/core';
-import * as createCoverageArtifact from '@src/lib/create-coverage-artifact';
-import { RushPackage } from '@src/types';
+import * as validatePrTitle from '@src/lib/validate-pr-title';
 import { run } from '../github-action';
+import { when } from 'jest-when';
 
 jest.mock('@actions/core');
-jest.mock('@src/lib/create-coverage-artifact');
+jest.mock('@src/lib/validate-pr-title');
 
 describe('github action', () => {
-  const rushPackages: RushPackage[] = [
-    {
-      packageName: 'packageName',
-      projectFolder: 'projectFolder',
-    },
-  ];
+  const token = 'token';
+  const owner = 'owner';
+  const repository = 'repository';
+  const pullRequestNumber = 'pullRequestNumber';
 
   const setFailedSpy = jest.spyOn(actionsCore, 'setFailed');
   const getInputSpy = jest.spyOn(actionsCore, 'getInput');
-  const createCoverageArtifactSpy = jest.spyOn(createCoverageArtifact, 'createCoverageArtifact');
+  const validatePrTitleSpy = jest.spyOn(validatePrTitle, 'validatePrTitle');
 
   beforeEach(() => {
-    getInputSpy.mockReturnValue(JSON.stringify(rushPackages));
+    when(getInputSpy)
+      .calledWith('token')
+      .mockReturnValue(token)
+      .calledWith('owner')
+      .mockReturnValue(owner)
+      .calledWith('repository')
+      .mockReturnValue(repository)
+      .calledWith('pullRequestNumber')
+      .mockReturnValue(pullRequestNumber);
   });
 
-  it('should run createCoverageArtifactSpy', () => {
+  it('should run validatePrTitle', () => {
     run();
 
-    expect(getInputSpy).toHaveBeenCalledTimes(1);
-    expect(getInputSpy).toHaveBeenCalledWith('rushProjects');
+    expect(getInputSpy).toHaveBeenCalledTimes(4);
+    expect(getInputSpy).toHaveBeenCalledWith('token');
+    expect(getInputSpy).toHaveBeenCalledWith('owner');
+    expect(getInputSpy).toHaveBeenCalledWith('repository');
+    expect(getInputSpy).toHaveBeenCalledWith('pullRequestNumber');
 
-    expect(createCoverageArtifactSpy).toHaveBeenCalledTimes(1);
-    expect(createCoverageArtifactSpy).toHaveBeenCalledWith(rushPackages);
+    expect(validatePrTitleSpy).toHaveBeenCalledTimes(1);
+    expect(validatePrTitleSpy).toHaveBeenCalledWith({
+      token,
+      owner,
+      repository,
+      pullRequestNumber: Number(pullRequestNumber),
+    });
 
     expect(setFailedSpy).toHaveBeenCalledTimes(0);
   });

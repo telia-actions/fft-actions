@@ -1,63 +1,25 @@
-import * as actionsCore from '@actions/core';
-import * as validatePrTitle from '@src/lib/validate-pr-title';
-import { run } from '../github-action';
-import { when } from 'jest-when';
+import { prTitleValidator } from '..';
 
-jest.mock('@actions/core');
-jest.mock('@src/lib/validate-pr-title');
+describe('prTitleValidator', () => {
+  it.each([
+    ['PROJ-12', true],
+    ['proj-12', false],
+    ['P-12', false],
+    ['PROJ-1', true],
+    ['PROJ-1a', false],
+    ['PROJ-1.2', true],
+    ['PROj-12', false],
+    ['PROJ2-12', false],
+    ['PROJ-1+2', true],
+    ['#1', true],
+    ['#12', true],
+    ['#1.2', true],
+    ['#12a', false],
+    ['#proj', false],
+    ['#2-5', true],
+  ])('should validate %p and return %p', (title, expected) => {
+    const result = prTitleValidator(title);
 
-describe('github action', () => {
-  const token = 'token';
-  const owner = 'owner';
-  const repository = 'repository';
-  const pullRequestNumber = 'pullRequestNumber';
-
-  const setFailedSpy = jest.spyOn(actionsCore, 'setFailed');
-  const getInputSpy = jest.spyOn(actionsCore, 'getInput');
-  const validatePrTitleSpy = jest.spyOn(validatePrTitle, 'validatePrTitle');
-
-  beforeEach(() => {
-    when(getInputSpy)
-      .calledWith('token')
-      .mockReturnValue(token)
-      .calledWith('owner')
-      .mockReturnValue(owner)
-      .calledWith('repository')
-      .mockReturnValue(repository)
-      .calledWith('pullRequestNumber')
-      .mockReturnValue(pullRequestNumber);
-  });
-
-  it('should run validatePrTitle', () => {
-    run();
-
-    expect(getInputSpy).toHaveBeenCalledTimes(4);
-    expect(getInputSpy).toHaveBeenCalledWith('token');
-    expect(getInputSpy).toHaveBeenCalledWith('owner');
-    expect(getInputSpy).toHaveBeenCalledWith('repository');
-    expect(getInputSpy).toHaveBeenCalledWith('pullRequestNumber');
-
-    expect(validatePrTitleSpy).toHaveBeenCalledTimes(1);
-    expect(validatePrTitleSpy).toHaveBeenCalledWith({
-      token,
-      owner,
-      repository,
-      pullRequestNumber: Number(pullRequestNumber),
-    });
-
-    expect(setFailedSpy).toHaveBeenCalledTimes(0);
-  });
-
-  it('should set failure when error occurs', () => {
-    const error = new Error('error');
-
-    getInputSpy.mockImplementation(() => {
-      throw error;
-    });
-
-    run();
-
-    expect(setFailedSpy).toHaveBeenCalledTimes(1);
-    expect(setFailedSpy).toHaveBeenCalledWith(error.message);
+    expect(result.isValid).toEqual(expected);
   });
 });

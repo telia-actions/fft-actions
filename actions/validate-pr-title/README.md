@@ -1,2 +1,2 @@
 # validate-pr-title
-Github action to upload test coverage files as artifact
+GitHub action to validate pull request title

@@ -8370,12 +8370,6 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const owner = core_1.getInput('owner');
         const repository = core_1.getInput('repository');
         const pullRequestNumber = core_1.getInput('pullRequestNumber');
-        core_1.info(JSON.stringify({
-            token,
-            owner,
-            repository,
-            pullRequestNumber: Number(pullRequestNumber),
-        }, null, 2));
         yield validate_pr_title_1.validatePrTitle({
             token,
             owner,

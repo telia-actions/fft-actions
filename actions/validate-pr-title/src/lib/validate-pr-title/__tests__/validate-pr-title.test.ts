@@ -1,93 +1,86 @@
-import * as github from '@actions/github';
-import { GitHub } from '@actions/github/lib/utils';
-import { RequestInterface } from '@octokit/types';
 import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types';
-import { createComment, getIssue } from '..';
+import { validatePrTitle } from '..';
+import * as githubClient from '@src/util/github-client';
 import { mockPartial } from '@src/util/mocks';
+import * as validators from '@src/util/validators';
+import { ValidationResult } from '@srcutil/validators/types';
+import { prTitleValidator } from '@src/util/validators';
 
-jest.mock('@actions/github');
+jest.mock('@src/util/github-client');
+jest.mock('@src/util/validators');
 
-const octokitFn = (): jest.Mock & {
-  defaults?: RequestInterface['defaults'];
-} => jest.fn();
-
-describe('github-client', () => {
+describe('validatePrTitle', () => {
   const token = 'token';
   const owner = 'owner';
   const repository = 'repository';
-  const body = 'body';
-  const issueNumber = 5;
+  const pullRequestNumber = 5;
 
-  const commentResponse = mockPartial<
-    RestEndpointMethodTypes['issues']['createComment']['response']
-  >({
-    data: {
-      id: 123,
-    },
+  const issue = mockPartial<RestEndpointMethodTypes['issues']['get']['response']['data']>({
+    id: 234,
+    title: 'title',
   });
 
-  const issueResponse = mockPartial<RestEndpointMethodTypes['issues']['get']['response']>({
-    data: {
-      id: 234,
-    },
-  });
-
-  const getOctokitSpy = jest.spyOn(github, 'getOctokit');
-
-  const createCommentFn = octokitFn();
-  const getFn = octokitFn();
-
-  const octokit = mockPartial<InstanceType<typeof GitHub>>({
-    rest: {
-      issues: {
-        createComment: createCommentFn,
-        get: getFn,
-      },
-    },
-  });
+  const createCommentSpy = jest.spyOn(githubClient, 'createComment');
+  const getIssueSpy = jest.spyOn(githubClient, 'getIssue');
+  const prTitleValidatorSpy = jest.spyOn(validators, 'prTitleValidator');
 
   beforeEach(() => {
-    getOctokitSpy.mockReturnValue(octokit);
+    getIssueSpy.mockResolvedValue(issue);
   });
 
-  describe('createComment', () => {
-    it('should create comment', async () => {
-      createCommentFn.mockResolvedValue(commentResponse);
+  it('should validate pr title', async () => {
+    const validationResult: ValidationResult = {
+      isValid: true,
+    };
 
-      const result = await createComment({ token, owner, repository, body, issueNumber });
+    prTitleValidatorSpy.mockReturnValue(validationResult);
 
-      expect(getOctokitSpy).toHaveBeenCalledTimes(1);
-      expect(getOctokitSpy).toHaveBeenCalledWith(token);
+    await validatePrTitle({ token, owner, repository, pullRequestNumber });
 
-      expect(createCommentFn).toHaveBeenCalledTimes(1);
-      expect(createCommentFn).toHaveBeenCalledWith({
-        owner,
-        repo: repository,
-        issue_number: issueNumber,
-        body,
-      });
-
-      expect(result).toBe(commentResponse.data);
+    expect(getIssueSpy).toHaveBeenCalledTimes(1);
+    expect(getIssueSpy).toHaveBeenCalledWith({
+      issueNumber: pullRequestNumber,
+      token,
+      owner,
+      repository,
     });
+
+    expect(prTitleValidatorSpy).toHaveBeenCalledTimes(1);
+    expect(prTitleValidatorSpy).toHaveBeenCalledWith(issue.title);
+
+    expect(createCommentSpy).toHaveBeenCalledTimes(0);
   });
 
-  describe('getIssue', () => {
-    it('should get issue', async () => {
-      getFn.mockResolvedValue(issueResponse);
+  it('should create comment when validation fails', async () => {
+    const validationResult: ValidationResult = {
+      isValid: false,
+      error: 'error',
+    };
 
-      const result = await getIssue({ token, owner, repository, issueNumber });
+    prTitleValidatorSpy.mockReturnValue(validationResult);
 
-      expect(getOctokitSpy).toHaveBeenCalledTimes(1);
-      expect(getOctokitSpy).toHaveBeenCalledWith(token);
+    await expect(validatePrTitle({ token, owner, repository, pullRequestNumber })).rejects.toEqual(
+      new Error(validationResult.error)
+    );
 
-      expect(getFn).toHaveBeenCalledTimes(1);
-      expect(getFn).toHaveBeenCalledWith({
-        owner,
-        repo: repository,
-        issue_number: issueNumber,
-      });
+    expect(getIssueSpy).toHaveBeenCalledTimes(1);
+    expect(getIssueSpy).toHaveBeenCalledWith({
+      issueNumber: pullRequestNumber,
+      token,
+      owner,
+      repository,
+    });
 
-      expect(result).toBe(issueResponse.data);
+    expect(prTitleValidatorSpy).toHaveBeenCalledTimes(1);
+    expect(prTitleValidatorSpy).toHaveBeenCalledWith(issue.title);
+
+    expect(createCommentSpy).toHaveBeenCalledTimes(1);
+    expect(createCommentSpy).toHaveBeenCalledWith({
+      issueNumber: pullRequestNumber,
+      body: validationResult.error,
+      token,
+      owner,
+      repository,
     });
   });
 });
