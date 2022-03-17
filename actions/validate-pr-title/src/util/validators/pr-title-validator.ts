@@ -12,6 +12,6 @@ export const prTitleValidator = (title: string): ValidationResult => {
 
   return {
     isValid: false,
-    error: `Pull request title "${title}" is invalid.`,
+    error: `Pull request title "${title}" should contain JIRA or GitHub number.`,
   };
 };
