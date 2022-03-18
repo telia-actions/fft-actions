@@ -8575,7 +8575,7 @@ const prTitleValidator = (title) => {
     }
     return {
         isValid: false,
-        error: `Pull request title "${title}" is invalid.`,
+        error: `Pull request title "${title}" should contain JIRA or GitHub number.`,
     };
 };
 exports.prTitleValidator = prTitleValidator;
