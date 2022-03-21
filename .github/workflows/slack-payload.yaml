@@ -1,0 +1,46 @@
+name: Test Slack notification payload
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches: [main]
+    paths:
+      - actions/slack-payload/**
+      - .github/workflows/slack-payload.yaml
+jobs:
+  upload_file:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo mock > mock.txt
+      - name: Upload file
+        uses: actions/upload-artifact@v2
+        with:
+          retention-days: 1
+          name: mock
+          path: mock.txt
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        mocks: [mocked_package_1, mocked_package_2, mocked_package_3, mocked_package_4]
+      fail-fast: false
+    name: ${{ matrix.mocks }}
+    steps:
+      - run: echo ${{ matrix.mocks }}
+  notify_slack:
+    needs: [upload_file, deploy]
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create payload for slack-github-action
+        id: helpers
+        uses: telia-actions/fft-actions/actions/slack-payload@fft-8-add-slack-notifications
+      - name: Post to a Slack channel
+        uses: telia-actions/slack-github-action@v1.17.0
+        with:
+          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          payload: ${{ steps.helpers.outputs.payload }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
