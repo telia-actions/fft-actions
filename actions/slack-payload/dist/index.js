@@ -8346,11 +8346,11 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (0, core_1.getInput)('token');
         const pullRequestNumber = (0, github_1.getPullRequestNumber)();
-        const deployedPackages = yield (0, github_1.getDeployedPackages)(token);
+        const deployedPackagesCount = yield (0, github_1.getDeployedPackagesCount)(token);
         const workflowData = yield (0, github_1.getWorkflowData)(token);
         if (pullRequestNumber !== 0) {
             const context = (0, github_1.getPullRequestContext)();
-            const payload = (0, pull_request_payload_1.createPullRequestPayload)(context, workflowData, deployedPackages);
+            const payload = (0, pull_request_payload_1.createPullRequestPayload)(context, workflowData, deployedPackagesCount);
             (0, core_1.setOutput)('payload', payload);
         }
     }
@@ -8396,7 +8396,7 @@ __exportStar(__nccwpck_require__(8505), exports);
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createPullRequestPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
-const createPullRequestPayload = (context, workflow, deployedPackages) => {
+const createPullRequestPayload = (context, workflow, deployedPackagesCount) => {
     const { number, title, html_url, merge_commit_sha } = context.pull_request;
     const workflowIcon = workflow.status === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
     const blocks = [];
@@ -8417,24 +8417,36 @@ const createPullRequestPayload = (context, workflow, deployedPackages) => {
     };
     const packagesAttachments = {
         color: '#808080',
-        fallback: `${deployedPackages.length} packages were deployed to a preview environment (preview-${number})`,
+        fallback: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
+        text: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
+        footer: 'mocked_package_1, mocked_package_2, mocked_package_3, mocked_package_4, mocked_package_5, mocked_package_6',
+        fields: [
+            {
+                title: 'Deployed package',
+                value: 'mocked_package_1',
+                short: true,
+            },
+            {
+                title: 'Deployed package',
+                value: 'mocked_package_2',
+                short: true,
+            },
+        ],
         blocks: [
             {
                 type: 'section',
                 text: {
                     type: 'mrkdwn',
-                    text: `${deployedPackages.length} packages were deployed to a preview environment (preview-${number})`,
+                    text: 'mocked_package_1',
                 },
             },
-            deployedPackages.map((packageName) => {
-                return {
-                    type: 'section',
-                    text: {
-                        type: 'mrkdwn',
-                        text: packageName,
-                    },
-                };
-            }),
+            {
+                type: 'section',
+                text: {
+                    type: 'mrkdwn',
+                    text: 'mocked_package_2',
+                },
+            },
         ],
     };
     blocks.push(titleBlock);
@@ -8466,7 +8478,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getWorkflowData = exports.getDeployedPackages = exports.getPushContext = exports.getPullRequestContext = exports.getRunId = exports.getPullRequestNumber = void 0;
+exports.getWorkflowData = exports.getDeployedPackagesCount = exports.getPushContext = exports.getPullRequestContext = exports.getRunId = exports.getPullRequestNumber = void 0;
 const github_1 = __nccwpck_require__(5438);
 const enums_1 = __nccwpck_require__(1511);
 const listJobsForWorkflowRun = (token) => __awaiter(void 0, void 0, void 0, function* () {
@@ -8495,17 +8507,19 @@ const getPushContext = () => {
     return github_1.context.payload;
 };
 exports.getPushContext = getPushContext;
-const getDeployedPackages = (token) => __awaiter(void 0, void 0, void 0, function* () {
+const getDeployedPackagesCount = (token) => __awaiter(void 0, void 0, void 0, function* () {
     const workflow = yield listJobsForWorkflowRun(token);
     return workflow.jobs.reduce((acc, job) => {
+        // eslint-disable-next-line no-console
+        console.log(job);
         const isDeployJob = job.name.startsWith('deploy');
         if (isDeployJob && job.conclusion === enums_1.GithubStatus.SUCCESS) {
-            acc.push(job.name);
+            acc = acc + 1;
         }
         return acc;
-    }, []);
+    }, 0);
 });
-exports.getDeployedPackages = getDeployedPackages;
+exports.getDeployedPackagesCount = getDeployedPackagesCount;
 const getWorkflowData = (token) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
     const workflow = yield client.rest.actions.getWorkflowRun({

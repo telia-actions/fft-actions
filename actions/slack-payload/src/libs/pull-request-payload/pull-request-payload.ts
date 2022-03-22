@@ -5,7 +5,7 @@ import type { WorkflowData } from '@src/utils/github/types';
 export const createPullRequestPayload = (
   context: PullRequestEvent,
   workflow: WorkflowData,
-  deployedPackages: string[]
+  deployedPackagesCount: number
 ): string => {
   const { number, title, html_url, merge_commit_sha } = context.pull_request;
   const workflowIcon =
@@ -28,24 +28,37 @@ export const createPullRequestPayload = (
   };
   const packagesAttachments = {
     color: '#808080',
-    fallback: `${deployedPackages.length} packages were deployed to a preview environment (preview-${number})`,
+    fallback: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
+    text: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
+    footer:
+      'mocked_package_1, mocked_package_2, mocked_package_3, mocked_package_4, mocked_package_5, mocked_package_6',
+    fields: [
+      {
+        title: 'Deployed package',
+        value: 'mocked_package_1',
+        short: true,
+      },
+      {
+        title: 'Deployed package',
+        value: 'mocked_package_2',
+        short: true,
+      },
+    ],
     blocks: [
       {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `${deployedPackages.length} packages were deployed to a preview environment (preview-${number})`,
+          text: 'mocked_package_1',
         },
       },
-      deployedPackages.map((packageName) => {
-        return {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: packageName,
-          },
-        };
-      }),
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: 'mocked_package_2',
+        },
+      },
     ],
   };
   blocks.push(titleBlock);

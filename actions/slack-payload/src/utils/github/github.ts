@@ -29,15 +29,17 @@ export const getPushContext = (): PushEvent => {
   return context.payload as PushEvent;
 };
 
-export const getDeployedPackages = async (token: string): Promise<string[]> => {
+export const getDeployedPackagesCount = async (token: string): Promise<number> => {
   const workflow = await listJobsForWorkflowRun(token);
-  return workflow.jobs.reduce<string[]>((acc, job) => {
+  return workflow.jobs.reduce<number>((acc, job) => {
+    // eslint-disable-next-line no-console
+    console.log(job);
     const isDeployJob = job.name.startsWith('deploy');
     if (isDeployJob && job.conclusion === GithubStatus.SUCCESS) {
-      acc.push(job.name);
+      acc = acc + 1;
     }
     return acc;
-  }, []);
+  }, 0);
 };
 
 export const getWorkflowData = async (token: string): Promise<WorkflowData> => {
