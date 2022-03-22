@@ -19,7 +19,7 @@ export const createPullRequestPayload = (
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `${workflowIcon} *<${context.repository.html_url}|${context.repository.name}>*`,
+      text: `${workflowIcon} *<${context.repository.html_url}|${context.repository.name}>* - ${workflow.name}`,
     },
   };
   const infoBlock = {

@@ -8408,7 +8408,7 @@ const createPullRequestPayload = (context, workflow, deployedPackagesCount) => {
         type: 'section',
         text: {
             type: 'mrkdwn',
-            text: `${workflowIcon} *<${context.repository.html_url}|${context.repository.name}>*`,
+            text: `${workflowIcon} *<${context.repository.html_url}|${context.repository.name}>* - ${workflow.name}`,
         },
     };
     const infoBlock = {
@@ -8505,7 +8505,7 @@ const getWorkflowData = (token) => __awaiter(void 0, void 0, void 0, function* (
     });
     return {
         name: workflow.data.name,
-        status: workflow.data.status,
+        status: workflow.data.conclusion,
         runId: github_1.context.runId,
     };
 });
