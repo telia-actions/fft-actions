@@ -32,18 +32,6 @@ export const createPullRequestPayload = (
     text: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
     footer:
       'mocked_package_1, mocked_package_2, mocked_package_3, mocked_package_4, mocked_package_5, mocked_package_6',
-    fields: [
-      {
-        title: 'Deployed package',
-        value: 'mocked_package_1',
-        short: true,
-      },
-      {
-        title: 'Deployed package',
-        value: 'mocked_package_2',
-        short: true,
-      },
-    ],
     blocks: [
       {
         type: 'section',

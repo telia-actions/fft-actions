@@ -26,7 +26,7 @@ jobs:
       matrix:
         mocks: [mocked_package_1, mocked_package_2, mocked_package_3, mocked_package_4]
       fail-fast: false
-    name: ${{ matrix.mocks }}
+    name: deploy / ${{ matrix.mocks }}
     steps:
       - run: echo ${{ matrix.mocks }}
   notify_slack:
