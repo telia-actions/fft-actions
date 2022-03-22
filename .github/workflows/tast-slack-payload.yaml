@@ -1,0 +1,19 @@
+name: Test Slack notification payload
+on:
+  workflow_run:
+    workflows: [Mocked workflow]
+    types: [completed]
+jobs:
+  notify_slack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create payload for slack-github-action
+        id: helpers
+        uses: telia-actions/fft-actions/actions/slack-payload@main
+      - name: Post to a Slack channel
+        uses: telia-actions/slack-github-action@v1.17.0
+        with:
+          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          payload: ${{ steps.helpers.outputs.payload }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
