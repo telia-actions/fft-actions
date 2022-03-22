@@ -8455,7 +8455,7 @@ const enums_1 = __nccwpck_require__(1511);
 const getWorkflowContext = () => {
     const workflowRunContext = github_1.context.payload;
     // eslint-disable-next-line no-console
-    console.log(workflowRunContext);
+    console.log(workflowRunContext.workflow_run.pull_requests);
     return {
         name: workflowRunContext.workflow_run.name,
         conclusion: workflowRunContext.workflow_run.conclusion,
@@ -8463,7 +8463,6 @@ const getWorkflowContext = () => {
         artifactsUrls: workflowRunContext.workflow_run.artifacts_url,
         runId: workflowRunContext.workflow_run.id,
         sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
-        // Multiply PR's???
         pullNumber: workflowRunContext.workflow_run.pull_requests[0].number,
         repository: {
             url: workflowRunContext.repository.html_url,
