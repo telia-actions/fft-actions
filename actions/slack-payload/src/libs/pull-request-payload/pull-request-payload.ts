@@ -9,6 +9,8 @@ export const createPullRequestPayload = (
   deployedPackagesCount: number
 ): string => {
   const { number, title, html_url } = context.pull_request;
+  // eslint-disable-next-line no-console
+  console.log(workflow);
   const workflowIcon =
     workflow.status === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
   const blocks = [];
@@ -17,17 +19,16 @@ export const createPullRequestPayload = (
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `${workflowIcon} <${context.repository.html_url}|${context.repository.name}>`,
+      text: `${workflowIcon} *<${context.repository.html_url}|${context.repository.name}>*`,
     },
-  };
-  const dividerBlock = {
-    type: 'divider',
   };
   const infoBlock = {
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: ` *<${html_url}|#${number} ${title}>* (commit id \`${getShortMergeSHA()}\`)`,
+      text: `${
+        SlackIcons.PULL_REQUEST
+      } *<${html_url}|#${number} ${title}>* (commit id \`${getShortMergeSHA()}\`)`,
     },
   };
   const packagesAttachments = {
@@ -36,7 +37,6 @@ export const createPullRequestPayload = (
     text: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
   };
   blocks.push(titleBlock);
-  blocks.push(dividerBlock);
   blocks.push(infoBlock);
   attachments.push(packagesAttachments);
   const payload = {

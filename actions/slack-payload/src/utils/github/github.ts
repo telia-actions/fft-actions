@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { context, getOctokit } from '@actions/github';
 import type { PullRequestEvent, PushEvent } from '@octokit/webhooks-types';
 import { GithubStatus } from '@src/enums';
@@ -37,9 +36,6 @@ export const getPushContext = (): PushEvent => {
 export const getDeployedPackagesCount = async (token: string): Promise<number> => {
   const workflow = await listJobsForWorkflowRun(token);
   return workflow.jobs.reduce<number>((acc, job) => {
-    console.log('---------');
-    console.log(job);
-    console.log('---------');
     const isDeployJob = job.name.startsWith('deploy');
     if (isDeployJob && job.conclusion === GithubStatus.SUCCESS) {
       acc = acc + 1;
