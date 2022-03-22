@@ -1,41 +1,36 @@
 import { context, getOctokit } from '@actions/github';
-import type { PullRequestEvent, PushEvent } from '@octokit/webhooks-types';
+import type { WorkflowRunEvent } from '@octokit/webhooks-types';
 import { GithubStatus } from '@src/enums';
-import type { ListJobsForWorkflowRun, WorkflowData } from './types';
+import type { PullRequestData, WorkflowData } from './types';
 
-const listJobsForWorkflowRun = async (token: string): Promise<ListJobsForWorkflowRun> => {
+export const getWorkflowContext = (): WorkflowData => {
+  const workflowRunContext = context.payload as WorkflowRunEvent;
+  // eslint-disable-next-line no-console
+  console.log(workflowRunContext);
+  return {
+    name: workflowRunContext.workflow_run.name,
+    conclusion: workflowRunContext.workflow_run.conclusion,
+    url: workflowRunContext.workflow_run.html_url,
+    artifactsUrls: workflowRunContext.workflow_run.artifacts_url,
+    runId: workflowRunContext.workflow_run.id,
+    sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
+    // Multiply PR's???
+    pullNumber: workflowRunContext.workflow_run.pull_requests[0].number,
+    repository: {
+      url: workflowRunContext.repository.html_url,
+      name: workflowRunContext.repository.name,
+    },
+  };
+};
+
+export const getDeployedPackagesCount = async (token: string, runId: number): Promise<number> => {
   const client = getOctokit(token);
-  const workflowJobs = await client.rest.actions.listJobsForWorkflowRun({
+  const workflow = await client.rest.actions.listJobsForWorkflowRun({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    run_id: context.runId,
+    run_id: runId,
   });
-  return workflowJobs.data;
-};
-
-export const getPullRequestNumber = (): number => {
-  return context.payload.pull_request?.number || 0;
-};
-
-export const getRunId = (): number => {
-  return context.runId;
-};
-
-export const getShortMergeSHA = (): string => {
-  return (context.payload.after || context.sha).substring(0, 8);
-};
-
-export const getPullRequestContext = (): PullRequestEvent => {
-  return context.payload as PullRequestEvent;
-};
-
-export const getPushContext = (): PushEvent => {
-  return context.payload as PushEvent;
-};
-
-export const getDeployedPackagesCount = async (token: string): Promise<number> => {
-  const workflow = await listJobsForWorkflowRun(token);
-  return workflow.jobs.reduce<number>((acc, job) => {
+  return workflow.data.jobs.reduce<number>((acc, job) => {
     const isDeployJob = job.name.startsWith('deploy');
     if (isDeployJob && job.conclusion === GithubStatus.SUCCESS) {
       acc = acc + 1;
@@ -44,18 +39,15 @@ export const getDeployedPackagesCount = async (token: string): Promise<number> =
   }, 0);
 };
 
-export const getWorkflowData = async (token: string): Promise<WorkflowData> => {
+export const getPullRequestContext = async (
+  token: string,
+  pullNumber: number
+): Promise<PullRequestData> => {
   const client = getOctokit(token);
-  const workflow = await client.rest.actions.getWorkflowRun({
+  const pullRequest = await client.rest.pulls.get({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    run_id: context.runId,
+    pull_number: pullNumber,
   });
-  return {
-    name: workflow.data.name,
-    conclusion: workflow.data.conclusion,
-    url: workflow.data.html_url,
-    artifactsUrls: workflow.data.artifacts_url,
-    runId: context.runId,
-  };
+  return { number: pullNumber, title: pullRequest.data.title, url: pullRequest.data.html_url };
 };

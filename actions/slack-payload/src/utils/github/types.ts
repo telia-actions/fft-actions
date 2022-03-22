@@ -6,6 +6,18 @@ export type WorkflowData = {
   url: string;
   artifactsUrls: string;
   runId: number;
+  sha: string;
+  pullNumber: number;
+  repository: {
+    name: string;
+    url: string;
+  };
+};
+
+export type PullRequestData = {
+  title: string;
+  number: number;
+  url: string;
 };
 
 export type ListJobsForWorkflowRun =

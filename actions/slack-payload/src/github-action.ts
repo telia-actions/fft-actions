@@ -3,19 +3,21 @@ import { createPullRequestPayload } from '@src/libs/pull-request-payload';
 import {
   getDeployedPackagesCount,
   getPullRequestContext,
-  getPullRequestNumber,
-  getWorkflowData,
+  getWorkflowContext,
 } from '@src/utils/github';
 
 export const run = async (): Promise<void> => {
   try {
     const token = getInput('token');
-    const pullRequestNumber = getPullRequestNumber();
-    const deployedPackagesCount = await getDeployedPackagesCount(token);
-    const workflowData = await getWorkflowData(token);
-    if (pullRequestNumber !== 0) {
-      const context = getPullRequestContext();
-      const payload = createPullRequestPayload(context, workflowData, deployedPackagesCount);
+    const workflowContext = getWorkflowContext();
+    const deployedPackagesCount = await getDeployedPackagesCount(token, workflowContext.runId);
+    if (workflowContext.pullNumber) {
+      const pullRequestContext = await getPullRequestContext(token, workflowContext.pullNumber);
+      const payload = createPullRequestPayload(
+        pullRequestContext,
+        workflowContext,
+        deployedPackagesCount
+      );
       setOutput('payload', payload);
     }
   } catch (error) {

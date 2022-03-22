@@ -8345,12 +8345,11 @@ const github_1 = __nccwpck_require__(87);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (0, core_1.getInput)('token');
-        const pullRequestNumber = (0, github_1.getPullRequestNumber)();
-        const deployedPackagesCount = yield (0, github_1.getDeployedPackagesCount)(token);
-        const workflowData = yield (0, github_1.getWorkflowData)(token);
-        if (pullRequestNumber !== 0) {
-            const context = (0, github_1.getPullRequestContext)();
-            const payload = (0, pull_request_payload_1.createPullRequestPayload)(context, workflowData, deployedPackagesCount);
+        const workflowContext = (0, github_1.getWorkflowContext)();
+        const deployedPackagesCount = yield (0, github_1.getDeployedPackagesCount)(token, workflowContext.runId);
+        if (workflowContext.pullNumber) {
+            const pullRequestContext = yield (0, github_1.getPullRequestContext)(token, workflowContext.pullNumber);
+            const payload = (0, pull_request_payload_1.createPullRequestPayload)(pullRequestContext, workflowContext, deployedPackagesCount);
             (0, core_1.setOutput)('payload', payload);
         }
     }
@@ -8396,32 +8395,30 @@ __exportStar(__nccwpck_require__(8505), exports);
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createPullRequestPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
-const github_1 = __nccwpck_require__(87);
-const createPullRequestPayload = (context, workflow, deployedPackagesCount) => {
-    const { number, title, html_url } = context.pull_request;
+const createPullRequestPayload = (pullRequestData, workflowData, deployedPackagesCount) => {
     // eslint-disable-next-line no-console
-    console.log(workflow);
-    const workflowIcon = workflow.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
+    console.log(workflowData);
+    const workflowIcon = workflowData.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
     const blocks = [];
     const attachments = [];
     const titleBlock = {
         type: 'section',
         text: {
             type: 'mrkdwn',
-            text: `${workflowIcon} *<${context.repository.html_url}|${context.repository.name}>* - ${workflow.name}`,
+            text: `${workflowIcon} *<${workflowData.repository.url}|${workflowData.repository.name}>* - ${workflowData.name}`,
         },
     };
     const infoBlock = {
         type: 'section',
         text: {
             type: 'mrkdwn',
-            text: `${enums_1.SlackIcons.PULL_REQUEST} *<${html_url}|#${number} ${title}>* (commit id \`${(0, github_1.getShortMergeSHA)()}\`)`,
+            text: `${enums_1.SlackIcons.PULL_REQUEST} *<${pullRequestData.url}|#${pullRequestData.number} ${pullRequestData.title}>* (commit id \`${workflowData.sha}\`)`,
         },
     };
     const packagesAttachments = {
         color: '#808080',
-        fallback: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
-        text: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
+        fallback: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${pullRequestData.number})`,
+        text: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${pullRequestData.number})`,
     };
     blocks.push(titleBlock);
     blocks.push(infoBlock);
@@ -8452,42 +8449,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getWorkflowData = exports.getDeployedPackagesCount = exports.getPushContext = exports.getPullRequestContext = exports.getShortMergeSHA = exports.getRunId = exports.getPullRequestNumber = void 0;
+exports.getPullRequestContext = exports.getDeployedPackagesCount = exports.getWorkflowContext = void 0;
 const github_1 = __nccwpck_require__(5438);
 const enums_1 = __nccwpck_require__(1511);
-const listJobsForWorkflowRun = (token) => __awaiter(void 0, void 0, void 0, function* () {
+const getWorkflowContext = () => {
+    const workflowRunContext = github_1.context.payload;
+    // eslint-disable-next-line no-console
+    console.log(workflowRunContext);
+    return {
+        name: workflowRunContext.workflow_run.name,
+        conclusion: workflowRunContext.workflow_run.conclusion,
+        url: workflowRunContext.workflow_run.html_url,
+        artifactsUrls: workflowRunContext.workflow_run.artifacts_url,
+        runId: workflowRunContext.workflow_run.id,
+        sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
+        // Multiply PR's???
+        pullNumber: workflowRunContext.workflow_run.pull_requests[0].number,
+        repository: {
+            url: workflowRunContext.repository.html_url,
+            name: workflowRunContext.repository.name,
+        },
+    };
+};
+exports.getWorkflowContext = getWorkflowContext;
+const getDeployedPackagesCount = (token, runId) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
-    const workflowJobs = yield client.rest.actions.listJobsForWorkflowRun({
+    const workflow = yield client.rest.actions.listJobsForWorkflowRun({
         owner: github_1.context.repo.owner,
         repo: github_1.context.repo.repo,
-        run_id: github_1.context.runId,
+        run_id: runId,
     });
-    return workflowJobs.data;
-});
-const getPullRequestNumber = () => {
-    var _a;
-    return ((_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number) || 0;
-};
-exports.getPullRequestNumber = getPullRequestNumber;
-const getRunId = () => {
-    return github_1.context.runId;
-};
-exports.getRunId = getRunId;
-const getShortMergeSHA = () => {
-    return (github_1.context.payload.after || github_1.context.sha).substring(0, 8);
-};
-exports.getShortMergeSHA = getShortMergeSHA;
-const getPullRequestContext = () => {
-    return github_1.context.payload;
-};
-exports.getPullRequestContext = getPullRequestContext;
-const getPushContext = () => {
-    return github_1.context.payload;
-};
-exports.getPushContext = getPushContext;
-const getDeployedPackagesCount = (token) => __awaiter(void 0, void 0, void 0, function* () {
-    const workflow = yield listJobsForWorkflowRun(token);
-    return workflow.jobs.reduce((acc, job) => {
+    return workflow.data.jobs.reduce((acc, job) => {
         const isDeployJob = job.name.startsWith('deploy');
         if (isDeployJob && job.conclusion === enums_1.GithubStatus.SUCCESS) {
             acc = acc + 1;
@@ -8496,22 +8488,16 @@ const getDeployedPackagesCount = (token) => __awaiter(void 0, void 0, void 0, fu
     }, 0);
 });
 exports.getDeployedPackagesCount = getDeployedPackagesCount;
-const getWorkflowData = (token) => __awaiter(void 0, void 0, void 0, function* () {
+const getPullRequestContext = (token, pullNumber) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
-    const workflow = yield client.rest.actions.getWorkflowRun({
+    const pullRequest = yield client.rest.pulls.get({
         owner: github_1.context.repo.owner,
         repo: github_1.context.repo.repo,
-        run_id: github_1.context.runId,
+        pull_number: pullNumber,
     });
-    return {
-        name: workflow.data.name,
-        conclusion: workflow.data.conclusion,
-        url: workflow.data.html_url,
-        artifactsUrls: workflow.data.artifacts_url,
-        runId: github_1.context.runId,
-    };
+    return { number: pullNumber, title: pullRequest.data.title, url: pullRequest.data.html_url };
 });
-exports.getWorkflowData = getWorkflowData;
+exports.getPullRequestContext = getPullRequestContext;
 
 
 /***/ }),
