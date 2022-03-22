@@ -8402,11 +8402,14 @@ const createPullRequestPayload = (context, workflow, deployedPackagesCount) => {
     const blocks = [];
     const attachments = [];
     const titleBlock = {
-        type: 'header',
+        type: 'section',
         text: {
             type: 'mrkdwn',
             text: `${workflowIcon} <${context.repository.html_url}| ${context.repository.name}`,
         },
+    };
+    const dividerBlock = {
+        type: 'divider',
     };
     const infoBlock = {
         type: 'section',
@@ -8438,6 +8441,7 @@ const createPullRequestPayload = (context, workflow, deployedPackagesCount) => {
         ],
     };
     blocks.push(titleBlock);
+    blocks.push(dividerBlock);
     blocks.push(infoBlock);
     attachments.push(packagesAttachments);
     const payload = {
@@ -8467,6 +8471,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getWorkflowData = exports.getDeployedPackagesCount = exports.getPushContext = exports.getPullRequestContext = exports.getRunId = exports.getPullRequestNumber = void 0;
+/* eslint-disable no-console */
 const github_1 = __nccwpck_require__(5438);
 const enums_1 = __nccwpck_require__(1511);
 const listJobsForWorkflowRun = (token) => __awaiter(void 0, void 0, void 0, function* () {
@@ -8498,8 +8503,9 @@ exports.getPushContext = getPushContext;
 const getDeployedPackagesCount = (token) => __awaiter(void 0, void 0, void 0, function* () {
     const workflow = yield listJobsForWorkflowRun(token);
     return workflow.jobs.reduce((acc, job) => {
-        // eslint-disable-next-line no-console
+        console.log('---------');
         console.log(job);
+        console.log('---------');
         const isDeployJob = job.name.startsWith('deploy');
         if (isDeployJob && job.conclusion === enums_1.GithubStatus.SUCCESS) {
             acc = acc + 1;

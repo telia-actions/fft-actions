@@ -13,11 +13,14 @@ export const createPullRequestPayload = (
   const blocks = [];
   const attachments = [];
   const titleBlock = {
-    type: 'header',
+    type: 'section',
     text: {
       type: 'mrkdwn',
       text: `${workflowIcon} <${context.repository.html_url}| ${context.repository.name}`,
     },
+  };
+  const dividerBlock = {
+    type: 'divider',
   };
   const infoBlock = {
     type: 'section',
@@ -50,6 +53,7 @@ export const createPullRequestPayload = (
     ],
   };
   blocks.push(titleBlock);
+  blocks.push(dividerBlock);
   blocks.push(infoBlock);
   attachments.push(packagesAttachments);
   const payload = {
