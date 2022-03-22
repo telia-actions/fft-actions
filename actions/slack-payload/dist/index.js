@@ -8401,7 +8401,7 @@ const createPullRequestPayload = (context, workflow, deployedPackagesCount) => {
     const { number, title, html_url } = context.pull_request;
     // eslint-disable-next-line no-console
     console.log(workflow);
-    const workflowIcon = workflow.status === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
+    const workflowIcon = workflow.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
     const blocks = [];
     const attachments = [];
     const titleBlock = {
@@ -8505,7 +8505,9 @@ const getWorkflowData = (token) => __awaiter(void 0, void 0, void 0, function* (
     });
     return {
         name: workflow.data.name,
-        status: workflow.data.conclusion,
+        conclusion: workflow.data.conclusion,
+        url: workflow.data.html_url,
+        artifactsUrls: workflow.data.artifacts_url,
         runId: github_1.context.runId,
     };
 });

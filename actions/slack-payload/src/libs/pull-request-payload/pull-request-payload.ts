@@ -12,7 +12,7 @@ export const createPullRequestPayload = (
   // eslint-disable-next-line no-console
   console.log(workflow);
   const workflowIcon =
-    workflow.status === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
+    workflow.conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
   const blocks = [];
   const attachments = [];
   const titleBlock = {

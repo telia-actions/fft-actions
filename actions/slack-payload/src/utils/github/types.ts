@@ -2,7 +2,9 @@ import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/d
 
 export type WorkflowData = {
   name: string | null | undefined;
-  status: string | null;
+  conclusion: string | null;
+  url: string;
+  artifactsUrls: string;
   runId: number;
 };
 

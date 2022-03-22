@@ -53,7 +53,9 @@ export const getWorkflowData = async (token: string): Promise<WorkflowData> => {
   });
   return {
     name: workflow.data.name,
-    status: workflow.data.conclusion,
+    conclusion: workflow.data.conclusion,
+    url: workflow.data.html_url,
+    artifactsUrls: workflow.data.artifacts_url,
     runId: context.runId,
   };
 };
