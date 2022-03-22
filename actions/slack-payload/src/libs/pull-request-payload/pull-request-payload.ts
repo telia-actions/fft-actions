@@ -1,5 +1,6 @@
 import type { PullRequestEvent } from '@octokit/webhooks-types';
 import { GithubStatus, SlackIcons } from '@src/enums';
+import { getShortMergeSHA } from '@src/utils/github';
 import type { WorkflowData } from '@src/utils/github/types';
 
 export const createPullRequestPayload = (
@@ -7,7 +8,7 @@ export const createPullRequestPayload = (
   workflow: WorkflowData,
   deployedPackagesCount: number
 ): string => {
-  const { number, title, html_url, merge_commit_sha } = context.pull_request;
+  const { number, title, html_url } = context.pull_request;
   const workflowIcon =
     workflow.status === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
   const blocks = [];
@@ -16,7 +17,7 @@ export const createPullRequestPayload = (
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `${workflowIcon} <${context.repository.html_url}| ${context.repository.name}`,
+      text: `${workflowIcon} <${context.repository.html_url}|${context.repository.name}>`,
     },
   };
   const dividerBlock = {
@@ -26,31 +27,13 @@ export const createPullRequestPayload = (
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: ` *<${html_url}|#${number} ${title}>* (commit id \`${merge_commit_sha}\`)`,
+      text: ` *<${html_url}|#${number} ${title}>* (commit id \`${getShortMergeSHA()}\`)`,
     },
   };
   const packagesAttachments = {
     color: '#808080',
     fallback: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
     text: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
-    footer:
-      'mocked_package_1, mocked_package_2, mocked_package_3, mocked_package_4, mocked_package_5, mocked_package_6',
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: 'mocked_package_1',
-        },
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: 'mocked_package_2',
-        },
-      },
-    ],
   };
   blocks.push(titleBlock);
   blocks.push(dividerBlock);

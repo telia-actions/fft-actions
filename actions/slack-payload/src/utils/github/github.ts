@@ -22,6 +22,10 @@ export const getRunId = (): number => {
   return context.runId;
 };
 
+export const getShortMergeSHA = (): string => {
+  return (context.payload.after || context.sha).substring(0, 8);
+};
+
 export const getPullRequestContext = (): PullRequestEvent => {
   return context.payload as PullRequestEvent;
 };

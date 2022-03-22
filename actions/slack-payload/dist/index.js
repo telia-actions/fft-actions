@@ -8396,8 +8396,9 @@ __exportStar(__nccwpck_require__(8505), exports);
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createPullRequestPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
+const github_1 = __nccwpck_require__(87);
 const createPullRequestPayload = (context, workflow, deployedPackagesCount) => {
-    const { number, title, html_url, merge_commit_sha } = context.pull_request;
+    const { number, title, html_url } = context.pull_request;
     const workflowIcon = workflow.status === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
     const blocks = [];
     const attachments = [];
@@ -8405,7 +8406,7 @@ const createPullRequestPayload = (context, workflow, deployedPackagesCount) => {
         type: 'section',
         text: {
             type: 'mrkdwn',
-            text: `${workflowIcon} <${context.repository.html_url}| ${context.repository.name}`,
+            text: `${workflowIcon} <${context.repository.html_url}|${context.repository.name}>`,
         },
     };
     const dividerBlock = {
@@ -8415,30 +8416,13 @@ const createPullRequestPayload = (context, workflow, deployedPackagesCount) => {
         type: 'section',
         text: {
             type: 'mrkdwn',
-            text: ` *<${html_url}|#${number} ${title}>* (commit id \`${merge_commit_sha}\`)`,
+            text: ` *<${html_url}|#${number} ${title}>* (commit id \`${(0, github_1.getShortMergeSHA)()}\`)`,
         },
     };
     const packagesAttachments = {
         color: '#808080',
         fallback: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
         text: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${number})`,
-        footer: 'mocked_package_1, mocked_package_2, mocked_package_3, mocked_package_4, mocked_package_5, mocked_package_6',
-        blocks: [
-            {
-                type: 'section',
-                text: {
-                    type: 'mrkdwn',
-                    text: 'mocked_package_1',
-                },
-            },
-            {
-                type: 'section',
-                text: {
-                    type: 'mrkdwn',
-                    text: 'mocked_package_2',
-                },
-            },
-        ],
     };
     blocks.push(titleBlock);
     blocks.push(dividerBlock);
@@ -8470,7 +8454,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getWorkflowData = exports.getDeployedPackagesCount = exports.getPushContext = exports.getPullRequestContext = exports.getRunId = exports.getPullRequestNumber = void 0;
+exports.getWorkflowData = exports.getDeployedPackagesCount = exports.getPushContext = exports.getPullRequestContext = exports.getShortMergeSHA = exports.getRunId = exports.getPullRequestNumber = void 0;
 /* eslint-disable no-console */
 const github_1 = __nccwpck_require__(5438);
 const enums_1 = __nccwpck_require__(1511);
@@ -8492,6 +8476,10 @@ const getRunId = () => {
     return github_1.context.runId;
 };
 exports.getRunId = getRunId;
+const getShortMergeSHA = () => {
+    return (github_1.context.payload.after || github_1.context.sha).substring(0, 8);
+};
+exports.getShortMergeSHA = getShortMergeSHA;
 const getPullRequestContext = () => {
     return github_1.context.payload;
 };
