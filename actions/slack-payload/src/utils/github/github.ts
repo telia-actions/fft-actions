@@ -1,5 +1,5 @@
 import { context, getOctokit } from '@actions/github';
-import { PullRequestEvent, PushEvent } from '@octokit/webhooks-definitions/schema';
+import type { PullRequestEvent, PushEvent } from '@octokit/webhooks-types';
 import { GithubStatus } from '@src/enums';
 import type { ListJobsForWorkflowRun, WorkflowData } from './types';
 

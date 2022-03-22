@@ -1,4 +1,4 @@
-import { PullRequestEvent } from '@octokit/webhooks-definitions/schema';
+import type { PullRequestEvent } from '@octokit/webhooks-types';
 import { GithubStatus, SlackIcons } from '@src/enums';
 import type { WorkflowData } from '@src/utils/github/types';
 
