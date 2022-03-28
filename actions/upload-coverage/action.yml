@@ -21,7 +21,7 @@ inputs:
   table:
     description: Database table name
     required: false
-    deafult: unit_test_coverage
+    default: unit_test_coverage
 runs:
   using: node12
   main: dist/index.js
