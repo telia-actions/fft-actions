@@ -4,6 +4,24 @@ inputs:
   rushProjects:
     description: A JSON array of { packageName, projectFolder } objects to collect coverage from
     required: true
+  region:
+    description: AWS region
+    required: false
+    default: eu-west-1
+  secretArn:
+    description: AWS secret arn
+    required: true
+  resourceArn:
+    description: AWS RDS cluster arn
+    required: true
+  database:
+    description: Database name
+    required: false
+    default: engagement_metrics_database
+  table:
+    description: Database table name
+    required: false
+    deafult: unit_test_coverage
 runs:
   using: node12
   main: dist/index.js
