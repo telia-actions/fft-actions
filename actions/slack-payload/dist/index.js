@@ -8340,7 +8340,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core_1 = __nccwpck_require__(2186);
-const pull_request_payload_1 = __nccwpck_require__(3215);
+const payload_1 = __nccwpck_require__(5762);
 const github_1 = __nccwpck_require__(87);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -8349,7 +8349,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const deployedPackagesCount = yield (0, github_1.getDeployedPackagesCount)(token, workflowContext.runId);
         if (workflowContext.pullNumber) {
             const pullRequestContext = yield (0, github_1.getPullRequestContext)(token, workflowContext.pullNumber);
-            const payload = (0, pull_request_payload_1.createPullRequestPayload)(pullRequestContext, workflowContext, deployedPackagesCount);
+            const payload = (0, payload_1.createPullRequestPayload)(pullRequestContext, workflowContext, deployedPackagesCount);
             (0, core_1.setOutput)('payload', payload);
         }
     }
@@ -8362,7 +8362,7 @@ exports.run = run;
 
 /***/ }),
 
-/***/ 3215:
+/***/ 5762:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -8382,12 +8382,12 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(8505), exports);
+__exportStar(__nccwpck_require__(957), exports);
 
 
 /***/ }),
 
-/***/ 8505:
+/***/ 957:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -8396,17 +8396,21 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createPullRequestPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
 const createPullRequestPayload = (pullRequestData, workflowData, deployedPackagesCount) => {
-    // eslint-disable-next-line no-console
-    console.log(workflowData);
     const workflowIcon = workflowData.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
     const blocks = [];
     const attachments = [];
     const titleBlock = {
         type: 'section',
-        text: {
-            type: 'mrkdwn',
-            text: `${workflowIcon} *<${workflowData.repository.url}|${workflowData.repository.name}>* - ${workflowData.name}`,
-        },
+        fields: [
+            {
+                type: 'mrkdwn',
+                text: `${workflowIcon} *<${workflowData.repository.url}|${workflowData.repository.name}>*`,
+            },
+            {
+                type: 'mrkdwn',
+                text: `${workflowIcon} *<${workflowData.url}|${workflowData.name}>*`,
+            },
+        ],
     };
     const infoBlock = {
         type: 'section',
@@ -8454,13 +8458,10 @@ const github_1 = __nccwpck_require__(5438);
 const enums_1 = __nccwpck_require__(1511);
 const getWorkflowContext = () => {
     const workflowRunContext = github_1.context.payload;
-    // eslint-disable-next-line no-console
-    console.log(workflowRunContext.workflow_run.pull_requests);
     return {
         name: workflowRunContext.workflow_run.name,
         conclusion: workflowRunContext.workflow_run.conclusion,
         url: workflowRunContext.workflow_run.html_url,
-        artifactsUrls: workflowRunContext.workflow_run.artifacts_url,
         runId: workflowRunContext.workflow_run.id,
         sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
         pullNumber: workflowRunContext.workflow_run.pull_requests[0].number,

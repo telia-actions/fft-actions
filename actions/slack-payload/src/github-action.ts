@@ -1,5 +1,5 @@
 import { getInput, setOutput } from '@actions/core';
-import { createPullRequestPayload } from '@src/libs/pull-request-payload';
+import { createPayload } from '@src/libs/payload';
 import {
   getDeployedPackagesCount,
   getPullRequestContext,
@@ -13,11 +13,10 @@ export const run = async (): Promise<void> => {
     const deployedPackagesCount = await getDeployedPackagesCount(token, workflowContext.runId);
     if (workflowContext.pullNumber) {
       const pullRequestContext = await getPullRequestContext(token, workflowContext.pullNumber);
-      const payload = createPullRequestPayload(
-        pullRequestContext,
-        workflowContext,
-        deployedPackagesCount
-      );
+      const payload = createPayload(workflowContext, deployedPackagesCount, pullRequestContext);
+      setOutput('payload', payload);
+    } else {
+      const payload = createPayload(workflowContext, deployedPackagesCount);
       setOutput('payload', payload);
     }
   } catch (error) {

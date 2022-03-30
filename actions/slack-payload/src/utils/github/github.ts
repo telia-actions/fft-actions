@@ -5,13 +5,10 @@ import type { PullRequestData, WorkflowData } from './types';
 
 export const getWorkflowContext = (): WorkflowData => {
   const workflowRunContext = context.payload as WorkflowRunEvent;
-  // eslint-disable-next-line no-console
-  console.log(workflowRunContext.workflow_run.pull_requests);
   return {
     name: workflowRunContext.workflow_run.name,
     conclusion: workflowRunContext.workflow_run.conclusion,
     url: workflowRunContext.workflow_run.html_url,
-    artifactsUrls: workflowRunContext.workflow_run.artifacts_url,
     runId: workflowRunContext.workflow_run.id,
     sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
     pullNumber: workflowRunContext.workflow_run.pull_requests[0].number,

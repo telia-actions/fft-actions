@@ -1,13 +1,12 @@
 import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types';
 
 export type WorkflowData = {
-  name: string | null | undefined;
+  name: string;
   conclusion: string | null;
   url: string;
-  artifactsUrls: string;
   runId: number;
   sha: string;
-  pullNumber: number;
+  pullNumber: number | undefined;
   repository: {
     name: string;
     url: string;
