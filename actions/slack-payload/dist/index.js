@@ -8349,7 +8349,11 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const deployedPackagesCount = yield (0, github_1.getDeployedPackagesCount)(token, workflowContext.runId);
         if (workflowContext.pullNumber) {
             const pullRequestContext = yield (0, github_1.getPullRequestContext)(token, workflowContext.pullNumber);
-            const payload = (0, payload_1.createPullRequestPayload)(pullRequestContext, workflowContext, deployedPackagesCount);
+            const payload = (0, payload_1.createPayload)(workflowContext, deployedPackagesCount, pullRequestContext);
+            (0, core_1.setOutput)('payload', payload);
+        }
+        else {
+            const payload = (0, payload_1.createPayload)(workflowContext, deployedPackagesCount);
             (0, core_1.setOutput)('payload', payload);
         }
     }
@@ -8393,37 +8397,17 @@ __exportStar(__nccwpck_require__(957), exports);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createPullRequestPayload = void 0;
+exports.createPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
-const createPullRequestPayload = (pullRequestData, workflowData, deployedPackagesCount) => {
+const createPayload = (workflowData, deployedPackagesCount, pullRequestData) => {
     const workflowIcon = workflowData.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
     const blocks = [];
     const attachments = [];
-    const titleBlock = {
-        type: 'section',
-        fields: [
-            {
-                type: 'mrkdwn',
-                text: `${workflowIcon} *<${workflowData.repository.url}|${workflowData.repository.name}>*`,
-            },
-            {
-                type: 'mrkdwn',
-                text: `${workflowIcon} *<${workflowData.url}|${workflowData.name}>*`,
-            },
-        ],
-    };
-    const infoBlock = {
-        type: 'section',
-        text: {
-            type: 'mrkdwn',
-            text: `${enums_1.SlackIcons.PULL_REQUEST} *<${pullRequestData.url}|#${pullRequestData.number} ${pullRequestData.title}>* (commit id \`${workflowData.sha}\`)`,
-        },
-    };
-    const packagesAttachments = {
-        color: '#808080',
-        fallback: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${pullRequestData.number})`,
-        text: `${deployedPackagesCount} packages were deployed to a preview environment (preview-${pullRequestData.number})`,
-    };
+    const titleBlock = getTitlePayload(workflowIcon, workflowData.repository.url, workflowData.repository.name, workflowData.url, workflowData.name);
+    const infoBlock = pullRequestData
+        ? getpullRequestPayload(pullRequestData.url, pullRequestData.number, pullRequestData.title, workflowData.sha)
+        : {};
+    const packagesAttachments = getPackagesPayload(deployedPackagesCount, workflowData.pullNumber ? `preview-${workflowData.pullNumber}` : 'dev-test');
     blocks.push(titleBlock);
     blocks.push(infoBlock);
     attachments.push(packagesAttachments);
@@ -8433,7 +8417,39 @@ const createPullRequestPayload = (pullRequestData, workflowData, deployedPackage
     };
     return JSON.stringify(payload);
 };
-exports.createPullRequestPayload = createPullRequestPayload;
+exports.createPayload = createPayload;
+const getpullRequestPayload = (url, number, title, sha) => {
+    return {
+        type: 'section',
+        text: {
+            type: 'mrkdwn',
+            text: `${enums_1.SlackIcons.PULL_REQUEST} *<${url}|#${number} ${title}>* (commit id \`${sha}\`)`,
+        },
+    };
+};
+const getPackagesPayload = (count, environment) => {
+    const upperCaseEnvironment = environment.toUpperCase();
+    return {
+        color: '#808080',
+        fallback: `${count} packages were deployed to *${upperCaseEnvironment}}* environment`,
+        text: `${count} packages were deployed to *${upperCaseEnvironment}}* environment`,
+    };
+};
+const getTitlePayload = (icon, repositoryUrl, repositoryName, workflowUrl, workflowName) => {
+    return {
+        type: 'section',
+        fields: [
+            {
+                type: 'mrkdwn',
+                text: `${icon} *<${repositoryUrl}|${repositoryName}>*`,
+            },
+            {
+                type: 'mrkdwn',
+                text: `${icon} *<${workflowUrl}|${workflowName}>*`,
+            },
+        ],
+    };
+};
 
 
 /***/ }),
