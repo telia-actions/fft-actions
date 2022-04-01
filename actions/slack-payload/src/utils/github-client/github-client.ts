@@ -27,6 +27,7 @@ export const getDeployedPackagesCount = async (token: string, runId: number): Pr
     run_id: runId,
   });
   return workflow.data.jobs.reduce<number>((acc, job) => {
+    // HOW TO IDENTIFY DEPLOY JOBS???
     const isDeployJob = job.name.startsWith('deploy');
     if (isDeployJob && job.conclusion === GithubStatus.SUCCESS) {
       acc = acc + 1;

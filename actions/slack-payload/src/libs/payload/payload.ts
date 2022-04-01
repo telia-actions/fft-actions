@@ -1,5 +1,5 @@
 import { GithubStatus, SlackIcons } from '@src/enums';
-import type { PullRequestData, WorkflowData } from '@src/utils/github/types';
+import type { PullRequestData, WorkflowData } from '@src/utils/github-client/types';
 
 export const createPayload = (
   workflowData: WorkflowData,
@@ -17,7 +17,7 @@ export const createPayload = (
     workflowData.url,
     workflowData.name
   );
-  const infoBlock = pullRequestData
+  const pullRequestBlock = pullRequestData
     ? getpullRequestPayload(
         pullRequestData.url,
         pullRequestData.number,
@@ -29,9 +29,11 @@ export const createPayload = (
     deployedPackagesCount,
     workflowData.pullNumber ? `preview-${workflowData.pullNumber}` : 'dev-test'
   );
+  const logsAttachments = workflowData.conclusion === GithubStatus.FAILURE ? getLogsPayload() : {};
   blocks.push(titleBlock);
-  blocks.push(infoBlock);
+  blocks.push(pullRequestBlock);
   attachments.push(packagesAttachments);
+  attachments.push(logsAttachments);
   const payload = {
     blocks,
     attachments,
@@ -52,9 +54,9 @@ const getpullRequestPayload = (url: string, number: number, title: string, sha: 
 const getPackagesPayload = (count: number, environment: string): any => {
   const upperCaseEnvironment = environment.toUpperCase();
   return {
-    color: '#808080',
-    fallback: `${count} packages were deployed to *${upperCaseEnvironment}}* environment`,
-    text: `${count} packages were deployed to *${upperCaseEnvironment}}* environment`,
+    color: '#28A745',
+    fallback: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
+    text: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
   };
 };
 
@@ -74,8 +76,16 @@ const getTitlePayload = (
       },
       {
         type: 'mrkdwn',
-        text: `${icon} *<${workflowUrl}|${workflowName}>*`,
+        text: `*<${workflowUrl}|${workflowName}>*`,
       },
     ],
+  };
+};
+
+const getLogsPayload = (): any => {
+  return {
+    color: '#CB2431',
+    fallback: `${SlackIcons.DOWNLOADS} Download build logs or test logs in`,
+    text: `${SlackIcons.DOWNLOADS} Download build logs or test logs in`,
   };
 };

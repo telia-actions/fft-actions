@@ -4,7 +4,7 @@ import {
   getDeployedPackagesCount,
   getPullRequestContext,
   getWorkflowContext,
-} from '@src/utils/github';
+} from '@src/utils/github-client';
 
 export const run = async (): Promise<void> => {
   try {

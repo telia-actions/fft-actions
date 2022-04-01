@@ -8341,14 +8341,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core_1 = __nccwpck_require__(2186);
 const payload_1 = __nccwpck_require__(5762);
-const github_1 = __nccwpck_require__(87);
+const github_client_1 = __nccwpck_require__(5809);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (0, core_1.getInput)('token');
-        const workflowContext = (0, github_1.getWorkflowContext)();
-        const deployedPackagesCount = yield (0, github_1.getDeployedPackagesCount)(token, workflowContext.runId);
+        const workflowContext = (0, github_client_1.getWorkflowContext)();
+        const deployedPackagesCount = yield (0, github_client_1.getDeployedPackagesCount)(token, workflowContext.runId);
         if (workflowContext.pullNumber) {
-            const pullRequestContext = yield (0, github_1.getPullRequestContext)(token, workflowContext.pullNumber);
+            const pullRequestContext = yield (0, github_client_1.getPullRequestContext)(token, workflowContext.pullNumber);
             const payload = (0, payload_1.createPayload)(workflowContext, deployedPackagesCount, pullRequestContext);
             (0, core_1.setOutput)('payload', payload);
         }
@@ -8404,13 +8404,15 @@ const createPayload = (workflowData, deployedPackagesCount, pullRequestData) => 
     const blocks = [];
     const attachments = [];
     const titleBlock = getTitlePayload(workflowIcon, workflowData.repository.url, workflowData.repository.name, workflowData.url, workflowData.name);
-    const infoBlock = pullRequestData
+    const pullRequestBlock = pullRequestData
         ? getpullRequestPayload(pullRequestData.url, pullRequestData.number, pullRequestData.title, workflowData.sha)
         : {};
     const packagesAttachments = getPackagesPayload(deployedPackagesCount, workflowData.pullNumber ? `preview-${workflowData.pullNumber}` : 'dev-test');
+    const logsAttachments = workflowData.conclusion === enums_1.GithubStatus.FAILURE ? getLogsPayload() : {};
     blocks.push(titleBlock);
-    blocks.push(infoBlock);
+    blocks.push(pullRequestBlock);
     attachments.push(packagesAttachments);
+    attachments.push(logsAttachments);
     const payload = {
         blocks,
         attachments,
@@ -8430,9 +8432,9 @@ const getpullRequestPayload = (url, number, title, sha) => {
 const getPackagesPayload = (count, environment) => {
     const upperCaseEnvironment = environment.toUpperCase();
     return {
-        color: '#808080',
-        fallback: `${count} packages were deployed to *${upperCaseEnvironment}}* environment`,
-        text: `${count} packages were deployed to *${upperCaseEnvironment}}* environment`,
+        color: '#28A745',
+        fallback: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
+        text: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
     };
 };
 const getTitlePayload = (icon, repositoryUrl, repositoryName, workflowUrl, workflowName) => {
@@ -8445,16 +8447,23 @@ const getTitlePayload = (icon, repositoryUrl, repositoryName, workflowUrl, workf
             },
             {
                 type: 'mrkdwn',
-                text: `${icon} *<${workflowUrl}|${workflowName}>*`,
+                text: `*<${workflowUrl}|${workflowName}>*`,
             },
         ],
+    };
+};
+const getLogsPayload = () => {
+    return {
+        color: '#CB2431',
+        fallback: `${enums_1.SlackIcons.DOWNLOADS} Download build logs or test logs in`,
+        text: `${enums_1.SlackIcons.DOWNLOADS} Download build logs or test logs in`,
     };
 };
 
 
 /***/ }),
 
-/***/ 4912:
+/***/ 1354:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -8496,6 +8505,7 @@ const getDeployedPackagesCount = (token, runId) => __awaiter(void 0, void 0, voi
         run_id: runId,
     });
     return workflow.data.jobs.reduce((acc, job) => {
+        // HOW TO IDENTIFY DEPLOY JOBS???
         const isDeployJob = job.name.startsWith('deploy');
         if (isDeployJob && job.conclusion === enums_1.GithubStatus.SUCCESS) {
             acc = acc + 1;
@@ -8518,7 +8528,7 @@ exports.getPullRequestContext = getPullRequestContext;
 
 /***/ }),
 
-/***/ 87:
+/***/ 5809:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -8538,7 +8548,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(4912), exports);
+__exportStar(__nccwpck_require__(1354), exports);
 
 
 /***/ }),
