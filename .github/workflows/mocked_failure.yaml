@@ -1,0 +1,34 @@
+name: Mocked workflow
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches: [main]
+    paths:
+      - actions/slack-payload/**
+      - .github/workflows/slack-payload.yaml
+jobs:
+  upload_file:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo mock > mock.txt
+      - name: Upload file
+        uses: actions/upload-artifact@v2
+        with:
+          retention-days: 1
+          name: build-log
+          path: build-log.txt
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        mocks: [mocked_package_1, mocked_package_2, mocked_package_3, mocked_package_4]
+      fail-fast: false
+    name: deploy / ${{ matrix.mocks }}
+    steps:
+      - run: | 
+          if [${{ matrix.mocks }} === 'mocked_package_2']
+          then
+            exit 1
