@@ -8407,14 +8407,15 @@ exports.createPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
 const createPayload = (workflowData, jobsData, attachmentsData, pullRequestData) => {
     const workflowIcon = workflowData.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
+    const environment = workflowData.pullNumber ? `preview-${workflowData.pullNumber}` : 'dev-test';
     const blocks = [];
     const attachments = [];
     const titleBlock = getTitlePayload(workflowIcon, workflowData.repository.url, workflowData.repository.name, workflowData.url, workflowData.name);
     const pullRequestBlock = pullRequestData
         ? getpullRequestPayload(pullRequestData.url, pullRequestData.number, pullRequestData.title, workflowData.sha)
         : {};
-    const successDeploymentAttachments = getSuccessPackagesPayload(jobsData.successDeployCount, workflowData.pullNumber ? `preview-${workflowData.pullNumber}` : 'dev-test');
-    const failureDeploymentAttachments = getFailurePackagesPayload(jobsData.failureDeployCount);
+    const successDeploymentAttachments = getPackagesPayload(enums_1.Colors.SUCCESS, jobsData.successDeployCount, environment);
+    const failureDeploymentAttachments = getPackagesPayload(enums_1.Colors.FAILURE, jobsData.failureDeployCount, environment);
     const logsAttachments = workflowData.conclusion === enums_1.GithubStatus.FAILURE ? getLogsPayload(attachmentsData) : {};
     blocks.push(titleBlock);
     blocks.push(pullRequestBlock);
@@ -8437,23 +8438,15 @@ const getpullRequestPayload = (url, number, title, sha) => {
         },
     };
 };
-const getSuccessPackagesPayload = (count, environment) => {
+const getPackagesPayload = (color, count, environment) => {
     if (count === 0)
         return {};
     const upperCaseEnvironment = environment.toUpperCase();
+    const message = `${count} packages were deployed to *${upperCaseEnvironment}* environment`;
     return {
-        color: enums_1.Colors.SUCCESS,
-        fallback: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
-        text: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
-    };
-};
-const getFailurePackagesPayload = (count) => {
-    if (count === 0)
-        return {};
-    return {
-        color: enums_1.Colors.FAILURE,
-        fallback: `${count} packages failed to deploy`,
-        text: `${count} packages failed to deploy`,
+        color,
+        fallback: message,
+        text: message,
     };
 };
 const getTitlePayload = (icon, repositoryUrl, repositoryName, workflowUrl, workflowName) => {

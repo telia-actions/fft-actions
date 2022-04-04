@@ -14,6 +14,7 @@ export const createPayload = (
 ): string => {
   const workflowIcon =
     workflowData.conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
+  const environment = workflowData.pullNumber ? `preview-${workflowData.pullNumber}` : 'dev-test';
   const blocks = [];
   const attachments = [];
   const titleBlock = getTitlePayload(
@@ -31,11 +32,16 @@ export const createPayload = (
         workflowData.sha
       )
     : {};
-  const successDeploymentAttachments = getSuccessPackagesPayload(
+  const successDeploymentAttachments = getPackagesPayload(
+    Colors.SUCCESS,
     jobsData.successDeployCount,
-    workflowData.pullNumber ? `preview-${workflowData.pullNumber}` : 'dev-test'
+    environment
   );
-  const failureDeploymentAttachments = getFailurePackagesPayload(jobsData.failureDeployCount);
+  const failureDeploymentAttachments = getPackagesPayload(
+    Colors.FAILURE,
+    jobsData.failureDeployCount,
+    environment
+  );
   const logsAttachments =
     workflowData.conclusion === GithubStatus.FAILURE ? getLogsPayload(attachmentsData) : {};
   blocks.push(titleBlock);
@@ -60,22 +66,14 @@ const getpullRequestPayload = (url: string, number: number, title: string, sha: 
   };
 };
 
-const getSuccessPackagesPayload = (count: number, environment: string): any => {
+const getPackagesPayload = (color: string, count: number, environment: string): any => {
   if (count === 0) return {};
   const upperCaseEnvironment = environment.toUpperCase();
+  const message = `${count} packages were deployed to *${upperCaseEnvironment}* environment`;
   return {
-    color: Colors.SUCCESS,
-    fallback: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
-    text: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
-  };
-};
-
-const getFailurePackagesPayload = (count: number): any => {
-  if (count === 0) return {};
-  return {
-    color: Colors.FAILURE,
-    fallback: `${count} packages failed to deploy`,
-    text: `${count} packages failed to deploy`,
+    color,
+    fallback: message,
+    text: message,
   };
 };
 

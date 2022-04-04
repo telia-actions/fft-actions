@@ -12,7 +12,7 @@ jobs:
   upload_file:
     runs-on: ubuntu-latest
     steps:
-      - run: echo mock > mock.txt
+      - run: echo mock > build-log.txt
       - name: Upload file
         uses: actions/upload-artifact@v2
         with:
@@ -32,3 +32,6 @@ jobs:
           if [${{ matrix.mocks }} === 'mocked_package_2']
           then
             exit 1
+          else
+            echo ${{ matrix.mocks }}
+          fi
