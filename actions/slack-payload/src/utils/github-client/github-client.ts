@@ -1,7 +1,7 @@
 import { context, getOctokit } from '@actions/github';
 import type { WorkflowRunEvent } from '@octokit/webhooks-types';
 import { GithubStatus } from '@src/enums';
-import type { PullRequestData, WorkflowData } from './types';
+import type { AttachmentsData, JobsData, PullRequestData, WorkflowData } from './types';
 
 export const getWorkflowContext = (): WorkflowData => {
   const workflowRunContext = context.payload as WorkflowRunEvent;
@@ -19,21 +19,30 @@ export const getWorkflowContext = (): WorkflowData => {
   };
 };
 
-export const getDeployedPackagesCount = async (token: string, runId: number): Promise<number> => {
+export const getJobsData = async (token: string, runId: number): Promise<JobsData> => {
   const client = getOctokit(token);
   const workflow = await client.rest.actions.listJobsForWorkflowRun({
     owner: context.repo.owner,
     repo: context.repo.repo,
     run_id: runId,
   });
-  return workflow.data.jobs.reduce<number>((acc, job) => {
-    // HOW TO IDENTIFY DEPLOY JOBS???
-    const isDeployJob = job.name.startsWith('deploy');
-    if (isDeployJob && job.conclusion === GithubStatus.SUCCESS) {
-      acc = acc + 1;
+  return workflow.data.jobs.reduce<JobsData>(
+    (acc, job) => {
+      const isDeployJob = job.name.startsWith('deploy');
+      if (job.conclusion === GithubStatus.FAILURE) {
+        acc.failedJobs.push(job.name);
+        if (isDeployJob) acc.failureDeployCount = acc.failureDeployCount + 1;
+      } else if (isDeployJob && job.conclusion === GithubStatus.SUCCESS) {
+        acc.successDeployCount = acc.successDeployCount + 1;
+      }
+      return acc;
+    },
+    {
+      successDeployCount: 0,
+      failureDeployCount: 0,
+      failedJobs: [],
     }
-    return acc;
-  }, 0);
+  );
 };
 
 export const getPullRequestContext = async (
@@ -47,4 +56,27 @@ export const getPullRequestContext = async (
     pull_number: pullNumber,
   });
   return { number: pullNumber, title: pullRequest.data.title, url: pullRequest.data.html_url };
+};
+
+export const getAttachmentsData = async (
+  token: string,
+  runId: number
+): Promise<AttachmentsData> => {
+  const client = getOctokit(token);
+  const attachments = await client.rest.actions.listWorkflowRunArtifacts({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    run_id: runId,
+  });
+  return attachments.data.artifacts.reduce(
+    (acc, artifact) => {
+      if (artifact.name.startsWith('build-logs')) acc.buildLogsUrl = artifact.url;
+      if (artifact.name.startsWith('test-logs')) acc.testLogsUrl = artifact.url;
+      return acc;
+    },
+    {
+      buildLogsUrl: '',
+      testLogsUrl: '',
+    }
+  );
 };

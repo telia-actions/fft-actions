@@ -1,9 +1,15 @@
-import { GithubStatus, SlackIcons } from '@src/enums';
-import type { PullRequestData, WorkflowData } from '@src/utils/github-client/types';
+import { Colors, GithubStatus, SlackIcons } from '@src/enums';
+import type {
+  AttachmentsData,
+  JobsData,
+  PullRequestData,
+  WorkflowData,
+} from '@src/utils/github-client/types';
 
 export const createPayload = (
   workflowData: WorkflowData,
-  deployedPackagesCount: number,
+  jobsData: JobsData,
+  attachmentsData: AttachmentsData,
   pullRequestData?: PullRequestData
 ): string => {
   const workflowIcon =
@@ -25,14 +31,17 @@ export const createPayload = (
         workflowData.sha
       )
     : {};
-  const packagesAttachments = getPackagesPayload(
-    deployedPackagesCount,
+  const successDeploymentAttachments = getSuccessPackagesPayload(
+    jobsData.successDeployCount,
     workflowData.pullNumber ? `preview-${workflowData.pullNumber}` : 'dev-test'
   );
-  const logsAttachments = workflowData.conclusion === GithubStatus.FAILURE ? getLogsPayload() : {};
+  const failureDeploymentAttachments = getFailurePackagesPayload(jobsData.failureDeployCount);
+  const logsAttachments =
+    workflowData.conclusion === GithubStatus.FAILURE ? getLogsPayload(attachmentsData) : {};
   blocks.push(titleBlock);
   blocks.push(pullRequestBlock);
-  attachments.push(packagesAttachments);
+  attachments.push(successDeploymentAttachments);
+  attachments.push(failureDeploymentAttachments);
   attachments.push(logsAttachments);
   const payload = {
     blocks,
@@ -51,12 +60,22 @@ const getpullRequestPayload = (url: string, number: number, title: string, sha: 
   };
 };
 
-const getPackagesPayload = (count: number, environment: string): any => {
+const getSuccessPackagesPayload = (count: number, environment: string): any => {
+  if (count === 0) return {};
   const upperCaseEnvironment = environment.toUpperCase();
   return {
-    color: '#28A745',
+    color: Colors.SUCCESS,
     fallback: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
     text: `${count} packages were deployed to *${upperCaseEnvironment}* environment`,
+  };
+};
+
+const getFailurePackagesPayload = (count: number): any => {
+  if (count === 0) return {};
+  return {
+    color: Colors.FAILURE,
+    fallback: `${count} packages failed to deploy`,
+    text: `${count} packages failed to deploy`,
   };
 };
 
@@ -82,10 +101,13 @@ const getTitlePayload = (
   };
 };
 
-const getLogsPayload = (): any => {
+const getLogsPayload = (attachmentsData: AttachmentsData): any => {
+  const message = `${SlackIcons.DOWNLOADS} Download ${
+    attachmentsData.buildLogsUrl ? `*<${attachmentsData.buildLogsUrl}|build logs>*` : ''
+  } ${attachmentsData.testLogsUrl ? `*<${attachmentsData.testLogsUrl}|test logs>*` : ''}`;
   return {
-    color: '#CB2431',
-    fallback: `${SlackIcons.DOWNLOADS} Download build logs or test logs in`,
-    text: `${SlackIcons.DOWNLOADS} Download build logs or test logs in`,
+    color: Colors.FAILURE,
+    fallback: message,
+    text: message,
   };
 };

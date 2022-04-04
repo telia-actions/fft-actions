@@ -19,5 +19,16 @@ export type PullRequestData = {
   url: string;
 };
 
+export type JobsData = {
+  successDeployCount: number;
+  failureDeployCount: number;
+  failedJobs: string[];
+};
+
+export type AttachmentsData = {
+  buildLogsUrl: string;
+  testLogsUrl: string;
+};
+
 export type ListJobsForWorkflowRun =
   RestEndpointMethodTypes['actions']['listJobsForWorkflowRun']['response']['data'];
