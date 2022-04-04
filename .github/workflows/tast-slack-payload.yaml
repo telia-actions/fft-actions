@@ -1,7 +1,7 @@
 name: Test Slack notification payload
 on:
   workflow_run:
-    workflows: [Mocked workflow]
+    workflows: [Mocked failure, Mocked success]
     types: [completed]
 jobs:
   notify_slack:
