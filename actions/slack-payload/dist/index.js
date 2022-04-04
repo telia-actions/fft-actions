@@ -8414,8 +8414,8 @@ const createPayload = (workflowData, jobsData, attachmentsData, pullRequestData)
     const pullRequestBlock = pullRequestData
         ? getpullRequestPayload(pullRequestData.url, pullRequestData.number, pullRequestData.title, workflowData.sha)
         : {};
-    const successDeploymentAttachments = getPackagesPayload(enums_1.Colors.SUCCESS, jobsData.successDeployCount, environment);
-    const failureDeploymentAttachments = getPackagesPayload(enums_1.Colors.FAILURE, jobsData.failureDeployCount, environment);
+    const successDeploymentAttachments = getPackagesPayload(enums_1.Colors.SUCCESS, enums_1.GithubStatus.SUCCESS, jobsData.successDeployCount, environment);
+    const failureDeploymentAttachments = getPackagesPayload(enums_1.Colors.FAILURE, enums_1.GithubStatus.FAILURE, jobsData.failureDeployCount, environment);
     const logsAttachments = workflowData.conclusion === enums_1.GithubStatus.FAILURE ? getLogsPayload(attachmentsData) : {};
     blocks.push(titleBlock);
     blocks.push(pullRequestBlock);
@@ -8438,11 +8438,11 @@ const getpullRequestPayload = (url, number, title, sha) => {
         },
     };
 };
-const getPackagesPayload = (color, count, environment) => {
+const getPackagesPayload = (color, status, count, environment) => {
     if (count === 0)
         return {};
     const upperCaseEnvironment = environment.toUpperCase();
-    const message = `${count} packages were deployed to *${upperCaseEnvironment}* environment`;
+    const message = `${status} deployments - *${count}* to *${upperCaseEnvironment}* environment`;
     return {
         color,
         fallback: message,
@@ -8554,9 +8554,9 @@ const getAttachmentsData = (token, runId) => __awaiter(void 0, void 0, void 0, f
     });
     return attachments.data.artifacts.reduce((acc, artifact) => {
         if (artifact.name.startsWith('build-logs'))
-            acc.buildLogsUrl = artifact.url;
+            acc.buildLogsUrl = artifact.archive_download_url;
         if (artifact.name.startsWith('test-logs'))
-            acc.testLogsUrl = artifact.url;
+            acc.testLogsUrl = artifact.archive_download_url;
         return acc;
     }, {
         buildLogsUrl: '',

@@ -34,11 +34,13 @@ export const createPayload = (
     : {};
   const successDeploymentAttachments = getPackagesPayload(
     Colors.SUCCESS,
+    GithubStatus.SUCCESS,
     jobsData.successDeployCount,
     environment
   );
   const failureDeploymentAttachments = getPackagesPayload(
     Colors.FAILURE,
+    GithubStatus.FAILURE,
     jobsData.failureDeployCount,
     environment
   );
@@ -66,10 +68,15 @@ const getpullRequestPayload = (url: string, number: number, title: string, sha: 
   };
 };
 
-const getPackagesPayload = (color: string, count: number, environment: string): any => {
+const getPackagesPayload = (
+  color: string,
+  status: string,
+  count: number,
+  environment: string
+): any => {
   if (count === 0) return {};
   const upperCaseEnvironment = environment.toUpperCase();
-  const message = `${count} packages were deployed to *${upperCaseEnvironment}* environment`;
+  const message = `${status} deployments - *${count}* to *${upperCaseEnvironment}* environment`;
   return {
     color,
     fallback: message,

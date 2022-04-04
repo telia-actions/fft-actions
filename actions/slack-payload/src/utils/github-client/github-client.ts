@@ -70,8 +70,8 @@ export const getAttachmentsData = async (
   });
   return attachments.data.artifacts.reduce(
     (acc, artifact) => {
-      if (artifact.name.startsWith('build-logs')) acc.buildLogsUrl = artifact.url;
-      if (artifact.name.startsWith('test-logs')) acc.testLogsUrl = artifact.url;
+      if (artifact.name.startsWith('build-logs')) acc.buildLogsUrl = artifact.archive_download_url;
+      if (artifact.name.startsWith('test-logs')) acc.testLogsUrl = artifact.archive_download_url;
       return acc;
     },
     {

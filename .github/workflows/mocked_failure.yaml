@@ -17,8 +17,8 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           retention-days: 1
-          name: build-log
-          path: build-log.txt
+          name: build-logs
+          path: build-logs.txt
   deploy:
     runs-on: ubuntu-latest
     strategy:
