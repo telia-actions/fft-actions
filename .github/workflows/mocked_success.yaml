@@ -1,4 +1,4 @@
-name: Mocked workflow
+name: Mocked success
 on:
   workflow_dispatch:
   pull_request:

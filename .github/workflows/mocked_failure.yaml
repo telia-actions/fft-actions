@@ -1,4 +1,4 @@
-name: Mocked workflow
+name: Mocked failure
 on:
   workflow_dispatch:
   pull_request:
@@ -29,7 +29,7 @@ jobs:
     name: deploy / ${{ matrix.mocks }}
     steps:
       - run: | 
-          if [${{ matrix.mocks }} === 'mocked_package_2']
+          if [${{ matrix.mocks }} === mocked_package_2]
           then
             exit 1
           else
