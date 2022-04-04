@@ -12,7 +12,7 @@ jobs:
   upload_file:
     runs-on: ubuntu-latest
     steps:
-      - run: echo mock > build-log.txt
+      - run: echo mock > build-logs.txt
       - name: Upload file
         uses: actions/upload-artifact@v2
         with:
