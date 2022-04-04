@@ -28,10 +28,5 @@ jobs:
       fail-fast: false
     name: deploy / ${{ matrix.mocks }}
     steps:
-      - run: | 
-          if [ "${{ matrix.mocks }}" == "mocked_package_2"];
-          then
-            exit 1
-          else
-            echo ${{ matrix.mocks }}
-          fi
+      - run: |
+          [ "${{ matrix.mocks }}" == "mocked_package_2" ] && exit 1 || echo "${{ matrix.mocks }}"
