@@ -19,9 +19,9 @@ export const run = async (): Promise<void> => {
     let environment = '';
     if (attachmentsData.environmentArtifactId) {
       const zipBuffer = await downloadArtifact(token, attachmentsData.environmentArtifactId);
-      writeFile('environment.zip', zipBuffer);
-      console.log('New file created');
-      await unzipArtifact('./environment.zip');
+      writeFile('environment.txt', zipBuffer);
+      // console.log('New file created');
+      // await unzipArtifact('./environment.zip');
       environment = readFile('./environment.txt');
     }
     console.log(environment);
