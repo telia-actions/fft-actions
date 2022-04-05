@@ -1,25 +1,78 @@
 import { context, getOctokit } from '@actions/github';
 import type { WorkflowRunEvent } from '@octokit/webhooks-types';
 import { GithubStatus } from '@src/enums';
+import { readFile, writeFile } from '../file-client';
+import { unzipArtifact } from '../tar/archive-artifact';
 import type { AttachmentsData, JobsData, PullRequestData, WorkflowData } from './types';
 
-export const getWorkflowContext = (): WorkflowData => {
+const getPullRequestData = async (token: string, pullNumber: number): Promise<PullRequestData> => {
+  const client = getOctokit(token);
+  const pullRequest = await client.rest.pulls.get({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    pull_number: pullNumber,
+  });
+  return { title: pullRequest.data.title, url: pullRequest.data.html_url, number: pullNumber };
+};
+
+const getAttachmentsData = async (token: string, runId: number): Promise<AttachmentsData> => {
+  const client = getOctokit(token);
+  const attachments = await client.rest.actions.listWorkflowRunArtifacts({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    run_id: runId,
+  });
+  const map = new Map<string, keyof AttachmentsData>([
+    ['build-logs', 'buildLogsArtifactId'],
+    ['test-logs', 'testLogsArtifactId'],
+    ['environment', 'environmentArtifactId'],
+  ]);
+  return attachments.data.artifacts.reduce(
+    (acc, artifact) => {
+      const mappedValue = map.get(artifact.name);
+      if (mappedValue) acc[mappedValue] = artifact.id;
+      return acc;
+    },
+    {
+      buildLogsArtifactId: 0,
+      testLogsArtifactId: 0,
+      environmentArtifactId: 0,
+    }
+  );
+};
+
+export const getWorkflowContext = async (token: string): Promise<WorkflowData> => {
   const workflowRunContext = context.payload as WorkflowRunEvent;
+  const pullRequestNumber = workflowRunContext.workflow_run.pull_requests[0].number;
+
+  const attachmentsData = await getAttachmentsData(token, workflowRunContext.workflow_run.id);
+  const jobsData = await getJobsData(token, workflowRunContext.workflow_run.id);
+  const pullRequestData = pullRequestNumber
+    ? await getPullRequestData(token, pullRequestNumber)
+    : undefined;
+  const environment = pullRequestNumber
+    ? `preview-${pullRequestNumber}`
+    : await getDataFromArtifact(token, attachmentsData.environmentArtifactId, 'environment');
+
   return {
-    name: workflowRunContext.workflow_run.name,
+    attachmentsIds: { ...attachmentsData },
+    checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
     conclusion: workflowRunContext.workflow_run.conclusion,
-    url: workflowRunContext.workflow_run.html_url,
+    environment,
+    jobsOutcome: { ...jobsData },
+    name: workflowRunContext.workflow_run.name,
+    pullRequest: { ...pullRequestData },
+    repository: {
+      name: workflowRunContext.repository.name,
+      url: workflowRunContext.repository.html_url,
+    },
     runId: workflowRunContext.workflow_run.id,
     sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
-    pullNumber: workflowRunContext.workflow_run.pull_requests[0].number,
-    repository: {
-      url: workflowRunContext.repository.html_url,
-      name: workflowRunContext.repository.name,
-    },
+    url: workflowRunContext.workflow_run.html_url,
   };
 };
 
-export const getJobsData = async (token: string, runId: number): Promise<JobsData> => {
+const getJobsData = async (token: string, runId: number): Promise<JobsData> => {
   const client = getOctokit(token);
   const workflow = await client.rest.actions.listJobsForWorkflowRun({
     owner: context.repo.owner,
@@ -45,55 +98,11 @@ export const getJobsData = async (token: string, runId: number): Promise<JobsDat
   );
 };
 
-export const getPullRequestContext = async (
+export const getDataFromArtifact = async (
   token: string,
-  pullNumber: number
-): Promise<PullRequestData> => {
-  const client = getOctokit(token);
-  const pullRequest = await client.rest.pulls.get({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    pull_number: pullNumber,
-  });
-  return { number: pullNumber, title: pullRequest.data.title, url: pullRequest.data.html_url };
-};
-
-export const getAttachmentsData = async (
-  token: string,
-  runId: number
-): Promise<AttachmentsData> => {
-  const client = getOctokit(token);
-  const attachments = await client.rest.actions.listWorkflowRunArtifacts({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    run_id: runId,
-  });
-  return attachments.data.artifacts.reduce(
-    (acc, artifact) => {
-      switch (artifact.name) {
-        case 'build-logs':
-          acc.buildLogsUrl = artifact.archive_download_url;
-          break;
-        case 'test-logs':
-          acc.testLogsUrl = artifact.archive_download_url;
-          break;
-        case 'environment':
-          acc.environmentArtifactId = artifact.id;
-          break;
-        default:
-          break;
-      }
-      return acc;
-    },
-    {
-      buildLogsUrl: '',
-      testLogsUrl: '',
-      environmentArtifactId: 0,
-    }
-  );
-};
-
-export const downloadArtifact = async (token: string, artifactId: number): Promise<Buffer> => {
+  artifactId: number,
+  filename: string
+): Promise<string> => {
   const client = getOctokit(token);
   const zip = await client.rest.actions.downloadArtifact({
     owner: context.repo.owner,
@@ -101,8 +110,7 @@ export const downloadArtifact = async (token: string, artifactId: number): Promi
     artifact_id: artifactId,
     archive_format: 'zip',
   });
-  console.log(zip.headers);
-  console.log(zip.url);
-  console.log(zip.data);
-  return Buffer.from(zip.data as ArrayBuffer);
+  writeFile(`${filename}.zip`, Buffer.from(zip.data as ArrayBuffer));
+  await unzipArtifact(filename);
+  return readFile(`${filename}.txt`);
 };

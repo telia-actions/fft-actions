@@ -1,44 +1,13 @@
 import { getInput, setOutput } from '@actions/core';
 import { createPayload } from '@src/libs/payload';
-import {
-  downloadArtifact,
-  getAttachmentsData,
-  getJobsData,
-  getPullRequestContext,
-  getWorkflowContext,
-} from '@src/utils/github-client';
-import { unzipArtifact } from '@src/utils/tar/archive-artifact';
-import { readFile, writeFile } from './utils/file-client';
+import { getWorkflowContext } from '@src/utils/github-client';
 
 export const run = async (): Promise<void> => {
   try {
     const token = getInput('token');
-    const workflowContext = getWorkflowContext();
-    const jobsData = await getJobsData(token, workflowContext.runId);
-    const attachmentsData = await getAttachmentsData(token, workflowContext.runId);
-    let environment = '';
-    if (attachmentsData.environmentArtifactId) {
-      const zipBuffer = await downloadArtifact(token, attachmentsData.environmentArtifactId);
-      writeFile('environment.zip', zipBuffer);
-      console.log('New file created');
-      await unzipArtifact('./environment.zip');
-      environment = readFile('./environment.txt');
-    }
-    console.log(environment);
-    if (workflowContext.pullNumber) {
-      const pullRequestContext = await getPullRequestContext(token, workflowContext.pullNumber);
-      const payload = createPayload(
-        environment,
-        workflowContext,
-        jobsData,
-        attachmentsData,
-        pullRequestContext
-      );
-      setOutput('payload', payload);
-    } else {
-      const payload = createPayload(environment, workflowContext, jobsData, attachmentsData);
-      setOutput('payload', payload);
-    }
+    const workflowContext = await getWorkflowContext(token);
+    const payload = createPayload(token, workflowContext);
+    setOutput('payload', payload);
   } catch (error) {
     setOutput('payload', 'Failed to generate slack message payload - please contact @fft');
   }

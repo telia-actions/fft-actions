@@ -1,22 +1,26 @@
 import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types';
 
 export type WorkflowData = {
+  environment: string;
+  checkSuiteId: number;
   name: string;
   conclusion: string | null;
   url: string;
   runId: number;
   sha: string;
-  pullNumber: number | undefined;
   repository: {
     name: string;
     url: string;
   };
+  attachmentsIds: AttachmentsData;
+  jobsOutcome: JobsData;
+  pullRequest: PullRequestData | undefined;
 };
 
 export type PullRequestData = {
-  title: string;
-  number: number;
-  url: string;
+  number?: number;
+  title?: string;
+  url?: string;
 };
 
 export type JobsData = {
@@ -26,8 +30,8 @@ export type JobsData = {
 };
 
 export type AttachmentsData = {
-  buildLogsUrl: string;
-  testLogsUrl: string;
+  buildLogsArtifactId: number;
+  testLogsArtifactId: number;
   environmentArtifactId: number;
 };
 

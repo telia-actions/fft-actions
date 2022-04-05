@@ -1,11 +1,10 @@
 import { Colors, SlackIcons } from '@src/enums';
-import { AttachmentsData } from '@src/utils/github-client/types';
 
 export const getPullRequestPayload = (
+  sha: string,
   url: string,
-  number: number,
   title: string,
-  sha: string
+  number: number
 ): any => {
   return {
     type: 'section',
@@ -54,10 +53,19 @@ export const getTitlePayload = (
   };
 };
 
-export const getLogsPayload = (attachmentsData: AttachmentsData): any => {
+export const getLogsPayload = (
+  url: string,
+  checkSuiteId: number,
+  buildArtifactId: number,
+  testArtfactId: number
+): any => {
   const message = `${SlackIcons.DOWNLOADS} Download ${
-    attachmentsData.buildLogsUrl ? `*<${attachmentsData.buildLogsUrl}|build logs>*` : ''
-  } ${attachmentsData.testLogsUrl ? `*<${attachmentsData.testLogsUrl}|test logs>*` : ''}`;
+    buildArtifactId
+      ? `*<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs>*`
+      : ''
+  } ${
+    testArtfactId ? `*<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>*` : ''
+  }`;
   return {
     color: Colors.FAILURE,
     fallback: message,

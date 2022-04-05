@@ -1,69 +1,70 @@
 import { Colors, GithubStatus, SlackIcons } from '@src/enums';
-import type {
-  AttachmentsData,
-  JobsData,
-  PullRequestData,
-  WorkflowData,
-} from '@src/utils/github-client/types';
+import type { WorkflowData } from '@src/utils/github-client/types';
 import {
   getLogsPayload,
   getPackagesPayload,
   getPullRequestPayload,
   getTitlePayload,
-} from './utils';
+} from '@src/utils/slack-message';
 
-export const createPayload = (
-  deployEnvironment: string,
-  workflowData: WorkflowData,
-  jobsData: JobsData,
-  attachmentsData: AttachmentsData,
-  pullRequestData?: PullRequestData
-): string => {
-  const workflowIcon =
-    workflowData.conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
-  const environment = workflowData.pullNumber
-    ? `preview-${workflowData.pullNumber}`
-    : deployEnvironment;
+export const createPayload = async (token: string, workflowData: WorkflowData): Promise<string> => {
   const blocks = [];
   const attachments = [];
-  const titleBlock = getTitlePayload(
-    workflowIcon,
-    workflowData.repository.url,
-    workflowData.repository.name,
-    workflowData.url,
-    workflowData.name
+
+  blocks.push(
+    getTitlePayload(
+      workflowData.conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE,
+      workflowData.repository.url,
+      workflowData.repository.name,
+      workflowData.url,
+      workflowData.name
+    )
   );
-  const pullRequestBlock = pullRequestData
-    ? getPullRequestPayload(
-        pullRequestData.url,
-        pullRequestData.number,
-        pullRequestData.title,
-        workflowData.sha
+  if (
+    workflowData.pullRequest?.title &&
+    workflowData.pullRequest.number &&
+    workflowData.pullRequest.url
+  ) {
+    blocks.push(
+      getPullRequestPayload(
+        workflowData.sha,
+        workflowData.pullRequest.url,
+        workflowData.pullRequest.title,
+        workflowData.pullRequest.number
       )
-    : {};
-  const successDeploymentAttachments = getPackagesPayload(
-    Colors.SUCCESS,
-    GithubStatus.SUCCESS,
-    jobsData.successDeployCount,
-    environment
+    );
+  }
+  attachments.push(
+    getPackagesPayload(
+      Colors.SUCCESS,
+      GithubStatus.SUCCESS,
+      workflowData.jobsOutcome.successDeployCount,
+      workflowData.environment
+    )
   );
-  const failureDeploymentAttachments = getPackagesPayload(
-    Colors.FAILURE,
-    GithubStatus.FAILURE,
-    jobsData.failureDeployCount,
-    environment
+  attachments.push(
+    getPackagesPayload(
+      Colors.FAILURE,
+      GithubStatus.FAILURE,
+      workflowData.jobsOutcome.failureDeployCount,
+      workflowData.environment
+    )
   );
-  const logsAttachments =
-    workflowData.conclusion === GithubStatus.FAILURE ? getLogsPayload(attachmentsData) : {};
-  blocks.push(titleBlock);
-  blocks.push(pullRequestBlock);
-  attachments.push(successDeploymentAttachments);
-  attachments.push(failureDeploymentAttachments);
-  attachments.push(logsAttachments);
+
+  if (workflowData.conclusion === GithubStatus.FAILURE) {
+    attachments.push(
+      getLogsPayload(
+        workflowData.url,
+        workflowData.checkSuiteId,
+        workflowData.attachmentsIds.buildLogsArtifactId,
+        workflowData.attachmentsIds.testLogsArtifactId
+      )
+    );
+  }
+
   const payload = {
     blocks,
     attachments,
   };
-  console.log(payload);
   return JSON.stringify(payload);
 };
