@@ -19,8 +19,9 @@ export const run = async (): Promise<void> => {
     console.log(attachmentsData.environmentArtifactId);
     await downloadArtifact(token, attachmentsData.environmentArtifactId);
     let environment = '';
-    if (isFileExists('./environment.txt')) {
-      await unzipArtifact('./environment.txt');
+    if (isFileExists('./environment.zip')) {
+      console.log('ENVIRONMENT ZIP EXISTS');
+      await unzipArtifact('./environment.zip');
       environment = readFile('./environment.txt');
     }
     console.log(environment);

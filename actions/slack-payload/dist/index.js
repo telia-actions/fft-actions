@@ -9625,8 +9625,8 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log(attachmentsData.environmentArtifactId);
         yield (0, github_client_1.downloadArtifact)(token, attachmentsData.environmentArtifactId);
         let environment = '';
-        if ((0, file_client_1.isFileExists)('./environment.txt')) {
-            yield (0, archive_artifact_1.unzipArtifact)('./environment.txt');
+        if ((0, file_client_1.isFileExists)('./environment.zip')) {
+            yield (0, archive_artifact_1.unzipArtifact)('./environment.zip');
             environment = (0, file_client_1.readFile)('./environment.txt');
         }
         console.log(environment);
@@ -9896,7 +9896,6 @@ const getAttachmentsData = (token, runId) => __awaiter(void 0, void 0, void 0, f
         repo: github_1.context.repo.repo,
         run_id: runId,
     });
-    console.log(attachments);
     return attachments.data.artifacts.reduce((acc, artifact) => {
         switch (artifact.name) {
             case 'build-logs':
