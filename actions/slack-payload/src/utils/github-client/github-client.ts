@@ -101,5 +101,6 @@ export const downloadArtifact = async (token: string, artifactId: number): Promi
     artifact_id: artifactId,
     archive_format: 'zip',
   });
+  console.log(zip.data);
   return Buffer.from(zip.data as ArrayBuffer);
 };
