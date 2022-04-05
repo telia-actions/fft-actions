@@ -68,6 +68,9 @@ export const getAttachmentsData = async (
     repo: context.repo.repo,
     run_id: runId,
   });
+
+  console.log(attachments.data);
+
   return attachments.data.artifacts.reduce(
     (acc, artifact) => {
       switch (artifact.name) {

@@ -9897,6 +9897,7 @@ const getAttachmentsData = (token, runId) => __awaiter(void 0, void 0, void 0, f
         repo: github_1.context.repo.repo,
         run_id: runId,
     });
+    console.log(attachments.data);
     return attachments.data.artifacts.reduce((acc, artifact) => {
         switch (artifact.name) {
             case 'build-logs':
