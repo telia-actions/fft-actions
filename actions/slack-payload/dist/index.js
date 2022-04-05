@@ -9625,11 +9625,11 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         console.log(attachmentsData.environmentArtifactId);
         yield (0, github_client_1.downloadArtifact)(token, attachmentsData.environmentArtifactId);
         let environment = '';
-        if ((0, file_client_1.isFileExists)('./environment.zip')) {
-            console.log('ENVIRONMENT ZIP EXISTS');
-            yield (0, archive_artifact_1.unzipArtifact)('./environment.zip');
-            environment = (0, file_client_1.readFile)('./environment.txt');
-        }
+        // if (isFileExists('./environment.zip')) {
+        console.log('ENVIRONMENT ZIP EXISTS');
+        yield (0, archive_artifact_1.unzipArtifact)('./environment.zip');
+        environment = (0, file_client_1.readFile)('./environment.txt');
+        // }
         console.log(environment);
         if (workflowContext.pullNumber) {
             const pullRequestContext = yield (0, github_client_1.getPullRequestContext)(token, workflowContext.pullNumber);
@@ -9922,12 +9922,13 @@ const getAttachmentsData = (token, runId) => __awaiter(void 0, void 0, void 0, f
 exports.getAttachmentsData = getAttachmentsData;
 const downloadArtifact = (token, artifactId) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
-    yield client.rest.actions.downloadArtifact({
+    const zip = yield client.rest.actions.downloadArtifact({
         owner: github_1.context.repo.owner,
         repo: github_1.context.repo.repo,
         artifact_id: artifactId,
         archive_format: 'zip',
     });
+    console.log(Buffer.from(zip.data));
 });
 exports.downloadArtifact = downloadArtifact;
 
@@ -9978,8 +9979,6 @@ exports.unzipArtifact = void 0;
 const exec_1 = __nccwpck_require__(1514);
 const unzipArtifact = (tarfile) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, exec_1.exec)('ls', ['-la']);
-    console.log(__dirname);
-    console.log(process.cwd());
     const exitCode = yield (0, exec_1.exec)('tar', ['xvf', tarfile]);
     if (exitCode !== 0) {
         throw new Error(`tar failed with exit code ${exitCode} when unzipping ${tarfile}`);
