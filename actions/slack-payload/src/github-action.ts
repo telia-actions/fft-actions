@@ -8,7 +8,7 @@ import {
   getWorkflowContext,
 } from '@src/utils/github-client';
 import { unzipArtifact } from '@src/utils/tar/archive-artifact';
-import { readFile } from './utils/file-client';
+import { isFileExists, readFile } from './utils/file-client';
 
 export const run = async (): Promise<void> => {
   try {
@@ -18,8 +18,11 @@ export const run = async (): Promise<void> => {
     const attachmentsData = await getAttachmentsData(token, workflowContext.runId);
     console.log(attachmentsData.environmentArtifactId);
     await downloadArtifact(token, attachmentsData.environmentArtifactId);
-    await unzipArtifact('environment.txt');
-    const environment = readFile('./environment.txt');
+    let environment = '';
+    if (isFileExists('./environment.txt')) {
+      await unzipArtifact('./environment.txt');
+      environment = readFile('./environment.txt');
+    }
     console.log(environment);
     if (workflowContext.pullNumber) {
       const pullRequestContext = await getPullRequestContext(token, workflowContext.pullNumber);

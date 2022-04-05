@@ -9622,9 +9622,13 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const workflowContext = (0, github_client_1.getWorkflowContext)();
         const jobsData = yield (0, github_client_1.getJobsData)(token, workflowContext.runId);
         const attachmentsData = yield (0, github_client_1.getAttachmentsData)(token, workflowContext.runId);
+        console.log(attachmentsData.environmentArtifactId);
         yield (0, github_client_1.downloadArtifact)(token, attachmentsData.environmentArtifactId);
-        yield (0, archive_artifact_1.unzipArtifact)('environment.txt');
-        const environment = (0, file_client_1.readFile)('./environment.txt');
+        let environment = '';
+        if ((0, file_client_1.isFileExists)('./environment.txt')) {
+            yield (0, archive_artifact_1.unzipArtifact)('./environment.txt');
+            environment = (0, file_client_1.readFile)('./environment.txt');
+        }
         console.log(environment);
         if (workflowContext.pullNumber) {
             const pullRequestContext = yield (0, github_client_1.getPullRequestContext)(token, workflowContext.pullNumber);
@@ -9777,12 +9781,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.readFile = void 0;
+exports.isFileExists = exports.readFile = void 0;
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const readFile = (pathToFile) => {
     return fs_1.default.readFileSync(pathToFile, { encoding: 'utf8' });
 };
 exports.readFile = readFile;
+const isFileExists = (pathToFile) => {
+    return !fs_1.default.existsSync(pathToFile);
+};
+exports.isFileExists = isFileExists;
 
 
 /***/ }),
@@ -9888,6 +9896,7 @@ const getAttachmentsData = (token, runId) => __awaiter(void 0, void 0, void 0, f
         repo: github_1.context.repo.repo,
         run_id: runId,
     });
+    console.log(attachments);
     return attachments.data.artifacts.reduce((acc, artifact) => {
         switch (artifact.name) {
             case 'build-logs':
