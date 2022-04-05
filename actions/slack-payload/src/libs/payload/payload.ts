@@ -13,7 +13,7 @@ import {
 } from './utils';
 
 export const createPayload = (
-  deployEnvironment: string,
+  deployEnvironment: string | undefined,
   workflowData: WorkflowData,
   jobsData: JobsData,
   attachmentsData: AttachmentsData,

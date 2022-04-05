@@ -16,6 +16,7 @@ export const run = async (): Promise<void> => {
     const workflowContext = getWorkflowContext();
     const jobsData = await getJobsData(token, workflowContext.runId);
     const attachmentsData = await getAttachmentsData(token, workflowContext.runId);
+    console.log(attachmentsData.environmentArtifactId);
     await downloadArtifact(token, attachmentsData.environmentArtifactId);
     await unzipArtifact('environment.txt');
     const environment = readFile('./environment.txt');
