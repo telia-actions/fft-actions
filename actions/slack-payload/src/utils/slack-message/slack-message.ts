@@ -21,7 +21,6 @@ export const getPackagesPayload = (
   count: number,
   environment: string
 ): any => {
-  if (count === 0) return {};
   const upperCaseEnvironment = environment.toUpperCase();
   const message = `${status} deployments - *${count}* to *${upperCaseEnvironment}* environment`;
   return {

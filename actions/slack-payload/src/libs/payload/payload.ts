@@ -34,23 +34,26 @@ export const createPayload = async (workflowData: WorkflowData): Promise<string>
       )
     );
   }
-  attachments.push(
-    getPackagesPayload(
-      Colors.SUCCESS,
-      GithubStatus.SUCCESS,
-      workflowData.jobsOutcome.successDeployCount,
-      workflowData.environment
-    )
-  );
-  attachments.push(
-    getPackagesPayload(
-      Colors.FAILURE,
-      GithubStatus.FAILURE,
-      workflowData.jobsOutcome.failureDeployCount,
-      workflowData.environment
-    )
-  );
-
+  if (workflowData.jobsOutcome.successDeployCount !== 0) {
+    attachments.push(
+      getPackagesPayload(
+        Colors.SUCCESS,
+        GithubStatus.SUCCESS,
+        workflowData.jobsOutcome.successDeployCount,
+        workflowData.environment
+      )
+    );
+  }
+  if (workflowData.jobsOutcome.failureDeployCount !== 0) {
+    attachments.push(
+      getPackagesPayload(
+        Colors.FAILURE,
+        GithubStatus.FAILURE,
+        workflowData.jobsOutcome.failureDeployCount,
+        workflowData.environment
+      )
+    );
+  }
   if (workflowData.conclusion === GithubStatus.FAILURE) {
     attachments.push(
       getLogsPayload(
@@ -66,6 +69,5 @@ export const createPayload = async (workflowData: WorkflowData): Promise<string>
     blocks,
     attachments,
   };
-  console.log(payload);
   return JSON.stringify(payload);
 };

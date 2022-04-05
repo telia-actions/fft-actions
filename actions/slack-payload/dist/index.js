@@ -9619,6 +9619,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const token = (0, core_1.getInput)('token');
         const workflowContext = yield (0, github_client_1.getWorkflowContext)(token);
         const payload = (0, payload_1.createPayload)(workflowContext);
+        console.log(payload);
         (0, core_1.setOutput)('payload', payload);
     }
     catch (error) {
@@ -9683,8 +9684,12 @@ const createPayload = (workflowData) => __awaiter(void 0, void 0, void 0, functi
         workflowData.pullRequest.url) {
         blocks.push((0, slack_message_1.getPullRequestPayload)(workflowData.sha, workflowData.pullRequest.url, workflowData.pullRequest.title, workflowData.pullRequest.number));
     }
-    attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.SUCCESS, enums_1.GithubStatus.SUCCESS, workflowData.jobsOutcome.successDeployCount, workflowData.environment));
-    attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.FAILURE, enums_1.GithubStatus.FAILURE, workflowData.jobsOutcome.failureDeployCount, workflowData.environment));
+    if (workflowData.jobsOutcome.successDeployCount !== 0) {
+        attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.SUCCESS, enums_1.GithubStatus.SUCCESS, workflowData.jobsOutcome.successDeployCount, workflowData.environment));
+    }
+    if (workflowData.jobsOutcome.failureDeployCount !== 0) {
+        attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.FAILURE, enums_1.GithubStatus.FAILURE, workflowData.jobsOutcome.failureDeployCount, workflowData.environment));
+    }
     if (workflowData.conclusion === enums_1.GithubStatus.FAILURE) {
         attachments.push((0, slack_message_1.getLogsPayload)(workflowData.url, workflowData.checkSuiteId, workflowData.attachmentsIds.buildLogsArtifactId, workflowData.attachmentsIds.testLogsArtifactId));
     }
@@ -9692,7 +9697,6 @@ const createPayload = (workflowData) => __awaiter(void 0, void 0, void 0, functi
         blocks,
         attachments,
     };
-    console.log(payload);
     return JSON.stringify(payload);
 });
 exports.createPayload = createPayload;
@@ -9939,8 +9943,6 @@ const getPullRequestPayload = (sha, url, title, number) => {
 };
 exports.getPullRequestPayload = getPullRequestPayload;
 const getPackagesPayload = (color, status, count, environment) => {
-    if (count === 0)
-        return {};
     const upperCaseEnvironment = environment.toUpperCase();
     const message = `${status} deployments - *${count}* to *${upperCaseEnvironment}* environment`;
     return {
