@@ -70,13 +70,35 @@ export const getAttachmentsData = async (
   });
   return attachments.data.artifacts.reduce(
     (acc, artifact) => {
-      if (artifact.name.startsWith('build-logs')) acc.buildLogsUrl = artifact.archive_download_url;
-      if (artifact.name.startsWith('test-logs')) acc.testLogsUrl = artifact.archive_download_url;
+      switch (artifact.name) {
+        case 'build-logs':
+          acc.buildLogsUrl = artifact.archive_download_url;
+          break;
+        case 'test-logs':
+          acc.testLogsUrl = artifact.archive_download_url;
+          break;
+        case 'environment':
+          acc.environmentArtifactId = artifact.id;
+          break;
+        default:
+          break;
+      }
       return acc;
     },
     {
       buildLogsUrl: '',
       testLogsUrl: '',
+      environmentArtifactId: 0,
     }
   );
+};
+
+export const downloadArtifact = async (token: string, artifactId: number): Promise<void> => {
+  const client = getOctokit(token);
+  await client.rest.actions.downloadArtifact({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    artifact_id: artifactId,
+    archive_format: 'zip',
+  });
 };

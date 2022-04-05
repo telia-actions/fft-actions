@@ -5,8 +5,15 @@ import type {
   PullRequestData,
   WorkflowData,
 } from '@src/utils/github-client/types';
+import {
+  getLogsPayload,
+  getPackagesPayload,
+  getPullRequestPayload,
+  getTitlePayload,
+} from './utils';
 
 export const createPayload = (
+  deployEnvironment: string,
   workflowData: WorkflowData,
   jobsData: JobsData,
   attachmentsData: AttachmentsData,
@@ -14,7 +21,9 @@ export const createPayload = (
 ): string => {
   const workflowIcon =
     workflowData.conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
-  const environment = workflowData.pullNumber ? `preview-${workflowData.pullNumber}` : 'dev-test';
+  const environment = workflowData.pullNumber
+    ? `preview-${workflowData.pullNumber}`
+    : deployEnvironment;
   const blocks = [];
   const attachments = [];
   const titleBlock = getTitlePayload(
@@ -25,7 +34,7 @@ export const createPayload = (
     workflowData.name
   );
   const pullRequestBlock = pullRequestData
-    ? getpullRequestPayload(
+    ? getPullRequestPayload(
         pullRequestData.url,
         pullRequestData.number,
         pullRequestData.title,
@@ -56,63 +65,4 @@ export const createPayload = (
     attachments,
   };
   return JSON.stringify(payload);
-};
-
-const getpullRequestPayload = (url: string, number: number, title: string, sha: string): any => {
-  return {
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: `${SlackIcons.PULL_REQUEST} *<${url}|#${number} ${title}>* (commit id \`${sha}\`)`,
-    },
-  };
-};
-
-const getPackagesPayload = (
-  color: string,
-  status: string,
-  count: number,
-  environment: string
-): any => {
-  if (count === 0) return {};
-  const upperCaseEnvironment = environment.toUpperCase();
-  const message = `${status} deployments - *${count}* to *${upperCaseEnvironment}* environment`;
-  return {
-    color,
-    fallback: message,
-    text: message,
-  };
-};
-
-const getTitlePayload = (
-  icon: string,
-  repositoryUrl: string,
-  repositoryName: string,
-  workflowUrl: string,
-  workflowName: string
-): any => {
-  return {
-    type: 'section',
-    fields: [
-      {
-        type: 'mrkdwn',
-        text: `${icon} *<${repositoryUrl}|${repositoryName}>*`,
-      },
-      {
-        type: 'mrkdwn',
-        text: `*<${workflowUrl}|${workflowName}>*`,
-      },
-    ],
-  };
-};
-
-const getLogsPayload = (attachmentsData: AttachmentsData): any => {
-  const message = `${SlackIcons.DOWNLOADS} Download ${
-    attachmentsData.buildLogsUrl ? `*<${attachmentsData.buildLogsUrl}|build logs>*` : ''
-  } ${attachmentsData.testLogsUrl ? `*<${attachmentsData.testLogsUrl}|test logs>*` : ''}`;
-  return {
-    color: Colors.FAILURE,
-    fallback: message,
-    text: message,
-  };
 };

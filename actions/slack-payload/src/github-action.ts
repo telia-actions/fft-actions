@@ -1,11 +1,14 @@
 import { getInput, setOutput } from '@actions/core';
 import { createPayload } from '@src/libs/payload';
 import {
+  downloadArtifact,
   getAttachmentsData,
   getJobsData,
   getPullRequestContext,
   getWorkflowContext,
 } from '@src/utils/github-client';
+import { unzipArtifact } from '@src/utils/tar/archive-artifact';
+import { readFile } from './utils/file-client';
 
 export const run = async (): Promise<void> => {
   try {
@@ -13,12 +16,22 @@ export const run = async (): Promise<void> => {
     const workflowContext = getWorkflowContext();
     const jobsData = await getJobsData(token, workflowContext.runId);
     const attachmentsData = await getAttachmentsData(token, workflowContext.runId);
+    await downloadArtifact(token, attachmentsData.environmentArtifactId);
+    await unzipArtifact('environment.txt');
+    const environment = readFile('./environment.txt');
+    console.log(environment);
     if (workflowContext.pullNumber) {
       const pullRequestContext = await getPullRequestContext(token, workflowContext.pullNumber);
-      const payload = createPayload(workflowContext, jobsData, attachmentsData, pullRequestContext);
+      const payload = createPayload(
+        environment,
+        workflowContext,
+        jobsData,
+        attachmentsData,
+        pullRequestContext
+      );
       setOutput('payload', payload);
     } else {
-      const payload = createPayload(workflowContext, jobsData, attachmentsData);
+      const payload = createPayload(environment, workflowContext, jobsData, attachmentsData);
       setOutput('payload', payload);
     }
   } catch (error) {

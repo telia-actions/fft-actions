@@ -28,6 +28,7 @@ export type JobsData = {
 export type AttachmentsData = {
   buildLogsUrl: string;
   testLogsUrl: string;
+  environmentArtifactId: number;
 };
 
 export type ListJobsForWorkflowRun =
