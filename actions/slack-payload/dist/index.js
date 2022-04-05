@@ -9618,7 +9618,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (0, core_1.getInput)('token');
         const workflowContext = yield (0, github_client_1.getWorkflowContext)(token);
-        const payload = (0, payload_1.createPayload)(token, workflowContext);
+        const payload = (0, payload_1.createPayload)(workflowContext);
         (0, core_1.setOutput)('payload', payload);
     }
     catch (error) {
@@ -9673,7 +9673,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
 const slack_message_1 = __nccwpck_require__(9584);
-const createPayload = (token, workflowData) => __awaiter(void 0, void 0, void 0, function* () {
+const createPayload = (workflowData) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const blocks = [];
     const attachments = [];
@@ -9692,6 +9692,7 @@ const createPayload = (token, workflowData) => __awaiter(void 0, void 0, void 0,
         blocks,
         attachments,
     };
+    console.log(payload);
     return JSON.stringify(payload);
 });
 exports.createPayload = createPayload;
