@@ -7,7 +7,7 @@ import {
   getTitlePayload,
 } from '@src/utils/slack-message';
 
-export const createPayload = async (token: string, workflowData: WorkflowData): Promise<string> => {
+export const createPayload = async (workflowData: WorkflowData): Promise<string> => {
   const blocks = [];
   const attachments = [];
 
@@ -66,5 +66,6 @@ export const createPayload = async (token: string, workflowData: WorkflowData): 
     blocks,
     attachments,
   };
+  console.log(payload);
   return JSON.stringify(payload);
 };
