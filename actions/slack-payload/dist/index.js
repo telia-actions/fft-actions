@@ -9921,14 +9921,12 @@ const getAttachmentsData = (token, runId) => __awaiter(void 0, void 0, void 0, f
 exports.getAttachmentsData = getAttachmentsData;
 const downloadArtifact = (token, artifactId) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
-    const test = yield client.rest.actions.downloadArtifact({
+    yield client.rest.actions.downloadArtifact({
         owner: github_1.context.repo.owner,
         repo: github_1.context.repo.repo,
         artifact_id: artifactId,
         archive_format: 'zip',
     });
-    console.log(test.status);
-    console.log(test.data);
 });
 exports.downloadArtifact = downloadArtifact;
 
@@ -9978,7 +9976,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.unzipArtifact = void 0;
 const exec_1 = __nccwpck_require__(1514);
 const unzipArtifact = (tarfile) => __awaiter(void 0, void 0, void 0, function* () {
-    const exitCode = yield (0, exec_1.exec)('tar', ['xvf', tarfile]);
+    const exitCode = yield (0, exec_1.exec)('tar', ['-xvf', tarfile]);
     if (exitCode !== 0) {
         throw new Error(`tar failed with exit code ${exitCode} when unzipping ${tarfile}`);
     }
