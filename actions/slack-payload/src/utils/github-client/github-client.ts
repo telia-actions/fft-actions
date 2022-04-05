@@ -95,10 +95,12 @@ export const getAttachmentsData = async (
 
 export const downloadArtifact = async (token: string, artifactId: number): Promise<void> => {
   const client = getOctokit(token);
-  await client.rest.actions.downloadArtifact({
+  const test = await client.rest.actions.downloadArtifact({
     owner: context.repo.owner,
     repo: context.repo.repo,
     artifact_id: artifactId,
     archive_format: 'zip',
   });
+  console.log(test.status);
+  console.log(test.data);
 };

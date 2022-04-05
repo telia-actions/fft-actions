@@ -9626,6 +9626,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         yield (0, github_client_1.downloadArtifact)(token, attachmentsData.environmentArtifactId);
         let environment = '';
         if ((0, file_client_1.isFileExists)('./environment.zip')) {
+            console.log('ENVIRONMENT ZIP EXISTS');
             yield (0, archive_artifact_1.unzipArtifact)('./environment.zip');
             environment = (0, file_client_1.readFile)('./environment.txt');
         }
@@ -9920,12 +9921,14 @@ const getAttachmentsData = (token, runId) => __awaiter(void 0, void 0, void 0, f
 exports.getAttachmentsData = getAttachmentsData;
 const downloadArtifact = (token, artifactId) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
-    yield client.rest.actions.downloadArtifact({
+    const test = yield client.rest.actions.downloadArtifact({
         owner: github_1.context.repo.owner,
         repo: github_1.context.repo.repo,
         artifact_id: artifactId,
         archive_format: 'zip',
     });
+    console.log(test.status);
+    console.log(test.data);
 });
 exports.downloadArtifact = downloadArtifact;
 
