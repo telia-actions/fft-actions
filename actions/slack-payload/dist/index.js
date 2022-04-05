@@ -9625,7 +9625,6 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         let environment = '';
         if (attachmentsData.environmentArtifactId) {
             const zipBuffer = yield (0, github_client_1.downloadArtifact)(token, attachmentsData.environmentArtifactId);
-            console.log(zipBuffer.toString('utf-8'));
             (0, file_client_1.writeFile)('environment.zip', zipBuffer);
             console.log('New file created');
             yield (0, archive_artifact_1.unzipArtifact)('./environment.zip');
