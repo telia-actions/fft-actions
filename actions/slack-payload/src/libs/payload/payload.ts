@@ -64,5 +64,6 @@ export const createPayload = (
     blocks,
     attachments,
   };
+  console.log(payload);
   return JSON.stringify(payload);
 };

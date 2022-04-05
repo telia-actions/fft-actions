@@ -9707,6 +9707,7 @@ const createPayload = (deployEnvironment, workflowData, jobsData, attachmentsDat
         blocks,
         attachments,
     };
+    console.log(payload);
     return JSON.stringify(payload);
 };
 exports.createPayload = createPayload;
@@ -9976,7 +9977,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.unzipArtifact = void 0;
 const exec_1 = __nccwpck_require__(1514);
 const unzipArtifact = (tarfile) => __awaiter(void 0, void 0, void 0, function* () {
-    const exitCode = yield (0, exec_1.exec)('tar', ['-xvf', tarfile]);
+    yield (0, exec_1.exec)('ls', ['-la']);
+    console.log(__dirname);
+    console.log(process.cwd());
+    const exitCode = yield (0, exec_1.exec)('tar', ['xvf', tarfile]);
     if (exitCode !== 0) {
         throw new Error(`tar failed with exit code ${exitCode} when unzipping ${tarfile}`);
     }
