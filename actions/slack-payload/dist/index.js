@@ -9928,7 +9928,7 @@ const downloadArtifact = (token, artifactId) => __awaiter(void 0, void 0, void 0
         artifact_id: artifactId,
         archive_format: 'zip',
     });
-    console.log(Buffer.from(zip.data));
+    console.log(Buffer.from(zip.data).toString());
 });
 exports.downloadArtifact = downloadArtifact;
 
