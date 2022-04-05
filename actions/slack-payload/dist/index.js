@@ -9929,7 +9929,7 @@ const downloadArtifact = (token, artifactId) => __awaiter(void 0, void 0, void 0
         artifact_id: artifactId,
         archive_format: 'zip',
     });
-    return zip.data;
+    return Buffer.from(zip.data);
 });
 exports.downloadArtifact = downloadArtifact;
 
