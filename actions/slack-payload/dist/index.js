@@ -9622,14 +9622,13 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const workflowContext = (0, github_client_1.getWorkflowContext)();
         const jobsData = yield (0, github_client_1.getJobsData)(token, workflowContext.runId);
         const attachmentsData = yield (0, github_client_1.getAttachmentsData)(token, workflowContext.runId);
-        console.log(attachmentsData.environmentArtifactId);
-        yield (0, github_client_1.downloadArtifact)(token, attachmentsData.environmentArtifactId);
         let environment = '';
-        // if (isFileExists('./environment.zip')) {
-        console.log('ENVIRONMENT ZIP EXISTS');
-        yield (0, archive_artifact_1.unzipArtifact)('./environment.zip');
-        environment = (0, file_client_1.readFile)('./environment.txt');
-        // }
+        if (attachmentsData.environmentArtifactId) {
+            const zipBuffer = yield (0, github_client_1.downloadArtifact)(token, attachmentsData.environmentArtifactId);
+            (0, file_client_1.writeFile)('environment.zip', zipBuffer);
+            yield (0, archive_artifact_1.unzipArtifact)('./environment.zip');
+            environment = (0, file_client_1.readFile)('./environment.txt');
+        }
         console.log(environment);
         if (workflowContext.pullNumber) {
             const pullRequestContext = yield (0, github_client_1.getPullRequestContext)(token, workflowContext.pullNumber);
@@ -9783,16 +9782,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isFileExists = exports.readFile = void 0;
+exports.writeFile = exports.readFile = void 0;
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const readFile = (pathToFile) => {
     return fs_1.default.readFileSync(pathToFile, { encoding: 'utf8' });
 };
 exports.readFile = readFile;
-const isFileExists = (pathToFile) => {
-    return !fs_1.default.existsSync(pathToFile);
+const writeFile = (fileName, content) => {
+    fs_1.default.writeFileSync(fileName, content);
 };
-exports.isFileExists = isFileExists;
+exports.writeFile = writeFile;
 
 
 /***/ }),
@@ -9928,7 +9927,7 @@ const downloadArtifact = (token, artifactId) => __awaiter(void 0, void 0, void 0
         artifact_id: artifactId,
         archive_format: 'zip',
     });
-    console.log(Buffer.from(zip.data).toString());
+    return zip.data;
 });
 exports.downloadArtifact = downloadArtifact;
 

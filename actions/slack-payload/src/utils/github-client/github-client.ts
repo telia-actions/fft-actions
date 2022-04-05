@@ -93,7 +93,7 @@ export const getAttachmentsData = async (
   );
 };
 
-export const downloadArtifact = async (token: string, artifactId: number): Promise<void> => {
+export const downloadArtifact = async (token: string, artifactId: number): Promise<Buffer> => {
   const client = getOctokit(token);
   const zip = await client.rest.actions.downloadArtifact({
     owner: context.repo.owner,
@@ -101,5 +101,5 @@ export const downloadArtifact = async (token: string, artifactId: number): Promi
     artifact_id: artifactId,
     archive_format: 'zip',
   });
-  console.log(Buffer.from(zip.data as Buffer).toString());
+  return zip.data as Buffer;
 };
