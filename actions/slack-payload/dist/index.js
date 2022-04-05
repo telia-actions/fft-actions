@@ -9980,11 +9980,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.unzipArtifact = void 0;
 const exec_1 = __nccwpck_require__(1514);
-const unzipArtifact = (tarfile) => __awaiter(void 0, void 0, void 0, function* () {
+const unzipArtifact = (zipFile) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, exec_1.exec)('ls', ['-la']);
-    const exitCode = yield (0, exec_1.exec)('tar', ['xvf', tarfile]);
+    const exitCode = yield (0, exec_1.exec)('unzip', [zipFile]);
     if (exitCode !== 0) {
-        throw new Error(`tar failed with exit code ${exitCode} when unzipping ${tarfile}`);
+        throw new Error(`tar failed with exit code ${exitCode} when unzipping ${zipFile}`);
     }
 });
 exports.unzipArtifact = unzipArtifact;
