@@ -9668,17 +9668,17 @@ const createPayload = (workflowData) => {
     var _a;
     const blocks = [];
     const attachments = [];
-    blocks.push((0, slack_message_1.getTitlePayload)(workflowData.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE, workflowData.repository.url, workflowData.repository.name, workflowData.url, workflowData.name));
+    blocks.push((0, slack_message_1.getTitlePayload)(workflowData.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE, workflowData.repository.url, workflowData.repository.name, workflowData.url, workflowData.name, workflowData.environment));
     if (((_a = workflowData.pullRequest) === null || _a === void 0 ? void 0 : _a.title) &&
         workflowData.pullRequest.number &&
         workflowData.pullRequest.url) {
         blocks.push((0, slack_message_1.getPullRequestPayload)(workflowData.sha, workflowData.pullRequest.url, workflowData.pullRequest.title, workflowData.pullRequest.number));
     }
     if (workflowData.jobsOutcome.successDeployCount !== 0) {
-        attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.SUCCESS, enums_1.GithubStatus.SUCCESS, workflowData.jobsOutcome.successDeployCount, workflowData.environment));
+        attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.SUCCESS, enums_1.GithubStatus.SUCCESS, workflowData.jobsOutcome.successDeployCount));
     }
     if (workflowData.jobsOutcome.failureDeployCount !== 0) {
-        attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.FAILURE, enums_1.GithubStatus.FAILURE, workflowData.jobsOutcome.failureDeployCount, workflowData.environment));
+        attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.FAILURE, enums_1.GithubStatus.FAILURE, workflowData.jobsOutcome.failureDeployCount));
     }
     if (workflowData.conclusion === enums_1.GithubStatus.FAILURE) {
         attachments.push((0, slack_message_1.getLogsPayload)(workflowData.repository.url, workflowData.checkSuiteId, workflowData.attachmentsIds.buildLogsArtifactId, workflowData.attachmentsIds.testLogsArtifactId));
@@ -9932,9 +9932,8 @@ const getPullRequestPayload = (sha, url, title, number) => {
     };
 };
 exports.getPullRequestPayload = getPullRequestPayload;
-const getPackagesPayload = (color, status, count, environment) => {
-    const upperCaseEnvironment = environment.toUpperCase();
-    const message = `${status} deployments - *${count}* to *${upperCaseEnvironment}* environment`;
+const getPackagesPayload = (color, status, count) => {
+    const message = `*${count}* ${status} deployments`;
     return {
         color,
         fallback: message,
@@ -9942,7 +9941,7 @@ const getPackagesPayload = (color, status, count, environment) => {
     };
 };
 exports.getPackagesPayload = getPackagesPayload;
-const getTitlePayload = (icon, repositoryUrl, repositoryName, workflowUrl, workflowName) => {
+const getTitlePayload = (icon, repositoryUrl, repositoryName, workflowUrl, workflowName, environment) => {
     return {
         type: 'section',
         fields: [
@@ -9953,6 +9952,10 @@ const getTitlePayload = (icon, repositoryUrl, repositoryName, workflowUrl, workf
             {
                 type: 'mrkdwn',
                 text: `*<${workflowUrl}|${workflowName}>*`,
+            },
+            {
+                type: 'mrkdwn',
+                text: `*Environment: ${environment.toUpperCase()}*`,
             },
         ],
     };

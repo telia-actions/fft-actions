@@ -17,7 +17,8 @@ export const createPayload = (workflowData: WorkflowData): string => {
       workflowData.repository.url,
       workflowData.repository.name,
       workflowData.url,
-      workflowData.name
+      workflowData.name,
+      workflowData.environment
     )
   );
   if (
@@ -39,8 +40,7 @@ export const createPayload = (workflowData: WorkflowData): string => {
       getPackagesPayload(
         Colors.SUCCESS,
         GithubStatus.SUCCESS,
-        workflowData.jobsOutcome.successDeployCount,
-        workflowData.environment
+        workflowData.jobsOutcome.successDeployCount
       )
     );
   }
@@ -49,8 +49,7 @@ export const createPayload = (workflowData: WorkflowData): string => {
       getPackagesPayload(
         Colors.FAILURE,
         GithubStatus.FAILURE,
-        workflowData.jobsOutcome.failureDeployCount,
-        workflowData.environment
+        workflowData.jobsOutcome.failureDeployCount
       )
     );
   }

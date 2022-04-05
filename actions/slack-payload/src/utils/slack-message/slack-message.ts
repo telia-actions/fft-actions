@@ -15,14 +15,8 @@ export const getPullRequestPayload = (
   };
 };
 
-export const getPackagesPayload = (
-  color: string,
-  status: string,
-  count: number,
-  environment: string
-): any => {
-  const upperCaseEnvironment = environment.toUpperCase();
-  const message = `${status} deployments - *${count}* to *${upperCaseEnvironment}* environment`;
+export const getPackagesPayload = (color: string, status: string, count: number): any => {
+  const message = `*${count}* ${status} deployments`;
   return {
     color,
     fallback: message,
@@ -35,7 +29,8 @@ export const getTitlePayload = (
   repositoryUrl: string,
   repositoryName: string,
   workflowUrl: string,
-  workflowName: string
+  workflowName: string,
+  environment: string
 ): any => {
   return {
     type: 'section',
@@ -47,6 +42,10 @@ export const getTitlePayload = (
       {
         type: 'mrkdwn',
         text: `*<${workflowUrl}|${workflowName}>*`,
+      },
+      {
+        type: 'mrkdwn',
+        text: `*Environment: ${environment.toUpperCase()}*`,
       },
     ],
   };
