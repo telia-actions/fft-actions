@@ -9790,7 +9790,7 @@ const readFile = (pathToFile) => {
 };
 exports.readFile = readFile;
 const writeFile = (fileName, content) => {
-    fs_1.default.writeFileSync(fileName, content);
+    fs_1.default.writeFileSync(fileName, content, 'utf-8');
 };
 exports.writeFile = writeFile;
 
@@ -9928,6 +9928,8 @@ const downloadArtifact = (token, artifactId) => __awaiter(void 0, void 0, void 0
         artifact_id: artifactId,
         archive_format: 'zip',
     });
+    console.log(zip.headers);
+    console.log(zip.url);
     console.log(zip.data);
     return Buffer.from(zip.data);
 });

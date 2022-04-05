@@ -5,5 +5,5 @@ export const readFile = (pathToFile: string): string => {
 };
 
 export const writeFile = (fileName: string, content: Buffer): void => {
-  fs.writeFileSync(fileName, content);
+  fs.writeFileSync(fileName, content, 'utf-8');
 };
