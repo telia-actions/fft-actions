@@ -7,7 +7,7 @@ import {
   getTitlePayload,
 } from '@src/utils/slack-message';
 
-export const createPayload = async (workflowData: WorkflowData): Promise<string> => {
+export const createPayload = (workflowData: WorkflowData): string => {
   const blocks = [];
   const attachments = [];
 

@@ -7,7 +7,6 @@ export const run = async (): Promise<void> => {
     const token = getInput('token');
     const workflowContext = await getWorkflowContext(token);
     const payload = createPayload(workflowContext);
-    console.log(payload);
     setOutput('payload', payload);
   } catch (error) {
     setOutput('payload', 'Failed to generate slack message payload - please contact @fft');
