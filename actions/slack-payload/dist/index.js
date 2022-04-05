@@ -9681,7 +9681,7 @@ const createPayload = (workflowData) => {
         attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.FAILURE, enums_1.GithubStatus.FAILURE, workflowData.jobsOutcome.failureDeployCount, workflowData.environment));
     }
     if (workflowData.conclusion === enums_1.GithubStatus.FAILURE) {
-        attachments.push((0, slack_message_1.getLogsPayload)(workflowData.url, workflowData.checkSuiteId, workflowData.attachmentsIds.buildLogsArtifactId, workflowData.attachmentsIds.testLogsArtifactId));
+        attachments.push((0, slack_message_1.getLogsPayload)(workflowData.repository.url, workflowData.checkSuiteId, workflowData.attachmentsIds.buildLogsArtifactId, workflowData.attachmentsIds.testLogsArtifactId));
     }
     const payload = {
         blocks,

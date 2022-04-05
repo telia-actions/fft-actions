@@ -57,7 +57,7 @@ export const createPayload = (workflowData: WorkflowData): string => {
   if (workflowData.conclusion === GithubStatus.FAILURE) {
     attachments.push(
       getLogsPayload(
-        workflowData.url,
+        workflowData.repository.url,
         workflowData.checkSuiteId,
         workflowData.attachmentsIds.buildLogsArtifactId,
         workflowData.attachmentsIds.testLogsArtifactId
