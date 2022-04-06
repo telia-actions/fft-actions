@@ -55,8 +55,10 @@ export const createPayload = (workflowData: WorkflowData): string => {
       )
     );
   }
-  if (workflowData.conclusion === GithubStatus.FAILURE) {
+  if (workflowData.jobsOutcome.failedJobSteps.length > 0) {
     attachments.push(getFailureStep(workflowData.jobsOutcome.failedJobSteps));
+  }
+  if (workflowData.conclusion === GithubStatus.FAILURE) {
     attachments.push(
       getLogsPayload(
         workflowData.repository.url,
