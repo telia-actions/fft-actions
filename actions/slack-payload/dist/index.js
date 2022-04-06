@@ -9994,8 +9994,16 @@ const getFailureStep = (failedSteps) => {
     return {
         color: enums_1.Colors.FAILURE,
         fallback: message,
-        text: message,
-        blocks: stepsBlock,
+        blocks: [
+            {
+                type: 'section',
+                text: {
+                    type: 'plain_text',
+                    text: message,
+                },
+            },
+            [...stepsBlock],
+        ],
     };
 };
 exports.getFailureStep = getFailureStep;

@@ -85,7 +85,15 @@ export const getFailureStep = (failedSteps: string[]): any => {
   return {
     color: Colors.FAILURE,
     fallback: message,
-    text: message,
-    blocks: stepsBlock,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'plain_text',
+          text: message,
+        },
+      },
+      [...stepsBlock],
+    ],
   };
 };
