@@ -1,6 +1,7 @@
 import { Colors, GithubStatus, SlackIcons } from '@src/enums';
 import type { WorkflowData } from '@src/utils/github-client/types';
 import {
+  getFailureStep,
   getLogsPayload,
   getPackagesPayload,
   getPullRequestPayload,
@@ -22,7 +23,8 @@ export const createPayload = (workflowData: WorkflowData): string => {
     )
   );
   if (
-    workflowData.pullRequest?.title &&
+    workflowData.pullRequest &&
+    workflowData.pullRequest.title &&
     workflowData.pullRequest.number &&
     workflowData.pullRequest.url
   ) {
@@ -54,6 +56,7 @@ export const createPayload = (workflowData: WorkflowData): string => {
     );
   }
   if (workflowData.conclusion === GithubStatus.FAILURE) {
+    attachments.push(getFailureStep(workflowData.jobsOutcome.failedJobSteps));
     attachments.push(
       getLogsPayload(
         workflowData.repository.url,

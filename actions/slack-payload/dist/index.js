@@ -9665,11 +9665,11 @@ exports.createPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
 const slack_message_1 = __nccwpck_require__(9584);
 const createPayload = (workflowData) => {
-    var _a;
     const blocks = [];
     const attachments = [];
     blocks.push((0, slack_message_1.getTitlePayload)(workflowData.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE, workflowData.repository.url, workflowData.repository.name, workflowData.url, workflowData.name, workflowData.environment));
-    if (((_a = workflowData.pullRequest) === null || _a === void 0 ? void 0 : _a.title) &&
+    if (workflowData.pullRequest &&
+        workflowData.pullRequest.title &&
         workflowData.pullRequest.number &&
         workflowData.pullRequest.url) {
         blocks.push((0, slack_message_1.getPullRequestPayload)(workflowData.sha, workflowData.pullRequest.url, workflowData.pullRequest.title, workflowData.pullRequest.number));
@@ -9681,6 +9681,7 @@ const createPayload = (workflowData) => {
         attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.FAILURE, enums_1.GithubStatus.FAILURE, workflowData.jobsOutcome.failureDeployCount));
     }
     if (workflowData.conclusion === enums_1.GithubStatus.FAILURE) {
+        attachments.push((0, slack_message_1.getFailureStep)(workflowData.jobsOutcome.failedJobSteps));
         attachments.push((0, slack_message_1.getLogsPayload)(workflowData.repository.url, workflowData.checkSuiteId, workflowData.attachmentsIds.buildLogsArtifactId, workflowData.attachmentsIds.testLogsArtifactId));
     }
     const payload = {
@@ -9833,7 +9834,12 @@ const getJobsData = (token, runId) => __awaiter(void 0, void 0, void 0, function
     return workflow.data.jobs.reduce((acc, job) => {
         const isDeployJob = job.name.startsWith('deploy');
         if (job.conclusion === enums_1.GithubStatus.FAILURE) {
-            acc.failedJobs.push(job.name);
+            if (!isDeployJob && job.steps) {
+                const failedStep = job.steps.find((step) => step.conclusion === enums_1.GithubStatus.FAILURE);
+                if (failedStep) {
+                    acc.failedJobSteps.push(failedStep.name);
+                }
+            }
             if (isDeployJob)
                 acc.failureDeployCount = acc.failureDeployCount + 1;
         }
@@ -9844,7 +9850,7 @@ const getJobsData = (token, runId) => __awaiter(void 0, void 0, void 0, function
     }, {
         successDeployCount: 0,
         failureDeployCount: 0,
-        failedJobs: [],
+        failedJobSteps: [],
     });
 });
 const getDataFromArtifact = (token, artifactId, filename) => __awaiter(void 0, void 0, void 0, function* () {
@@ -9920,7 +9926,7 @@ __exportStar(__nccwpck_require__(6170), exports);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getLogsPayload = exports.getTitlePayload = exports.getPackagesPayload = exports.getPullRequestPayload = void 0;
+exports.getFailureStep = exports.getLogsPayload = exports.getTitlePayload = exports.getPackagesPayload = exports.getPullRequestPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
 const getPullRequestPayload = (sha, url, title, number) => {
     return {
@@ -9972,6 +9978,25 @@ const getLogsPayload = (url, checkSuiteId, buildArtifactId, testArtfactId) => {
     };
 };
 exports.getLogsPayload = getLogsPayload;
+const getFailureStep = (failedSteps) => {
+    const message = `Workflow failed during steps:`;
+    const stepsBlock = failedSteps.map((step) => {
+        return {
+            type: 'section',
+            text: {
+                type: 'plain_text',
+                text: step,
+            },
+        };
+    });
+    return {
+        color: enums_1.Colors.FAILURE,
+        fallback: message,
+        text: message,
+        blocks: stepsBlock,
+    };
+};
+exports.getFailureStep = getFailureStep;
 
 
 /***/ }),

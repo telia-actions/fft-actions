@@ -70,3 +70,22 @@ export const getLogsPayload = (
     text: message,
   };
 };
+
+export const getFailureStep = (failedSteps: string[]): any => {
+  const message = `Workflow failed during steps:`;
+  const stepsBlock = failedSteps.map((step) => {
+    return {
+      type: 'section',
+      text: {
+        type: 'plain_text',
+        text: step,
+      },
+    };
+  });
+  return {
+    color: Colors.FAILURE,
+    fallback: message,
+    text: message,
+    blocks: stepsBlock,
+  };
+};

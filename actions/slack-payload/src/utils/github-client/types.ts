@@ -26,7 +26,7 @@ export type PullRequestData = {
 export type JobsData = {
   successDeployCount: number;
   failureDeployCount: number;
-  failedJobs: string[];
+  failedJobSteps: string[];
 };
 
 export type AttachmentsData = {

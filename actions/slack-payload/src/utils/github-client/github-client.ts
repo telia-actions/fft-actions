@@ -83,7 +83,12 @@ const getJobsData = async (token: string, runId: number): Promise<JobsData> => {
     (acc, job) => {
       const isDeployJob = job.name.startsWith('deploy');
       if (job.conclusion === GithubStatus.FAILURE) {
-        acc.failedJobs.push(job.name);
+        if (!isDeployJob && job.steps) {
+          const failedStep = job.steps.find((step) => step.conclusion === GithubStatus.FAILURE);
+          if (failedStep) {
+            acc.failedJobSteps.push(failedStep.name);
+          }
+        }
         if (isDeployJob) acc.failureDeployCount = acc.failureDeployCount + 1;
       } else if (isDeployJob && job.conclusion === GithubStatus.SUCCESS) {
         acc.successDeployCount = acc.successDeployCount + 1;
@@ -93,7 +98,7 @@ const getJobsData = async (token: string, runId: number): Promise<JobsData> => {
     {
       successDeployCount: 0,
       failureDeployCount: 0,
-      failedJobs: [],
+      failedJobSteps: [],
     }
   );
 };
