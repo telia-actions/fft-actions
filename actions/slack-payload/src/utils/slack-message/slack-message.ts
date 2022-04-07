@@ -1,4 +1,4 @@
-import { Colors, SlackIcons } from '@src/enums';
+import { Colors, GithubStatus, SlackIcons } from '@src/enums';
 
 export const getPullRequestPayload = (
   sha: string,
@@ -24,7 +24,7 @@ export const getPackagesPayload = (color: string, status: string, count: number)
   };
 };
 
-export const getTitlePayload = (
+export const getInformationBlock = (
   icon: string,
   repositoryUrl: string,
   repositoryName: string,
@@ -91,5 +91,18 @@ export const getFailureStep = (failedSteps: string[]): any => {
       },
       ...stepsBlock,
     ],
+  };
+};
+
+export const getHeaderBlock = (conclusion: string | null): any => {
+  const icon = conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
+  return {
+    type: 'header',
+    text: {
+      type: 'plain_text',
+      text: `${icon} ${
+        conclusion === GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'
+      })`,
+    },
   };
 };

@@ -2,18 +2,20 @@ import { Colors, GithubStatus, SlackIcons } from '@src/enums';
 import type { WorkflowData } from '@src/utils/github-client/types';
 import {
   getFailureStep,
+  getHeaderBlock,
+  getInformationBlock,
   getLogsPayload,
   getPackagesPayload,
   getPullRequestPayload,
-  getTitlePayload,
 } from '@src/utils/slack-message';
 
 export const createPayload = (workflowData: WorkflowData): string => {
   const blocks = [];
   const attachments = [];
 
+  blocks.push(getHeaderBlock(workflowData.conclusion));
   blocks.push(
-    getTitlePayload(
+    getInformationBlock(
       workflowData.conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE,
       workflowData.repository.url,
       workflowData.repository.name,
@@ -22,12 +24,7 @@ export const createPayload = (workflowData: WorkflowData): string => {
       workflowData.environment
     )
   );
-  if (
-    workflowData.pullRequest &&
-    workflowData.pullRequest.title &&
-    workflowData.pullRequest.number &&
-    workflowData.pullRequest.url
-  ) {
+  if (workflowData.pullRequest) {
     blocks.push(
       getPullRequestPayload(
         workflowData.sha,

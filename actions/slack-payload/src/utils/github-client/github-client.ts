@@ -55,13 +55,13 @@ export const getWorkflowContext = async (token: string): Promise<WorkflowData> =
     : await getDataFromArtifact(token, attachmentsData.environmentArtifactId, 'environment');
 
   return {
-    attachmentsIds: { ...attachmentsData },
+    attachmentsIds: attachmentsData,
     checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
     conclusion: workflowRunContext.workflow_run.conclusion,
     environment,
-    jobsOutcome: { ...jobsData },
+    jobsOutcome: jobsData,
     name: workflowRunContext.workflow_run.name,
-    pullRequest: { ...pullRequestData },
+    pullRequest: pullRequestData,
     repository: {
       name: workflowRunContext.repository.name,
       url: workflowRunContext.repository.html_url,
@@ -79,15 +79,12 @@ const getJobsData = async (token: string, runId: number): Promise<JobsData> => {
     repo: context.repo.repo,
     run_id: runId,
   });
-  console.log(workflow.data.jobs);
   return workflow.data.jobs.reduce<JobsData>(
     (acc, job) => {
       const isDeployJob = job.name.startsWith('deploy');
       if (job.conclusion === GithubStatus.FAILURE) {
         if (!isDeployJob && job.steps) {
-          console.log(job.steps);
           const failedStep = job.steps.find((step) => step.conclusion === GithubStatus.FAILURE);
-          console.log(failedStep);
           if (failedStep) {
             acc.failedJobSteps.push(failedStep.name);
           }
@@ -106,7 +103,7 @@ const getJobsData = async (token: string, runId: number): Promise<JobsData> => {
   );
 };
 
-export const getDataFromArtifact = async (
+const getDataFromArtifact = async (
   token: string,
   artifactId: number,
   filename: string

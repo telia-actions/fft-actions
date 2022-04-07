@@ -18,9 +18,9 @@ export type WorkflowData = {
 };
 
 export type PullRequestData = {
-  number?: number;
-  title?: string;
-  url?: string;
+  number: number;
+  title: string;
+  url: string;
 };
 
 export type JobsData = {
