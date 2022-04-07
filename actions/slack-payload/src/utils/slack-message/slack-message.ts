@@ -89,7 +89,7 @@ export const getFailureStep = (failedSteps: string[]): any => {
           text: message,
         },
       },
-      [...stepsBlock],
+      { ...stepsBlock },
     ],
   };
 };

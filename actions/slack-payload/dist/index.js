@@ -10001,7 +10001,7 @@ const getFailureStep = (failedSteps) => {
                     text: message,
                 },
             },
-            [...stepsBlock],
+            Object.assign({}, stepsBlock),
         ],
     };
 };
