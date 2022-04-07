@@ -19,9 +19,6 @@ jobs:
           retention-days: 1
           name: build-logs
           path: build-logs.txt
-      - name: Mocked failure step
-        continue-on-error: true
-        run: exit 1
   deploy:
     runs-on: ubuntu-latest
     strategy:
@@ -33,3 +30,8 @@ jobs:
     steps:
       - run: |
           [ "${{ matrix.mocks }}" == "mocked_package_2" ] && exit 1 || echo "${{ matrix.mocks }}"
+  mocked_failure:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Mocked failure step
+      run: exit 1
