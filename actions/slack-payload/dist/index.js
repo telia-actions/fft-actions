@@ -9935,13 +9935,13 @@ const getPullRequestPayload = (sha, url, title, number) => {
         type: 'section',
         text: {
             type: 'mrkdwn',
-            text: `${enums_1.SlackIcons.PULL_REQUEST} *<${url}|#${number} ${title}>* (commit id \`${sha}\`)`,
+            text: `${enums_1.SlackIcons.PULL_REQUEST} <${url}|#${number} ${title}> (commit id \`${sha}\`)`,
         },
     };
 };
 exports.getPullRequestPayload = getPullRequestPayload;
 const getPackagesPayload = (color, status, count) => {
-    const message = `*${count}* ${status} deployments`;
+    const message = `${count} ${status} deployments`;
     return {
         color,
         fallback: message,
@@ -9955,24 +9955,22 @@ const getTitlePayload = (icon, repositoryUrl, repositoryName, workflowUrl, workf
         fields: [
             {
                 type: 'mrkdwn',
-                text: `${icon} *<${repositoryUrl}|${repositoryName}>*`,
+                text: `${icon} <${repositoryUrl}|${repositoryName}>`,
             },
             {
                 type: 'mrkdwn',
-                text: `*<${workflowUrl}|${workflowName}>*`,
+                text: `<${workflowUrl}|${workflowName}>`,
             },
             {
                 type: 'mrkdwn',
-                text: `*Environment: ${environment.toUpperCase()}*`,
+                text: `Environment: ${environment.toUpperCase()}`,
             },
         ],
     };
 };
 exports.getTitlePayload = getTitlePayload;
 const getLogsPayload = (url, checkSuiteId, buildArtifactId, testArtfactId) => {
-    const message = `${enums_1.SlackIcons.DOWNLOADS} Download ${buildArtifactId
-        ? `*<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs>*`
-        : ''} ${testArtfactId ? `*<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>*` : ''}`;
+    const message = `${enums_1.SlackIcons.DOWNLOADS} Download ${buildArtifactId ? `<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs>` : ''} ${testArtfactId ? `<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>` : ''}`;
     return {
         color: enums_1.Colors.FAILURE,
         fallback: message,

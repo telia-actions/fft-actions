@@ -10,13 +10,13 @@ export const getPullRequestPayload = (
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `${SlackIcons.PULL_REQUEST} *<${url}|#${number} ${title}>* (commit id \`${sha}\`)`,
+      text: `${SlackIcons.PULL_REQUEST} <${url}|#${number} ${title}> (commit id \`${sha}\`)`,
     },
   };
 };
 
 export const getPackagesPayload = (color: string, status: string, count: number): any => {
-  const message = `*${count}* ${status} deployments`;
+  const message = `${count} ${status} deployments`;
   return {
     color,
     fallback: message,
@@ -37,15 +37,15 @@ export const getTitlePayload = (
     fields: [
       {
         type: 'mrkdwn',
-        text: `${icon} *<${repositoryUrl}|${repositoryName}>*`,
+        text: `${icon} <${repositoryUrl}|${repositoryName}>`,
       },
       {
         type: 'mrkdwn',
-        text: `*<${workflowUrl}|${workflowName}>*`,
+        text: `<${workflowUrl}|${workflowName}>`,
       },
       {
         type: 'mrkdwn',
-        text: `*Environment: ${environment.toUpperCase()}*`,
+        text: `Environment: ${environment.toUpperCase()}`,
       },
     ],
   };
@@ -58,12 +58,8 @@ export const getLogsPayload = (
   testArtfactId: number
 ): any => {
   const message = `${SlackIcons.DOWNLOADS} Download ${
-    buildArtifactId
-      ? `*<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs>*`
-      : ''
-  } ${
-    testArtfactId ? `*<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>*` : ''
-  }`;
+    buildArtifactId ? `<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs>` : ''
+  } ${testArtfactId ? `<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>` : ''}`;
   return {
     color: Colors.FAILURE,
     fallback: message,
