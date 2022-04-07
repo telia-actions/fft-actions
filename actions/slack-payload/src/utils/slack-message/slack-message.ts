@@ -44,7 +44,7 @@ export const getTitlePayload = (
         text: `<${workflowUrl}|${workflowName}>`,
       },
       {
-        type: 'mrkdwn',
+        type: 'plain_text',
         text: `Environment: ${environment.toUpperCase()}`,
       },
     ],

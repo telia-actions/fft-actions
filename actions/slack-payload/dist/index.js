@@ -9682,8 +9682,6 @@ const createPayload = (workflowData) => {
     }
     if (workflowData.jobsOutcome.failedJobSteps.length > 0) {
         attachments.push((0, slack_message_1.getFailureStep)(workflowData.jobsOutcome.failedJobSteps));
-    }
-    if (workflowData.conclusion === enums_1.GithubStatus.FAILURE) {
         attachments.push((0, slack_message_1.getLogsPayload)(workflowData.repository.url, workflowData.checkSuiteId, workflowData.attachmentsIds.buildLogsArtifactId, workflowData.attachmentsIds.testLogsArtifactId));
     }
     const payload = {
@@ -9962,7 +9960,7 @@ const getTitlePayload = (icon, repositoryUrl, repositoryName, workflowUrl, workf
                 text: `<${workflowUrl}|${workflowName}>`,
             },
             {
-                type: 'mrkdwn',
+                type: 'plain_text',
                 text: `Environment: ${environment.toUpperCase()}`,
             },
         ],
