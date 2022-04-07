@@ -1,4 +1,4 @@
-import { Colors, GithubStatus, SlackIcons } from '@src/enums';
+import { Colors, GithubStatus } from '@src/enums';
 import type { WorkflowData } from '@src/utils/github-client/types';
 import {
   getFailureStep,

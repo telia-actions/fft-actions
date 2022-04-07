@@ -9577,7 +9577,6 @@ var SlackIcons;
 (function (SlackIcons) {
     SlackIcons["FAILURE"] = ":fire:";
     SlackIcons["SUCCESS"] = ":white_check_mark:";
-    SlackIcons["MAGNIFIER"] = ":mag:";
     SlackIcons["PULL_REQUEST"] = ":pullrequest:";
     SlackIcons["DOWNLOADS"] = ":scroll:";
 })(SlackIcons = exports.SlackIcons || (exports.SlackIcons = {}));
