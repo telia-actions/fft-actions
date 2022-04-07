@@ -19,6 +19,9 @@ jobs:
           retention-days: 1
           name: build-logs
           path: build-logs.txt
+      - name: Mocked failure step
+        continue-on-error: true
+        run: exit 1
   deploy:
     runs-on: ubuntu-latest
     strategy:
