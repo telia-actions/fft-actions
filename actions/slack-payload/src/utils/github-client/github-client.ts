@@ -79,12 +79,15 @@ const getJobsData = async (token: string, runId: number): Promise<JobsData> => {
     repo: context.repo.repo,
     run_id: runId,
   });
+  console.log(workflow.data.jobs);
   return workflow.data.jobs.reduce<JobsData>(
     (acc, job) => {
       const isDeployJob = job.name.startsWith('deploy');
       if (job.conclusion === GithubStatus.FAILURE) {
         if (!isDeployJob && job.steps) {
+          console.log(job.steps);
           const failedStep = job.steps.find((step) => step.conclusion === GithubStatus.FAILURE);
+          console.log(failedStep);
           if (failedStep) {
             acc.failedJobSteps.push(failedStep.name);
           }

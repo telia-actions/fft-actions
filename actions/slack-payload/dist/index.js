@@ -9831,11 +9831,14 @@ const getJobsData = (token, runId) => __awaiter(void 0, void 0, void 0, function
         repo: github_1.context.repo.repo,
         run_id: runId,
     });
+    console.log(workflow.data.jobs);
     return workflow.data.jobs.reduce((acc, job) => {
         const isDeployJob = job.name.startsWith('deploy');
         if (job.conclusion === enums_1.GithubStatus.FAILURE) {
             if (!isDeployJob && job.steps) {
+                console.log(job.steps);
                 const failedStep = job.steps.find((step) => step.conclusion === enums_1.GithubStatus.FAILURE);
+                console.log(failedStep);
                 if (failedStep) {
                     acc.failedJobSteps.push(failedStep.name);
                 }
