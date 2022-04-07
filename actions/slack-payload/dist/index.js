@@ -9668,7 +9668,7 @@ const createPayload = (workflowData) => {
     const blocks = [];
     const attachments = [];
     blocks.push((0, slack_message_1.getHeaderBlock)(workflowData.conclusion));
-    blocks.push((0, slack_message_1.getInformationBlock)(workflowData.conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE, workflowData.repository.url, workflowData.repository.name, workflowData.url, workflowData.name, workflowData.environment));
+    blocks.push((0, slack_message_1.getInformationBlock)(workflowData.repository.url, workflowData.repository.name, workflowData.url, workflowData.name, workflowData.environment));
     if (workflowData.pullRequest) {
         blocks.push((0, slack_message_1.getPullRequestPayload)(workflowData.sha, workflowData.pullRequest.url, workflowData.pullRequest.title, workflowData.pullRequest.number));
     }
@@ -9944,13 +9944,13 @@ const getPackagesPayload = (color, status, count) => {
     };
 };
 exports.getPackagesPayload = getPackagesPayload;
-const getInformationBlock = (icon, repositoryUrl, repositoryName, workflowUrl, workflowName, environment) => {
+const getInformationBlock = (repositoryUrl, repositoryName, workflowUrl, workflowName, environment) => {
     return {
         type: 'section',
         fields: [
             {
                 type: 'mrkdwn',
-                text: `${icon} <${repositoryUrl}|${repositoryName}>`,
+                text: `<${repositoryUrl}|${repositoryName}>`,
             },
             {
                 type: 'mrkdwn',
@@ -10006,7 +10006,7 @@ const getHeaderBlock = (conclusion) => {
         type: 'header',
         text: {
             type: 'plain_text',
-            text: `${icon} ${conclusion === enums_1.GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'})`,
+            text: `${icon} ${conclusion === enums_1.GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'}`,
         },
     };
 };

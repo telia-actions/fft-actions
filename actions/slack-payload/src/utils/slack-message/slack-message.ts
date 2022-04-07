@@ -25,7 +25,6 @@ export const getPackagesPayload = (color: string, status: string, count: number)
 };
 
 export const getInformationBlock = (
-  icon: string,
   repositoryUrl: string,
   repositoryName: string,
   workflowUrl: string,
@@ -37,7 +36,7 @@ export const getInformationBlock = (
     fields: [
       {
         type: 'mrkdwn',
-        text: `${icon} <${repositoryUrl}|${repositoryName}>`,
+        text: `<${repositoryUrl}|${repositoryName}>`,
       },
       {
         type: 'mrkdwn',
@@ -102,7 +101,7 @@ export const getHeaderBlock = (conclusion: string | null): any => {
       type: 'plain_text',
       text: `${icon} ${
         conclusion === GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'
-      })`,
+      }`,
     },
   };
 };

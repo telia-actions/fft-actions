@@ -16,7 +16,6 @@ export const createPayload = (workflowData: WorkflowData): string => {
   blocks.push(getHeaderBlock(workflowData.conclusion));
   blocks.push(
     getInformationBlock(
-      workflowData.conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE,
       workflowData.repository.url,
       workflowData.repository.name,
       workflowData.url,
