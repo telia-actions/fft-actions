@@ -9612,11 +9612,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core_1 = __nccwpck_require__(2186);
 const payload_1 = __nccwpck_require__(5762);
-const github_client_1 = __nccwpck_require__(5809);
+const workflow_context_1 = __nccwpck_require__(7429);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (0, core_1.getInput)('token');
-        const workflowContext = yield (0, github_client_1.getWorkflowContext)(token);
+        const workflowContext = yield (0, workflow_context_1.getWorkflowContext)(token);
         const payload = (0, payload_1.createPayload)(workflowContext);
         (0, core_1.setOutput)('payload', payload);
     }
@@ -9692,6 +9692,191 @@ exports.createPayload = createPayload;
 
 /***/ }),
 
+/***/ 7429:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(6484), exports);
+
+
+/***/ }),
+
+/***/ 6484:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getWorkflowContext = void 0;
+const github_1 = __nccwpck_require__(5438);
+const github_client_1 = __nccwpck_require__(5809);
+const enums_1 = __nccwpck_require__(1511);
+const file_client_1 = __nccwpck_require__(3354);
+const exec_client_1 = __nccwpck_require__(8133);
+const getWorkflowContext = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    const workflowRunContext = github_1.context.payload;
+    const pullRequestNumber = workflowRunContext.workflow_run.pull_requests[0].number;
+    const attachmentsData = yield (0, github_client_1.getAttachmentsData)(token, workflowRunContext.workflow_run.id);
+    const jobsData = yield (0, github_client_1.getJobsData)(token, workflowRunContext.workflow_run.id);
+    const pullRequestData = pullRequestNumber
+        ? yield (0, github_client_1.getPullRequestData)(token, pullRequestNumber)
+        : undefined;
+    const attachmentsIds = mapAttachmentsData(attachmentsData);
+    const environment = yield getEnvironment(token, pullRequestNumber, attachmentsIds.environmentArtifactId);
+    return {
+        attachmentsIds,
+        checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
+        conclusion: workflowRunContext.workflow_run.conclusion,
+        environment,
+        jobsOutcome: mapJobsData(jobsData),
+        name: workflowRunContext.workflow_run.name,
+        pullRequest: mapPullRequestData(pullRequestData),
+        repository: {
+            name: workflowRunContext.repository.name,
+            url: workflowRunContext.repository.html_url,
+        },
+        runId: workflowRunContext.workflow_run.id,
+        sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
+        url: workflowRunContext.workflow_run.html_url,
+    };
+});
+exports.getWorkflowContext = getWorkflowContext;
+const mapAttachmentsData = (attachments) => {
+    const map = new Map([
+        ['build-logs', 'buildLogsArtifactId'],
+        ['test-logs', 'testLogsArtifactId'],
+        ['environment', 'environmentArtifactId'],
+    ]);
+    return attachments.artifacts.reduce((acc, artifact) => {
+        const mappedValue = map.get(artifact.name);
+        if (mappedValue)
+            acc[mappedValue] = artifact.id;
+        return acc;
+    }, {
+        buildLogsArtifactId: 0,
+        testLogsArtifactId: 0,
+        environmentArtifactId: 0,
+    });
+};
+const mapPullRequestData = (pullRequest) => {
+    if (!pullRequest)
+        return;
+    return { title: pullRequest.title, url: pullRequest.html_url, number: pullRequest.number };
+};
+const mapJobsData = (workflowJobs) => {
+    return workflowJobs.jobs.reduce((acc, job) => {
+        const isDeployJob = job.name.startsWith('deploy');
+        if (job.conclusion === enums_1.GithubStatus.FAILURE) {
+            if (!isDeployJob && job.steps) {
+                const failedStep = job.steps.find((step) => step.conclusion === enums_1.GithubStatus.FAILURE);
+                if (failedStep) {
+                    acc.failedJobSteps.push(failedStep.name);
+                }
+            }
+            if (isDeployJob)
+                acc.failureDeployCount = acc.failureDeployCount + 1;
+        }
+        else if (isDeployJob && job.conclusion === enums_1.GithubStatus.SUCCESS) {
+            acc.successDeployCount = acc.successDeployCount + 1;
+        }
+        return acc;
+    }, {
+        successDeployCount: 0,
+        failureDeployCount: 0,
+        failedJobSteps: [],
+    });
+};
+const getEnvironment = (token, pullRequestNumber, environmentArtifactId) => __awaiter(void 0, void 0, void 0, function* () {
+    if (pullRequestNumber)
+        return `preview-${pullRequestNumber}`;
+    const environmentArtifact = yield (0, github_client_1.getArtifact)(token, environmentArtifactId);
+    const fileName = 'environment';
+    (0, file_client_1.writeFile)(`${fileName}.zip`, Buffer.from(environmentArtifact));
+    yield (0, exec_client_1.unzipArtifact)(fileName);
+    return (0, file_client_1.readFile)(`${fileName}.txt`);
+});
+
+
+/***/ }),
+
+/***/ 478:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.unzipArtifact = void 0;
+const exec_1 = __nccwpck_require__(1514);
+const unzipArtifact = (zipFile) => __awaiter(void 0, void 0, void 0, function* () {
+    const exitCode = yield (0, exec_1.exec)('unzip', [zipFile]);
+    if (exitCode !== 0) {
+        throw new Error(`uzip failed with exit code ${exitCode} when unzipping ${zipFile}`);
+    }
+});
+exports.unzipArtifact = unzipArtifact;
+
+
+/***/ }),
+
+/***/ 8133:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(478), exports);
+
+
+/***/ }),
+
 /***/ 4369:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -9755,11 +9940,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getWorkflowContext = void 0;
+exports.getArtifact = exports.getJobsData = exports.getAttachmentsData = exports.getPullRequestData = void 0;
 const github_1 = __nccwpck_require__(5438);
-const enums_1 = __nccwpck_require__(1511);
-const file_client_1 = __nccwpck_require__(3354);
-const archive_artifact_1 = __nccwpck_require__(2145);
 const getPullRequestData = (token, pullNumber) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
     const pullRequest = yield client.rest.pulls.get({
@@ -9767,8 +9949,9 @@ const getPullRequestData = (token, pullNumber) => __awaiter(void 0, void 0, void
         repo: github_1.context.repo.repo,
         pull_number: pullNumber,
     });
-    return { title: pullRequest.data.title, url: pullRequest.data.html_url, number: pullNumber };
+    return pullRequest.data;
 });
+exports.getPullRequestData = getPullRequestData;
 const getAttachmentsData = (token, runId) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
     const attachments = yield client.rest.actions.listWorkflowRunArtifacts({
@@ -9776,51 +9959,9 @@ const getAttachmentsData = (token, runId) => __awaiter(void 0, void 0, void 0, f
         repo: github_1.context.repo.repo,
         run_id: runId,
     });
-    const map = new Map([
-        ['build-logs', 'buildLogsArtifactId'],
-        ['test-logs', 'testLogsArtifactId'],
-        ['environment', 'environmentArtifactId'],
-    ]);
-    return attachments.data.artifacts.reduce((acc, artifact) => {
-        const mappedValue = map.get(artifact.name);
-        if (mappedValue)
-            acc[mappedValue] = artifact.id;
-        return acc;
-    }, {
-        buildLogsArtifactId: 0,
-        testLogsArtifactId: 0,
-        environmentArtifactId: 0,
-    });
+    return attachments.data;
 });
-const getWorkflowContext = (token) => __awaiter(void 0, void 0, void 0, function* () {
-    const workflowRunContext = github_1.context.payload;
-    const pullRequestNumber = workflowRunContext.workflow_run.pull_requests[0].number;
-    const attachmentsData = yield getAttachmentsData(token, workflowRunContext.workflow_run.id);
-    const jobsData = yield getJobsData(token, workflowRunContext.workflow_run.id);
-    const pullRequestData = pullRequestNumber
-        ? yield getPullRequestData(token, pullRequestNumber)
-        : undefined;
-    const environment = pullRequestNumber
-        ? `preview-${pullRequestNumber}`
-        : yield getDataFromArtifact(token, attachmentsData.environmentArtifactId, 'environment');
-    return {
-        attachmentsIds: attachmentsData,
-        checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
-        conclusion: workflowRunContext.workflow_run.conclusion,
-        environment,
-        jobsOutcome: jobsData,
-        name: workflowRunContext.workflow_run.name,
-        pullRequest: pullRequestData,
-        repository: {
-            name: workflowRunContext.repository.name,
-            url: workflowRunContext.repository.html_url,
-        },
-        runId: workflowRunContext.workflow_run.id,
-        sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
-        url: workflowRunContext.workflow_run.html_url,
-    };
-});
-exports.getWorkflowContext = getWorkflowContext;
+exports.getAttachmentsData = getAttachmentsData;
 const getJobsData = (token, runId) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
     const workflow = yield client.rest.actions.listJobsForWorkflowRun({
@@ -9828,40 +9969,20 @@ const getJobsData = (token, runId) => __awaiter(void 0, void 0, void 0, function
         repo: github_1.context.repo.repo,
         run_id: runId,
     });
-    return workflow.data.jobs.reduce((acc, job) => {
-        const isDeployJob = job.name.startsWith('deploy');
-        if (job.conclusion === enums_1.GithubStatus.FAILURE) {
-            if (!isDeployJob && job.steps) {
-                const failedStep = job.steps.find((step) => step.conclusion === enums_1.GithubStatus.FAILURE);
-                if (failedStep) {
-                    acc.failedJobSteps.push(failedStep.name);
-                }
-            }
-            if (isDeployJob)
-                acc.failureDeployCount = acc.failureDeployCount + 1;
-        }
-        else if (isDeployJob && job.conclusion === enums_1.GithubStatus.SUCCESS) {
-            acc.successDeployCount = acc.successDeployCount + 1;
-        }
-        return acc;
-    }, {
-        successDeployCount: 0,
-        failureDeployCount: 0,
-        failedJobSteps: [],
-    });
+    return workflow.data;
 });
-const getDataFromArtifact = (token, artifactId, filename) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getJobsData = getJobsData;
+const getArtifact = (token, artifactId) => __awaiter(void 0, void 0, void 0, function* () {
     const client = (0, github_1.getOctokit)(token);
-    const zip = yield client.rest.actions.downloadArtifact({
+    const artifact = yield client.rest.actions.downloadArtifact({
         owner: github_1.context.repo.owner,
         repo: github_1.context.repo.repo,
         artifact_id: artifactId,
         archive_format: 'zip',
     });
-    (0, file_client_1.writeFile)(`${filename}.zip`, Buffer.from(zip.data));
-    yield (0, archive_artifact_1.unzipArtifact)(filename);
-    return (0, file_client_1.readFile)(`${filename}.txt`);
+    return artifact.data;
 });
+exports.getArtifact = getArtifact;
 
 
 /***/ }),
@@ -10010,35 +10131,6 @@ const getHeaderBlock = (conclusion) => {
     };
 };
 exports.getHeaderBlock = getHeaderBlock;
-
-
-/***/ }),
-
-/***/ 2145:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.unzipArtifact = void 0;
-const exec_1 = __nccwpck_require__(1514);
-const unzipArtifact = (zipFile) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, exec_1.exec)('ls', ['-la']);
-    const exitCode = yield (0, exec_1.exec)('unzip', [zipFile]);
-    if (exitCode !== 0) {
-        throw new Error(`tar failed with exit code ${exitCode} when unzipping ${zipFile}`);
-    }
-});
-exports.unzipArtifact = unzipArtifact;
 
 
 /***/ }),

@@ -1,5 +1,4 @@
 import { Colors, GithubStatus } from '@src/enums';
-import type { WorkflowData } from '@src/utils/github-client/types';
 import {
   getFailureStep,
   getHeaderBlock,
@@ -8,6 +7,7 @@ import {
   getPackagesPayload,
   getPullRequestPayload,
 } from '@src/utils/slack-message';
+import type { WorkflowData } from '@src/libs/workflow-context/types';
 
 export const createPayload = (workflowData: WorkflowData): string => {
   const blocks = [];

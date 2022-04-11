@@ -1,6 +1,6 @@
 import { getInput, setOutput } from '@actions/core';
 import { createPayload } from '@src/libs/payload';
-import { getWorkflowContext } from '@src/utils/github-client';
+import { getWorkflowContext } from '@src/libs/workflow-context';
 
 export const run = async (): Promise<void> => {
   try {

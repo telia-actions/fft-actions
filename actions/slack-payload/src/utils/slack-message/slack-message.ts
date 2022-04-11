@@ -1,11 +1,12 @@
 import { Colors, GithubStatus, SlackIcons } from '@src/enums';
+import type { SlackPayloadAttachment, SlackPayloadBlock } from './types';
 
 export const getPullRequestPayload = (
   sha: string,
   url: string,
   title: string,
   number: number
-): any => {
+): SlackPayloadBlock => {
   return {
     type: 'section',
     text: {
@@ -15,7 +16,11 @@ export const getPullRequestPayload = (
   };
 };
 
-export const getPackagesPayload = (color: string, status: string, count: number): any => {
+export const getPackagesPayload = (
+  color: string,
+  status: string,
+  count: number
+): SlackPayloadAttachment => {
   const message = `${count} ${status} deployments`;
   return {
     color,
@@ -30,7 +35,7 @@ export const getInformationBlock = (
   workflowUrl: string,
   workflowName: string,
   environment: string
-): any => {
+): SlackPayloadBlock => {
   return {
     type: 'section',
     fields: [
@@ -55,7 +60,7 @@ export const getLogsPayload = (
   checkSuiteId: number,
   buildArtifactId: number,
   testArtfactId: number
-): any => {
+): SlackPayloadAttachment => {
   const message = `${SlackIcons.DOWNLOADS} Download ${
     buildArtifactId ? `<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs>` : ''
   } ${testArtfactId ? `<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>` : ''}`;
@@ -66,9 +71,9 @@ export const getLogsPayload = (
   };
 };
 
-export const getFailureStep = (failedSteps: string[]): any => {
+export const getFailureStep = (failedSteps: string[]): SlackPayloadAttachment => {
   const message = `Workflow failed during steps:`;
-  const stepsBlock = failedSteps.map((step) => {
+  const stepsBlock = failedSteps.map<SlackPayloadBlock>((step) => {
     return {
       type: 'section',
       text: {
@@ -93,7 +98,7 @@ export const getFailureStep = (failedSteps: string[]): any => {
   };
 };
 
-export const getHeaderBlock = (conclusion: string | null): any => {
+export const getHeaderBlock = (conclusion: string | null): SlackPayloadBlock => {
   const icon = conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
   return {
     type: 'header',
