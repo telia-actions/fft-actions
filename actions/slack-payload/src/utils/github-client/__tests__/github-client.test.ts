@@ -1,10 +1,10 @@
 import * as github from '@actions/github';
 import { getArtifact, getAttachmentsData, getJobsData, getPullRequestData } from '../github-client';
 
-const mockedResponse = 'mockedResponse';
-const mockedToken = 'mockedToken';
-const mockedOwner = 'mockedOwner';
-const mockedRepo = 'mockedRepo';
+const mockedResponse = 'response';
+const mockedToken = 'token';
+const mockedOwner = 'owner';
+const mockedRepo = 'repo';
 const mockedNumber = 1;
 
 const getPullRequestMock = jest.fn().mockResolvedValue({ data: mockedResponse });

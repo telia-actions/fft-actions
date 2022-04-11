@@ -1,19 +1,28 @@
-type SlackTextTypes = 'mrkdwn' | 'plain_text';
+type SlackTextType = 'mrkdwn' | 'plain_text';
 
 type SlackTextBlock = {
-  type: SlackTextTypes;
+  type: SlackTextType;
   text: string;
 };
 
-export type SlackPayloadBlock = {
+export type SlackPayloadBlockText = {
   type: string;
-  text?: SlackTextBlock;
-  fields?: SlackTextBlock[];
+  text: SlackTextBlock;
 };
 
-export type SlackPayloadAttachment = {
+export type SlackPayloadBlockFields = {
+  type: string;
+  fields: SlackTextBlock[];
+};
+
+export type SlackPayloadAttachmentText = {
   color: string;
   fallback: string;
-  text?: string;
-  blocks?: SlackPayloadBlock[];
+  text: string;
+};
+
+export type SlackPayloadAttachmentBlocks = {
+  color: string;
+  fallback: string;
+  blocks: SlackPayloadBlockText[];
 };

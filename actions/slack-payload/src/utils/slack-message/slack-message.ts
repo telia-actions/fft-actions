@@ -1,31 +1,21 @@
 import { Colors, GithubStatus, SlackIcons } from '@src/enums';
-import type { SlackPayloadAttachment, SlackPayloadBlock } from './types';
+import type {
+  SlackPayloadAttachmentBlocks,
+  SlackPayloadAttachmentText,
+  SlackPayloadBlockFields,
+  SlackPayloadBlockText,
+} from './types';
 
-export const getPullRequestPayload = (
-  sha: string,
-  url: string,
-  title: string,
-  number: number
-): SlackPayloadBlock => {
+export const getHeaderBlock = (conclusion: string | null): SlackPayloadBlockText => {
+  const icon = conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
   return {
-    type: 'section',
+    type: 'header',
     text: {
-      type: 'mrkdwn',
-      text: `${SlackIcons.PULL_REQUEST} <${url}|#${number} ${title}> (commit id \`${sha}\`)`,
+      type: 'plain_text',
+      text: `${icon} ${
+        conclusion === GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'
+      }`,
     },
-  };
-};
-
-export const getPackagesPayload = (
-  color: string,
-  status: string,
-  count: number
-): SlackPayloadAttachment => {
-  const message = `${count} ${status} deployments`;
-  return {
-    color,
-    fallback: message,
-    text: message,
   };
 };
 
@@ -35,7 +25,7 @@ export const getInformationBlock = (
   workflowUrl: string,
   workflowName: string,
   environment: string
-): SlackPayloadBlock => {
+): SlackPayloadBlockFields => {
   return {
     type: 'section',
     fields: [
@@ -55,25 +45,37 @@ export const getInformationBlock = (
   };
 };
 
-export const getLogsPayload = (
+export const getPullRequestBlock = (
+  sha: string,
   url: string,
-  checkSuiteId: number,
-  buildArtifactId: number,
-  testArtfactId: number
-): SlackPayloadAttachment => {
-  const message = `${SlackIcons.DOWNLOADS} Download ${
-    buildArtifactId ? `<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs>` : ''
-  } ${testArtfactId ? `<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>` : ''}`;
+  title: string,
+  number: number
+): SlackPayloadBlockText => {
   return {
-    color: Colors.FAILURE,
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: `${SlackIcons.PULL_REQUEST} <${url}|#${number} ${title}> (commit id \`${sha}\`)`,
+    },
+  };
+};
+
+export const getPackagesAttachment = (
+  color: string,
+  status: string,
+  count: number
+): SlackPayloadAttachmentText => {
+  const message = `${count} ${status} deployments`;
+  return {
+    color,
     fallback: message,
     text: message,
   };
 };
 
-export const getFailureStep = (failedSteps: string[]): SlackPayloadAttachment => {
+export const getFailureStepAttachment = (failedSteps: string[]): SlackPayloadAttachmentBlocks => {
   const message = `Workflow failed during steps:`;
-  const stepsBlock = failedSteps.map<SlackPayloadBlock>((step) => {
+  const stepsBlock = failedSteps.map<SlackPayloadBlockText>((step) => {
     return {
       type: 'section',
       text: {
@@ -98,15 +100,20 @@ export const getFailureStep = (failedSteps: string[]): SlackPayloadAttachment =>
   };
 };
 
-export const getHeaderBlock = (conclusion: string | null): SlackPayloadBlock => {
-  const icon = conclusion === GithubStatus.SUCCESS ? SlackIcons.SUCCESS : SlackIcons.FAILURE;
+export const getLogsAttachment = (
+  url: string,
+  checkSuiteId: number,
+  buildArtifactId: number,
+  testArtfactId: number
+): SlackPayloadAttachmentText => {
+  const message = `${SlackIcons.DOWNLOADS} Download ${
+    buildArtifactId
+      ? `<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs> `
+      : ''
+  }${testArtfactId ? `<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>` : ''}`;
   return {
-    type: 'header',
-    text: {
-      type: 'plain_text',
-      text: `${icon} ${
-        conclusion === GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'
-      }`,
-    },
+    color: Colors.FAILURE,
+    fallback: message,
+    text: message,
   };
 };

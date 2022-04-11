@@ -1,11 +1,11 @@
 import { Colors, GithubStatus } from '@src/enums';
 import {
-  getFailureStep,
+  getFailureStepAttachment,
   getHeaderBlock,
   getInformationBlock,
-  getLogsPayload,
-  getPackagesPayload,
-  getPullRequestPayload,
+  getLogsAttachment,
+  getPackagesAttachment,
+  getPullRequestBlock,
 } from '@src/utils/slack-message';
 import type { WorkflowData } from '@src/libs/workflow-context/types';
 
@@ -25,7 +25,7 @@ export const createPayload = (workflowData: WorkflowData): string => {
   );
   if (workflowData.pullRequest) {
     blocks.push(
-      getPullRequestPayload(
+      getPullRequestBlock(
         workflowData.sha,
         workflowData.pullRequest.url,
         workflowData.pullRequest.title,
@@ -35,7 +35,7 @@ export const createPayload = (workflowData: WorkflowData): string => {
   }
   if (workflowData.jobsOutcome.successDeployCount !== 0) {
     attachments.push(
-      getPackagesPayload(
+      getPackagesAttachment(
         Colors.SUCCESS,
         GithubStatus.SUCCESS,
         workflowData.jobsOutcome.successDeployCount
@@ -44,7 +44,7 @@ export const createPayload = (workflowData: WorkflowData): string => {
   }
   if (workflowData.jobsOutcome.failureDeployCount !== 0) {
     attachments.push(
-      getPackagesPayload(
+      getPackagesAttachment(
         Colors.FAILURE,
         GithubStatus.FAILURE,
         workflowData.jobsOutcome.failureDeployCount
@@ -52,9 +52,9 @@ export const createPayload = (workflowData: WorkflowData): string => {
     );
   }
   if (workflowData.jobsOutcome.failedJobSteps.length > 0) {
-    attachments.push(getFailureStep(workflowData.jobsOutcome.failedJobSteps));
+    attachments.push(getFailureStepAttachment(workflowData.jobsOutcome.failedJobSteps));
     attachments.push(
-      getLogsPayload(
+      getLogsAttachment(
         workflowData.repository.url,
         workflowData.checkSuiteId,
         workflowData.attachmentsIds.buildLogsArtifactId,

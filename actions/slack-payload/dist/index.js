@@ -9669,17 +9669,17 @@ const createPayload = (workflowData) => {
     blocks.push((0, slack_message_1.getHeaderBlock)(workflowData.conclusion));
     blocks.push((0, slack_message_1.getInformationBlock)(workflowData.repository.url, workflowData.repository.name, workflowData.url, workflowData.name, workflowData.environment));
     if (workflowData.pullRequest) {
-        blocks.push((0, slack_message_1.getPullRequestPayload)(workflowData.sha, workflowData.pullRequest.url, workflowData.pullRequest.title, workflowData.pullRequest.number));
+        blocks.push((0, slack_message_1.getPullRequestBlock)(workflowData.sha, workflowData.pullRequest.url, workflowData.pullRequest.title, workflowData.pullRequest.number));
     }
     if (workflowData.jobsOutcome.successDeployCount !== 0) {
-        attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.SUCCESS, enums_1.GithubStatus.SUCCESS, workflowData.jobsOutcome.successDeployCount));
+        attachments.push((0, slack_message_1.getPackagesAttachment)(enums_1.Colors.SUCCESS, enums_1.GithubStatus.SUCCESS, workflowData.jobsOutcome.successDeployCount));
     }
     if (workflowData.jobsOutcome.failureDeployCount !== 0) {
-        attachments.push((0, slack_message_1.getPackagesPayload)(enums_1.Colors.FAILURE, enums_1.GithubStatus.FAILURE, workflowData.jobsOutcome.failureDeployCount));
+        attachments.push((0, slack_message_1.getPackagesAttachment)(enums_1.Colors.FAILURE, enums_1.GithubStatus.FAILURE, workflowData.jobsOutcome.failureDeployCount));
     }
     if (workflowData.jobsOutcome.failedJobSteps.length > 0) {
-        attachments.push((0, slack_message_1.getFailureStep)(workflowData.jobsOutcome.failedJobSteps));
-        attachments.push((0, slack_message_1.getLogsPayload)(workflowData.repository.url, workflowData.checkSuiteId, workflowData.attachmentsIds.buildLogsArtifactId, workflowData.attachmentsIds.testLogsArtifactId));
+        attachments.push((0, slack_message_1.getFailureStepAttachment)(workflowData.jobsOutcome.failedJobSteps));
+        attachments.push((0, slack_message_1.getLogsAttachment)(workflowData.repository.url, workflowData.checkSuiteId, workflowData.attachmentsIds.buildLogsArtifactId, workflowData.attachmentsIds.testLogsArtifactId));
     }
     const payload = {
         blocks,
@@ -10043,27 +10043,19 @@ __exportStar(__nccwpck_require__(6170), exports);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getHeaderBlock = exports.getFailureStep = exports.getLogsPayload = exports.getInformationBlock = exports.getPackagesPayload = exports.getPullRequestPayload = void 0;
+exports.getLogsAttachment = exports.getFailureStepAttachment = exports.getPackagesAttachment = exports.getPullRequestBlock = exports.getInformationBlock = exports.getHeaderBlock = void 0;
 const enums_1 = __nccwpck_require__(1511);
-const getPullRequestPayload = (sha, url, title, number) => {
+const getHeaderBlock = (conclusion) => {
+    const icon = conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
     return {
-        type: 'section',
+        type: 'header',
         text: {
-            type: 'mrkdwn',
-            text: `${enums_1.SlackIcons.PULL_REQUEST} <${url}|#${number} ${title}> (commit id \`${sha}\`)`,
+            type: 'plain_text',
+            text: `${icon} ${conclusion === enums_1.GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'}`,
         },
     };
 };
-exports.getPullRequestPayload = getPullRequestPayload;
-const getPackagesPayload = (color, status, count) => {
-    const message = `${count} ${status} deployments`;
-    return {
-        color,
-        fallback: message,
-        text: message,
-    };
-};
-exports.getPackagesPayload = getPackagesPayload;
+exports.getHeaderBlock = getHeaderBlock;
 const getInformationBlock = (repositoryUrl, repositoryName, workflowUrl, workflowName, environment) => {
     return {
         type: 'section',
@@ -10084,16 +10076,26 @@ const getInformationBlock = (repositoryUrl, repositoryName, workflowUrl, workflo
     };
 };
 exports.getInformationBlock = getInformationBlock;
-const getLogsPayload = (url, checkSuiteId, buildArtifactId, testArtfactId) => {
-    const message = `${enums_1.SlackIcons.DOWNLOADS} Download ${buildArtifactId ? `<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs>` : ''} ${testArtfactId ? `<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>` : ''}`;
+const getPullRequestBlock = (sha, url, title, number) => {
     return {
-        color: enums_1.Colors.FAILURE,
+        type: 'section',
+        text: {
+            type: 'mrkdwn',
+            text: `${enums_1.SlackIcons.PULL_REQUEST} <${url}|#${number} ${title}> (commit id \`${sha}\`)`,
+        },
+    };
+};
+exports.getPullRequestBlock = getPullRequestBlock;
+const getPackagesAttachment = (color, status, count) => {
+    const message = `${count} ${status} deployments`;
+    return {
+        color,
         fallback: message,
         text: message,
     };
 };
-exports.getLogsPayload = getLogsPayload;
-const getFailureStep = (failedSteps) => {
+exports.getPackagesAttachment = getPackagesAttachment;
+const getFailureStepAttachment = (failedSteps) => {
     const message = `Workflow failed during steps:`;
     const stepsBlock = failedSteps.map((step) => {
         return {
@@ -10119,18 +10121,18 @@ const getFailureStep = (failedSteps) => {
         ],
     };
 };
-exports.getFailureStep = getFailureStep;
-const getHeaderBlock = (conclusion) => {
-    const icon = conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
+exports.getFailureStepAttachment = getFailureStepAttachment;
+const getLogsAttachment = (url, checkSuiteId, buildArtifactId, testArtfactId) => {
+    const message = `${enums_1.SlackIcons.DOWNLOADS} Download ${buildArtifactId
+        ? `<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs> `
+        : ''}${testArtfactId ? `<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>` : ''}`;
     return {
-        type: 'header',
-        text: {
-            type: 'plain_text',
-            text: `${icon} ${conclusion === enums_1.GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'}`,
-        },
+        color: enums_1.Colors.FAILURE,
+        fallback: message,
+        text: message,
     };
 };
-exports.getHeaderBlock = getHeaderBlock;
+exports.getLogsAttachment = getLogsAttachment;
 
 
 /***/ }),
