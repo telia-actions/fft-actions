@@ -9865,22 +9865,37 @@ const file_client_1 = __nccwpck_require__(3354);
 const exec_client_1 = __nccwpck_require__(8133);
 const getWorkflowContext = (token) => __awaiter(void 0, void 0, void 0, function* () {
     const workflowRunContext = github_1.context.payload;
-    const pullRequestNumber = workflowRunContext.workflow_run.pull_requests[0].number;
-    const attachmentsData = yield (0, github_client_1.getAttachmentsData)(token, workflowRunContext.workflow_run.id);
+    const pullRequestNumber = workflowRunContext.workflow_run.pull_requests.length > 0
+        ? workflowRunContext.workflow_run.pull_requests[0].number
+        : 0;
+    return pullRequestNumber
+        ? getContextWithPullRequest(token, pullRequestNumber, workflowRunContext)
+        : getContextWithoutPullRequest(token, workflowRunContext);
+});
+exports.getWorkflowContext = getWorkflowContext;
+const getContextWithPullRequest = (token, pullRequestNumber, workflowRunContext) => __awaiter(void 0, void 0, void 0, function* () {
+    const pullRequestData = yield (0, github_client_1.getPullRequestData)(token, pullRequestNumber);
+    const workflowData = yield getBaseContext(token, workflowRunContext);
+    return Object.assign(Object.assign({}, workflowData), { pullRequest: mapPullRequestData(pullRequestData) });
+});
+const getContextWithoutPullRequest = (token, workflowRunContext) => __awaiter(void 0, void 0, void 0, function* () {
+    const workflowData = yield getBaseContext(token, workflowRunContext);
+    return Object.assign(Object.assign({}, workflowData), { pullRequest: undefined });
+});
+const getBaseContext = (token, workflowRunContext) => __awaiter(void 0, void 0, void 0, function* () {
     const jobsData = yield (0, github_client_1.getJobsData)(token, workflowRunContext.workflow_run.id);
-    const pullRequestData = pullRequestNumber
-        ? yield (0, github_client_1.getPullRequestData)(token, pullRequestNumber)
-        : undefined;
-    const attachmentsIds = mapAttachmentsData(attachmentsData);
-    const environment = yield getEnvironment(token, pullRequestNumber, attachmentsIds.environmentArtifactId);
+    const attachmentsData = yield (0, github_client_1.getAttachmentsData)(token, workflowRunContext.workflow_run.id);
+    const environmentArtifactId = getEnvironmentAttachmentId(attachmentsData);
+    const environment = environmentArtifactId
+        ? yield getEnvironment(token, environmentArtifactId)
+        : 'Unknown';
     return {
-        attachmentsIds,
+        attachmentsIds: mapAttachmentsData(attachmentsData),
         checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
         conclusion: workflowRunContext.workflow_run.conclusion,
         environment,
         jobsOutcome: mapJobsData(jobsData),
         name: workflowRunContext.workflow_run.name,
-        pullRequest: mapPullRequestData(pullRequestData),
         repository: {
             name: workflowRunContext.repository.name,
             url: workflowRunContext.repository.html_url,
@@ -9890,7 +9905,6 @@ const getWorkflowContext = (token) => __awaiter(void 0, void 0, void 0, function
         url: workflowRunContext.workflow_run.html_url,
     };
 });
-exports.getWorkflowContext = getWorkflowContext;
 const mapAttachmentsData = (attachments) => {
     const map = new Map([
         ['build-logs', 'buildLogsArtifactId'],
@@ -9907,6 +9921,10 @@ const mapAttachmentsData = (attachments) => {
         testLogsArtifactId: 0,
         environmentArtifactId: 0,
     });
+};
+const getEnvironmentAttachmentId = (attachments) => {
+    const environmentAttachment = attachments.artifacts.find((artifact) => artifact.name === 'environment');
+    return environmentAttachment ? environmentAttachment.id : 0;
 };
 const mapPullRequestData = (pullRequest) => {
     if (!pullRequest)
@@ -9936,14 +9954,17 @@ const mapJobsData = (workflowJobs) => {
         failedJobSteps: [],
     });
 };
-const getEnvironment = (token, pullRequestNumber, environmentArtifactId) => __awaiter(void 0, void 0, void 0, function* () {
-    if (pullRequestNumber)
-        return `preview-${pullRequestNumber}`;
-    const environmentArtifact = yield (0, github_client_1.getArtifact)(token, environmentArtifactId);
-    const fileName = 'environment';
-    (0, file_client_1.writeFile)(`${fileName}.zip`, Buffer.from(environmentArtifact));
-    yield (0, exec_client_1.unzipArtifact)(fileName);
-    return (0, file_client_1.readFile)(`${fileName}.txt`);
+const getEnvironment = (token, environmentArtifactId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const environmentArtifact = yield (0, github_client_1.getArtifact)(token, environmentArtifactId);
+        const fileName = 'environment';
+        (0, file_client_1.writeFile)(`${fileName}.zip`, Buffer.from(environmentArtifact));
+        yield (0, exec_client_1.unzipArtifact)(fileName);
+        return (0, file_client_1.readFile)(`${fileName}.txt`);
+    }
+    catch (error) {
+        return 'Unknown';
+    }
 });
 
 

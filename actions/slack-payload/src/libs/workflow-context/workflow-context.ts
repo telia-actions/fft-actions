@@ -18,28 +18,53 @@ import { unzipArtifact } from '@src/utils/exec-client';
 
 export const getWorkflowContext = async (token: string): Promise<WorkflowData> => {
   const workflowRunContext = context.payload as WorkflowRunEvent;
-  const pullRequestNumber = workflowRunContext.workflow_run.pull_requests[0].number;
+  const pullRequestNumber =
+    workflowRunContext.workflow_run.pull_requests.length > 0
+      ? workflowRunContext.workflow_run.pull_requests[0].number
+      : 0;
+  return pullRequestNumber
+    ? getContextWithPullRequest(token, pullRequestNumber, workflowRunContext)
+    : getContextWithoutPullRequest(token, workflowRunContext);
+};
 
-  const attachmentsData = await getAttachmentsData(token, workflowRunContext.workflow_run.id);
-  const jobsData = await getJobsData(token, workflowRunContext.workflow_run.id);
-  const pullRequestData = pullRequestNumber
-    ? await getPullRequestData(token, pullRequestNumber)
-    : undefined;
-
-  const attachmentsIds = mapAttachmentsData(attachmentsData);
-  const environment = await getEnvironment(
-    token,
-    pullRequestNumber,
-    attachmentsIds.environmentArtifactId
-  );
+const getContextWithPullRequest = async (
+  token: string,
+  pullRequestNumber: number,
+  workflowRunContext: WorkflowRunEvent
+): Promise<WorkflowData> => {
+  const pullRequestData = await getPullRequestData(token, pullRequestNumber);
+  const workflowData = await getBaseContext(token, workflowRunContext);
   return {
-    attachmentsIds,
+    ...workflowData,
+    pullRequest: mapPullRequestData(pullRequestData),
+  };
+};
+
+const getContextWithoutPullRequest = async (
+  token: string,
+  workflowRunContext: WorkflowRunEvent
+): Promise<WorkflowData> => {
+  const workflowData = await getBaseContext(token, workflowRunContext);
+  return { ...workflowData, pullRequest: undefined };
+};
+
+const getBaseContext = async (
+  token: string,
+  workflowRunContext: WorkflowRunEvent
+): Promise<Omit<WorkflowData, 'pullRequest'>> => {
+  const jobsData = await getJobsData(token, workflowRunContext.workflow_run.id);
+  const attachmentsData = await getAttachmentsData(token, workflowRunContext.workflow_run.id);
+  const environmentArtifactId = getEnvironmentAttachmentId(attachmentsData);
+  const environment = environmentArtifactId
+    ? await getEnvironment(token, environmentArtifactId)
+    : 'Unknown';
+  return {
+    attachmentsIds: mapAttachmentsData(attachmentsData),
     checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
     conclusion: workflowRunContext.workflow_run.conclusion,
     environment,
     jobsOutcome: mapJobsData(jobsData),
     name: workflowRunContext.workflow_run.name,
-    pullRequest: mapPullRequestData(pullRequestData),
     repository: {
       name: workflowRunContext.repository.name,
       url: workflowRunContext.repository.html_url,
@@ -68,6 +93,13 @@ const mapAttachmentsData = (attachments: ListWorkflowRunArtifacts): AttachmentsD
       environmentArtifactId: 0,
     }
   );
+};
+
+const getEnvironmentAttachmentId = (attachments: ListWorkflowRunArtifacts): number => {
+  const environmentAttachment = attachments.artifacts.find(
+    (artifact) => artifact.name === 'environment'
+  );
+  return environmentAttachment ? environmentAttachment.id : 0;
 };
 
 const mapPullRequestData = (pullRequest: PullRequest | undefined): PullRequestData | undefined => {
@@ -100,17 +132,16 @@ const mapJobsData = (workflowJobs: ListJobsForWorkflowRun): JobsData => {
   );
 };
 
-const getEnvironment = async (
-  token: string,
-  pullRequestNumber: number,
-  environmentArtifactId: number
-): Promise<string> => {
-  if (pullRequestNumber) return `preview-${pullRequestNumber}`;
+const getEnvironment = async (token: string, environmentArtifactId: number): Promise<string> => {
+  try {
+    const environmentArtifact = await getArtifact(token, environmentArtifactId);
+    const fileName = 'environment';
 
-  const environmentArtifact = await getArtifact(token, environmentArtifactId);
-  const fileName = 'environment';
+    writeFile(`${fileName}.zip`, Buffer.from(environmentArtifact as ArrayBuffer));
+    await unzipArtifact(fileName);
 
-  writeFile(`${fileName}.zip`, Buffer.from(environmentArtifact as ArrayBuffer));
-  await unzipArtifact(fileName);
-  return readFile(`${fileName}.txt`);
+    return readFile(`${fileName}.txt`);
+  } catch (error) {
+    return 'Unknown';
+  }
 };

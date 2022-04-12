@@ -22,7 +22,7 @@ describe('slack-message', () => {
 
         expect(payload.type).toBe('header');
         expect(payload.text.type).toBe('plain_text');
-        expect(payload.text.text).toBe(':white_check_mark: Successful workflow');
+        expect(payload.text.text).toBe(`${SlackIcons.SUCCESS} Successful workflow`);
       });
     });
     describe('given conclusion is "failue"', () => {
@@ -31,7 +31,7 @@ describe('slack-message', () => {
 
         expect(payload.type).toBe('header');
         expect(payload.text.type).toBe('plain_text');
-        expect(payload.text.text).toBe(':fire: Failed workflow');
+        expect(payload.text.text).toBe(`${SlackIcons.FAILURE} Failed workflow`);
       });
     });
   });
