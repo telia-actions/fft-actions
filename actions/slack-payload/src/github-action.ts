@@ -1,5 +1,5 @@
 import { getInput, setOutput } from '@actions/core';
-import { createPayload } from '@src/libs/payload';
+import { createPayload } from '@src/libs/slack-payload';
 import { getWorkflowContext } from '@src/libs/workflow-context';
 
 export const run = async (): Promise<void> => {

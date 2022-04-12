@@ -9611,13 +9611,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core_1 = __nccwpck_require__(2186);
-const payload_1 = __nccwpck_require__(5762);
+const slack_payload_1 = __nccwpck_require__(9052);
 const workflow_context_1 = __nccwpck_require__(7429);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (0, core_1.getInput)('token');
         const workflowContext = yield (0, workflow_context_1.getWorkflowContext)(token);
-        const payload = (0, payload_1.createPayload)(workflowContext);
+        const payload = (0, slack_payload_1.createPayload)(workflowContext);
         (0, core_1.setOutput)('payload', payload);
     }
     catch (error) {
@@ -9629,7 +9629,7 @@ exports.run = run;
 
 /***/ }),
 
-/***/ 5762:
+/***/ 2116:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -9649,12 +9649,137 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(957), exports);
+__exportStar(__nccwpck_require__(1329), exports);
 
 
 /***/ }),
 
-/***/ 957:
+/***/ 1329:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getLogsAttachment = exports.getFailureStepAttachment = exports.getPackagesAttachment = exports.getPullRequestBlock = exports.getInformationBlock = exports.getHeaderBlock = void 0;
+const enums_1 = __nccwpck_require__(1511);
+const getHeaderBlock = (conclusion) => {
+    const icon = conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
+    return {
+        type: 'header',
+        text: {
+            type: 'plain_text',
+            text: `${icon} ${conclusion === enums_1.GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'}`,
+        },
+    };
+};
+exports.getHeaderBlock = getHeaderBlock;
+const getInformationBlock = (repositoryUrl, repositoryName, workflowUrl, workflowName, environment) => {
+    return {
+        type: 'section',
+        fields: [
+            {
+                type: 'mrkdwn',
+                text: `<${repositoryUrl}|${repositoryName}>`,
+            },
+            {
+                type: 'mrkdwn',
+                text: `<${workflowUrl}|${workflowName}>`,
+            },
+            {
+                type: 'plain_text',
+                text: `Environment: ${environment.toUpperCase()}`,
+            },
+        ],
+    };
+};
+exports.getInformationBlock = getInformationBlock;
+const getPullRequestBlock = (sha, url, title, number) => {
+    return {
+        type: 'section',
+        text: {
+            type: 'mrkdwn',
+            text: `${enums_1.SlackIcons.PULL_REQUEST} <${url}|#${number} ${title}> (commit id \`${sha}\`)`,
+        },
+    };
+};
+exports.getPullRequestBlock = getPullRequestBlock;
+const getPackagesAttachment = (color, status, count) => {
+    const message = `${count} ${status} deployments`;
+    return {
+        color,
+        fallback: message,
+        text: message,
+    };
+};
+exports.getPackagesAttachment = getPackagesAttachment;
+const getFailureStepAttachment = (failedSteps) => {
+    const message = `Workflow failed during steps:`;
+    const stepsBlock = failedSteps.map((step) => {
+        return {
+            type: 'section',
+            text: {
+                type: 'plain_text',
+                text: step,
+            },
+        };
+    });
+    return {
+        color: enums_1.Colors.FAILURE,
+        fallback: message,
+        blocks: [
+            {
+                type: 'section',
+                text: {
+                    type: 'plain_text',
+                    text: message,
+                },
+            },
+            ...stepsBlock,
+        ],
+    };
+};
+exports.getFailureStepAttachment = getFailureStepAttachment;
+const getLogsAttachment = (url, checkSuiteId, buildArtifactId, testArtfactId) => {
+    const message = `${enums_1.SlackIcons.DOWNLOADS} Download ${buildArtifactId
+        ? `<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs> `
+        : ''}${testArtfactId ? `<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>` : ''}`;
+    return {
+        color: enums_1.Colors.FAILURE,
+        fallback: message,
+        text: message,
+    };
+};
+exports.getLogsAttachment = getLogsAttachment;
+
+
+/***/ }),
+
+/***/ 9052:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(1304), exports);
+
+
+/***/ }),
+
+/***/ 1304:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -9662,7 +9787,7 @@ __exportStar(__nccwpck_require__(957), exports);
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
-const slack_message_1 = __nccwpck_require__(9584);
+const slack_message_1 = __nccwpck_require__(2116);
 const createPayload = (workflowData) => {
     const blocks = [];
     const attachments = [];
@@ -10008,131 +10133,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 __exportStar(__nccwpck_require__(1354), exports);
-
-
-/***/ }),
-
-/***/ 9584:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(6170), exports);
-
-
-/***/ }),
-
-/***/ 6170:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getLogsAttachment = exports.getFailureStepAttachment = exports.getPackagesAttachment = exports.getPullRequestBlock = exports.getInformationBlock = exports.getHeaderBlock = void 0;
-const enums_1 = __nccwpck_require__(1511);
-const getHeaderBlock = (conclusion) => {
-    const icon = conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
-    return {
-        type: 'header',
-        text: {
-            type: 'plain_text',
-            text: `${icon} ${conclusion === enums_1.GithubStatus.SUCCESS ? 'Successful workflow' : 'Failed workflow'}`,
-        },
-    };
-};
-exports.getHeaderBlock = getHeaderBlock;
-const getInformationBlock = (repositoryUrl, repositoryName, workflowUrl, workflowName, environment) => {
-    return {
-        type: 'section',
-        fields: [
-            {
-                type: 'mrkdwn',
-                text: `<${repositoryUrl}|${repositoryName}>`,
-            },
-            {
-                type: 'mrkdwn',
-                text: `<${workflowUrl}|${workflowName}>`,
-            },
-            {
-                type: 'plain_text',
-                text: `Environment: ${environment.toUpperCase()}`,
-            },
-        ],
-    };
-};
-exports.getInformationBlock = getInformationBlock;
-const getPullRequestBlock = (sha, url, title, number) => {
-    return {
-        type: 'section',
-        text: {
-            type: 'mrkdwn',
-            text: `${enums_1.SlackIcons.PULL_REQUEST} <${url}|#${number} ${title}> (commit id \`${sha}\`)`,
-        },
-    };
-};
-exports.getPullRequestBlock = getPullRequestBlock;
-const getPackagesAttachment = (color, status, count) => {
-    const message = `${count} ${status} deployments`;
-    return {
-        color,
-        fallback: message,
-        text: message,
-    };
-};
-exports.getPackagesAttachment = getPackagesAttachment;
-const getFailureStepAttachment = (failedSteps) => {
-    const message = `Workflow failed during steps:`;
-    const stepsBlock = failedSteps.map((step) => {
-        return {
-            type: 'section',
-            text: {
-                type: 'plain_text',
-                text: step,
-            },
-        };
-    });
-    return {
-        color: enums_1.Colors.FAILURE,
-        fallback: message,
-        blocks: [
-            {
-                type: 'section',
-                text: {
-                    type: 'plain_text',
-                    text: message,
-                },
-            },
-            ...stepsBlock,
-        ],
-    };
-};
-exports.getFailureStepAttachment = getFailureStepAttachment;
-const getLogsAttachment = (url, checkSuiteId, buildArtifactId, testArtfactId) => {
-    const message = `${enums_1.SlackIcons.DOWNLOADS} Download ${buildArtifactId
-        ? `<${url}/suites/${checkSuiteId}/artifacts/${buildArtifactId}|build logs> `
-        : ''}${testArtfactId ? `<${url}/suites/${checkSuiteId}/artifacts/${testArtfactId}|test logs>` : ''}`;
-    return {
-        color: enums_1.Colors.FAILURE,
-        fallback: message,
-        text: message,
-    };
-};
-exports.getLogsAttachment = getLogsAttachment;
 
 
 /***/ }),

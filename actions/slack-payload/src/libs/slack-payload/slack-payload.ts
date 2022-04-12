@@ -6,7 +6,7 @@ import {
   getLogsAttachment,
   getPackagesAttachment,
   getPullRequestBlock,
-} from '@src/utils/slack-message';
+} from '@src/libs/slack-message';
 import type { WorkflowData } from '@src/libs/workflow-context/types';
 
 export const createPayload = (workflowData: WorkflowData): string => {

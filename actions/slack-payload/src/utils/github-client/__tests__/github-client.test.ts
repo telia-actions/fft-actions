@@ -44,9 +44,9 @@ describe('github-client', () => {
       const data = await getPullRequestData(mockedToken, mockedNumber);
 
       expect(data).toBe(mockedResponse);
-      expect(getOctokitSpy).toBeCalledTimes(1);
+      expect(getOctokitSpy).toHaveBeenCalledTimes(1);
       expect(getOctokitSpy).toHaveBeenCalledWith(mockedToken);
-      expect(getPullRequestMock).toBeCalledTimes(1);
+      expect(getPullRequestMock).toHaveBeenCalledTimes(1);
       expect(getPullRequestMock).toHaveBeenCalledWith({
         owner: mockedOwner,
         pull_number: mockedNumber,
@@ -60,9 +60,9 @@ describe('github-client', () => {
       const data = await getAttachmentsData(mockedToken, mockedNumber);
 
       expect(data).toBe(mockedResponse);
-      expect(getOctokitSpy).toBeCalledTimes(1);
+      expect(getOctokitSpy).toHaveBeenCalledTimes(1);
       expect(getOctokitSpy).toHaveBeenCalledWith(mockedToken);
-      expect(listWorkflowRunArtifactsMock).toBeCalledTimes(1);
+      expect(listWorkflowRunArtifactsMock).toHaveBeenCalledTimes(1);
       expect(listWorkflowRunArtifactsMock).toHaveBeenCalledWith({
         owner: mockedOwner,
         run_id: mockedNumber,
@@ -76,9 +76,9 @@ describe('github-client', () => {
       const data = await getJobsData(mockedToken, mockedNumber);
 
       expect(data).toBe(mockedResponse);
-      expect(getOctokitSpy).toBeCalledTimes(1);
+      expect(getOctokitSpy).toHaveBeenCalledTimes(1);
       expect(getOctokitSpy).toHaveBeenCalledWith(mockedToken);
-      expect(listWorkflowRunMock).toBeCalledTimes(1);
+      expect(listWorkflowRunMock).toHaveBeenCalledTimes(1);
       expect(listWorkflowRunMock).toHaveBeenCalledWith({
         owner: mockedOwner,
         run_id: mockedNumber,
@@ -92,9 +92,9 @@ describe('github-client', () => {
       const data = await getArtifact(mockedToken, mockedNumber);
 
       expect(data).toBe(mockedResponse);
-      expect(getOctokitSpy).toBeCalledTimes(1);
+      expect(getOctokitSpy).toHaveBeenCalledTimes(1);
       expect(getOctokitSpy).toHaveBeenCalledWith(mockedToken);
-      expect(downloadArtifactMock).toBeCalledTimes(1);
+      expect(downloadArtifactMock).toHaveBeenCalledTimes(1);
       expect(downloadArtifactMock).toHaveBeenCalledWith({
         archive_format: 'zip',
         artifact_id: mockedNumber,
