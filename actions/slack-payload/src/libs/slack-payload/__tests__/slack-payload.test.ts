@@ -48,7 +48,7 @@ describe('createPayload method', () => {
       mockedWorkflowContext.environment
     );
   });
-  it('should only containt header and information blocks of slack message payload', () => {
+  it('should only contain header and information blocks of slack message payload', () => {
     const pullRequestPayloadSpy = jest.spyOn(slackMessage, 'getPullRequestBlock');
     const packagesPayloadSpy = jest.spyOn(slackMessage, 'getPackagesAttachment');
     const stepFailuresPayloadSpy = jest.spyOn(slackMessage, 'getFailureStepAttachment');
