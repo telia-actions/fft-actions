@@ -14,7 +14,7 @@ describe('exec client', () => {
       expect(execSpy).toHaveBeenCalledTimes(1);
       expect(execSpy).toHaveBeenCalledWith(command, [mockedFileName]);
     });
-    it('should throw an error', async () => {
+    it('should throw an error if unzip fails', async () => {
       const errorCode = 1;
 
       jest.spyOn(exec, 'exec').mockResolvedValue(errorCode);
