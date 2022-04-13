@@ -15,7 +15,7 @@ describe('fs client', () => {
       expect(fsSpy).toHaveBeenCalledTimes(1);
       expect(fsSpy).toHaveBeenCalledWith(mockedPathToFile, 'utf-8');
     });
-    it('should write buffer to file asynchronous ', () => {
+    it('should write buffer to file synchronously ', () => {
       const mockedContent = Buffer.from([1, 2, 3]);
 
       const fsSpy = jest.spyOn(fs, 'writeFileSync');
