@@ -7,7 +7,7 @@ const mockedPathToFile = '/path/to/file';
 
 describe('fs client', () => {
   describe('readFile method', () => {
-    it('should read file content asynchronous', () => {
+    it('should read file content synchronously', () => {
       const fsSpy = jest.spyOn(fs, 'readFileSync');
 
       readFile(mockedPathToFile);
