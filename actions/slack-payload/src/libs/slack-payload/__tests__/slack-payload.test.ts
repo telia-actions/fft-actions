@@ -84,7 +84,7 @@ describe('createPayload method', () => {
       );
     });
   });
-  describe('given workflow has successfull deployments', () => {
+  describe('given workflow has successful deployments', () => {
     it('should return success deployments payload', () => {
       const packagesPayloadSpy = jest.spyOn(slackMessage, 'getPackagesAttachment');
 
