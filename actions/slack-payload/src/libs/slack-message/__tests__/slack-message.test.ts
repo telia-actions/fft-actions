@@ -8,8 +8,10 @@ import {
   getPullRequestBlock,
 } from '../slack-message';
 
-const mockedUrl = 'http://www.mocked.com';
-const mockedName = 'name';
+const mockedUrl = 'first-mocked-url';
+const mockedUrl2 = 'second-mocked-url';
+const mockedName = 'first-mocked-name';
+const mockedName2 = 'second-mocked-name';
 const mockedSha = 'sha';
 const mockedTitle = 'title';
 const mockedNumber = 1;
@@ -41,8 +43,8 @@ describe('slack-message', () => {
       const payload = getInformationBlock(
         mockedUrl,
         mockedName,
-        mockedUrl,
-        mockedName,
+        mockedUrl2,
+        mockedName2,
         mockedEnvironment
       );
 
@@ -53,7 +55,7 @@ describe('slack-message', () => {
       expect(payload.fields[0].text).toBe(`<${mockedUrl}|${mockedName}>`);
 
       expect(payload.fields[1].type).toBe('mrkdwn');
-      expect(payload.fields[1].text).toBe(`<${mockedUrl}|${mockedName}>`);
+      expect(payload.fields[1].text).toBe(`<${mockedUrl2}|${mockedName2}>`);
 
       expect(payload.fields[2].type).toBe('plain_text');
       expect(payload.fields[2].text).toBe(`Environment: ${mockedEnvironment.toUpperCase()}`);
