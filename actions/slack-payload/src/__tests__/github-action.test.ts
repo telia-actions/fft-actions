@@ -37,19 +37,26 @@ describe('github action', () => {
     });
   });
   describe('given that error occurs', () => {
-    it('should set payload as github action output', async () => {
+    it('should format error payload', async () => {
+      const mockedErrorPayload = 'Error message to slack';
+      const mockedError = 'mockedError';
+
       const setOutputSpy = jest.spyOn(actionsCore, 'setOutput').mockImplementation();
+      const payloadSpy = jest
+        .spyOn(payload, 'createErrorPayload')
+        .mockReturnValue(mockedErrorPayload);
+
       jest.spyOn(payload, 'createPayload').mockImplementation(() => {
-        throw Error('Error');
+        throw mockedError;
       });
 
       await run();
 
       expect(setOutputSpy).toHaveBeenCalledTimes(1);
-      expect(setOutputSpy).toHaveBeenCalledWith(
-        'payload',
-        'Failed to generate slack message payload - please contact @fft'
-      );
+      expect(setOutputSpy).toHaveBeenCalledWith('payload', mockedErrorPayload);
+
+      expect(payloadSpy).toHaveBeenCalledTimes(1);
+      expect(payloadSpy).toHaveBeenCalledWith(mockedError);
     });
   });
 });

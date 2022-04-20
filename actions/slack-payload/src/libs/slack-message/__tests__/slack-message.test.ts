@@ -1,5 +1,7 @@
 import { Colors, GithubStatus, SlackIcons } from '@src/enums';
 import {
+  getErrorAttachment,
+  getErrorHeaderBlock,
   getFailureStepAttachment,
   getHeaderBlock,
   getInformationBlock,
@@ -133,6 +135,27 @@ describe('slack-message', () => {
 
       expect(payload.blocks[1].text.type).toBe('plain_text');
       expect(payload.blocks[1].text.text).toBe(mockedStepFailures[0]);
+    });
+  });
+  describe('getErrorHeaderBlock method', () => {
+    it('should return error block payload', () => {
+      const payload = getErrorHeaderBlock();
+
+      expect(payload.type).toBe('header');
+      expect(payload.text.type).toBe('plain_text');
+      expect(payload.text.text).toBe(
+        'Failed to generate slack message payload - please contact @fft'
+      );
+    });
+  });
+  describe('getErrorAttachment method', () => {
+    it('should return error attachemnt payload', () => {
+      const mockedError = 'error';
+      const payload = getErrorAttachment(mockedError);
+
+      expect(payload.color).toBe(Colors.FAILURE);
+      expect(payload.fallback).toBe(mockedError);
+      expect(payload.text).toBe(mockedError);
     });
   });
 });
