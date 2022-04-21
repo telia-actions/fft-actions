@@ -1,5 +1,5 @@
 import { getInput, setOutput } from '@actions/core';
-import { createPayload } from '@src/libs/slack-payload';
+import { createErrorPayload, createPayload } from '@src/libs/slack-payload';
 import { getWorkflowContext } from '@src/libs/workflow-context';
 
 export const run = async (): Promise<void> => {
@@ -9,6 +9,7 @@ export const run = async (): Promise<void> => {
     const payload = createPayload(workflowContext);
     setOutput('payload', payload);
   } catch (error) {
-    setOutput('payload', 'Failed to generate slack message payload - please contact @fft');
+    const errorPayload = createErrorPayload(error);
+    setOutput('payload', errorPayload);
   }
 };

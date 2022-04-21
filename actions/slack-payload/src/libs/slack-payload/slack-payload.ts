@@ -1,5 +1,7 @@
 import { Colors, GithubStatus } from '@src/enums';
 import {
+  getErrorAttachment,
+  getErrorHeaderBlock,
   getFailureStepAttachment,
   getHeaderBlock,
   getInformationBlock,
@@ -63,6 +65,18 @@ export const createPayload = (workflowData: WorkflowData): string => {
     );
   }
 
+  const payload = {
+    blocks,
+    attachments,
+  };
+  return JSON.stringify(payload);
+};
+
+export const createErrorPayload = (error: unknown): string => {
+  const blocks = [];
+  const attachments = [];
+  blocks.push(getErrorHeaderBlock());
+  attachments.push(getErrorAttachment(error));
   const payload = {
     blocks,
     attachments,

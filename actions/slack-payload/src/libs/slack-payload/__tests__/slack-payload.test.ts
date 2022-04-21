@@ -1,4 +1,4 @@
-import { createPayload } from '../slack-payload';
+import { createErrorPayload, createPayload } from '../slack-payload';
 import * as slackMessage from '@src/libs/slack-message';
 import { Colors, GithubStatus } from '@src/enums';
 
@@ -157,5 +157,21 @@ describe('createPayload method', () => {
         mockedWorkflowContext.attachmentsIds.testLogsArtifactId
       );
     });
+  });
+});
+
+describe('createErrorPayload method', () => {
+  it('should return error header block and error attachment', () => {
+    const headerPayloadSpy = jest.spyOn(slackMessage, 'getErrorHeaderBlock');
+    const errorPayloadSpy = jest.spyOn(slackMessage, 'getErrorAttachment');
+
+    const mockedError = 'error';
+
+    createErrorPayload(mockedError);
+
+    expect(headerPayloadSpy).toHaveBeenCalledTimes(1);
+
+    expect(errorPayloadSpy).toHaveBeenCalledTimes(1);
+    expect(errorPayloadSpy).toHaveBeenCalledWith(mockedError);
   });
 });

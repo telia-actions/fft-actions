@@ -117,3 +117,21 @@ export const getLogsAttachment = (
     text: message,
   };
 };
+
+export const getErrorHeaderBlock = (): SlackPayloadBlockText => {
+  return {
+    type: 'header',
+    text: {
+      type: 'plain_text',
+      text: 'Failed to generate slack message payload - please contact @fft',
+    },
+  };
+};
+
+export const getErrorAttachment = (error: unknown): SlackPayloadAttachmentText => {
+  return {
+    color: Colors.FAILURE,
+    fallback: `${error}`,
+    text: `${error}`,
+  };
+};
