@@ -12,7 +12,7 @@ export const run = (): void => {
     setOutput('config', previewEnvConfig);
 
     if (staticAppName) {
-      const appConfig = previewEnvConfig.static_apps.find((app) => app.name === staticAppName);
+      const appConfig = previewEnvConfig.apps.find((app) => app.name === staticAppName);
 
       setOutput('staticApp', appConfig);
     }
