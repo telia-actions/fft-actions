@@ -36,6 +36,7 @@ runs:
         token: ${{ inputs.gitToken }}
         repository: telia-company/transistor-aws-infrastructure
         ref: fft-49-preview-code-to-generic
+        clean: false
     - name: cd
       run: |
         cd ..
