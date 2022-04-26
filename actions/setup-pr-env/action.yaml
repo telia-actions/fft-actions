@@ -33,6 +33,8 @@ runs:
         token: ${{ inputs.gitToken }}
         repository: telia-company/transistor-aws-infrastructure
         ref: fft-49-preview-code-to-generic
+    - name: cd
+      run: cd ..
     - name: ls
       run: ls
       shell: bash
@@ -40,12 +42,12 @@ runs:
       run: pwd
       shell: bash
     - name: Copy config
-      run: mv ${{ inputs.routeConfig }} ./preview
+      run: mv ${{ inputs.routeConfig }} ./transistor-aws-infrastructure/preview
       shell: bash
     - name: Terraform Init
       run: terraform init -backend-config="key=pipeline/tse/pull_request/${{ inputs.prNumber }}.tfstate"
       shell: bash
-      working-directory: ./preview
+      working-directory: ./transistor-aws-infrastructure/preview
     - name: Terraform plan
       env:
         TF_VAR_env_name: ${{ inputs.envName }}
@@ -53,9 +55,9 @@ runs:
         TF_VAR_subnet_name: ${{ inputs.subnetName }}
       run: terraform plan -var-file="${{ inputs.routeConfig }}" -out plan
       shell: bash
-      working-directory: ./preview
+      working-directory: ./transistor-aws-infrastructure/preview
     - name: Terraform Apply
       if: ${{ inputs.applyChanges == 'true' }}
       run: terraform apply -auto-approve "plan"
       shell: bash
-      working-directory: ./preview
+      working-directory: ./transistor-aws-infrastructure/preview
