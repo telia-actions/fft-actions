@@ -35,6 +35,7 @@ runs:
         ref: fft-49-preview-code-to-generic
     - name: cd
       run: cd ..
+      shell: bash
     - name: ls
       run: ls
       shell: bash
