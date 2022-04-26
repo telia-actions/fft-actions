@@ -33,6 +33,12 @@ runs:
         token: ${{ inputs.gitToken }}
         repository: telia-company/transistor-aws-infrastructure
         ref: fft-49-preview-code-to-generic
+    - name: ls
+      run: ls
+      shell: bash
+    - name: pwd
+      run: pwd
+      shell: bash
     - name: Copy config
       run: mv ${{ inputs.routeConfig }} ./preview
       shell: bash
