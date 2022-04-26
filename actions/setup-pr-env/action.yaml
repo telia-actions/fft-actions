@@ -33,6 +33,9 @@ runs:
         token: ${{ inputs.gitToken }}
         repository: telia-company/transistor-aws-infrastructure
         ref: fft-49-preview-code-to-generic
+    - name: Copy config
+      run: mv ${{ inputs.routeConfig }} ./preview/${{ inputs.routeConfig }}
+      shell: bash
     - name: Terraform Init
       run: terraform init -backend-config="key=pipeline/tse/pull_request/${{ inputs.prNumber }}.tfstate"
       shell: bash
