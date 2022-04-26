@@ -27,6 +27,9 @@ runs:
         echo "AWS_ACCESS_KEY_ID=${{ inputs.awsAccsessKeyId }}" >> $GITHUB_ENV
         echo "AWS_SECRET_ACCESS_KEY=${{ inputs.awsSecretAccessKey }}" >> $GITHUB_ENV
         echo "AWS_SESSION_TOKEN=${{ inputs.awsSessionToken }}" >> $GITHUB_ENV
+    - name: ls
+      run: ls
+      shell: bash
     - name: Checkout repository code
       uses: actions/checkout@v2
       with:
