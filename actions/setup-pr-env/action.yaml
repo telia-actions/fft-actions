@@ -8,6 +8,8 @@ inputs:
     required: true
   awsSessionToken:
     required: true
+  envName:
+    required: true
   gitToken:
     required: true
   prNumber:
@@ -30,13 +32,14 @@ runs:
       with:
         token: ${{ inputs.gitToken }}
         repository: telia-company/transistor-aws-infrastructure
+        ref: fft-49-preview-code-to-generic
     - name: Terraform Init
       run: terraform init -backend-config="key=pipeline/tse/pull_request/${{ inputs.prNumber }}.tfstate"
       shell: bash
       working-directory: ./preview
     - name: Terraform plan
       env:
-        TF_VAR_env_name: dev
+        TF_VAR_env_name: ${{ inputs.envName }}
         TF_VAR_gh_prefix: ${{ inputs.prNumber }}
         TF_VAR_subnet_name: ${{ inputs.subnetName }}
       run: terraform plan -var-file="${{ inputs.routeConfig }}" -out plan
