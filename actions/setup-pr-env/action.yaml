@@ -34,7 +34,9 @@ runs:
         repository: telia-company/transistor-aws-infrastructure
         ref: fft-49-preview-code-to-generic
     - name: cd
-      run: cd ..
+      run: |
+        cd ..
+        ls
       shell: bash
     - name: ls
       run: ls
