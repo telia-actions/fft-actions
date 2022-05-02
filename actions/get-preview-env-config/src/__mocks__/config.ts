@@ -1,5 +1,5 @@
 export default {
-  static_apps: [
+  apps: [
     {
       name: 'app1',
       port: 3000,

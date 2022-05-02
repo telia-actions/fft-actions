@@ -1572,7 +1572,7 @@ const run = () => {
         const previewEnvConfig = json_client_1.readJsonWithComments(configFilePath);
         core_1.setOutput('config', previewEnvConfig);
         if (staticAppName) {
-            const appConfig = previewEnvConfig.static_apps.find((app) => app.name === staticAppName);
+            const appConfig = previewEnvConfig.apps.find((app) => app.name === staticAppName);
             core_1.setOutput('staticApp', appConfig);
         }
     }

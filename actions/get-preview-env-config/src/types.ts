@@ -6,5 +6,5 @@ export type StaticAppConfig = {
 };
 
 export type PreviewEnvConfig = {
-  static_apps: StaticAppConfig[];
+  apps: StaticAppConfig[];
 };
