@@ -39,6 +39,7 @@ runs:
         token: ${{ inputs.gitToken }}
         repository: telia-company/fft-aws-infrastructure
         path: fft-aws-infrastructure
+        ref: fft-49-use-modules-for-preview
     - name: Copy config
       run: mv ${{ inputs.terraformParameters }} ${{ steps.variables.outputs.terraform_working_dir }}
       shell: bash
