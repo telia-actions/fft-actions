@@ -10,7 +10,7 @@ jobs:
       - name: Create payload for slack-github-action
         id: helpers
         uses: telia-actions/fft-actions/actions/slack-payload@fft-1570-missing-author-information-in-notifications
-      - name: email
+      - name: Echo email
         run: echo ${{ steps.helpers.outputs.author_email }}
       - name: Post to a Slack channel
         uses: telia-actions/slack-github-action@v1.17.0
