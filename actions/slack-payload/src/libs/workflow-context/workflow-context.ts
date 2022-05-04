@@ -54,15 +54,16 @@ const getBaseContext = async (
 ): Promise<Omit<WorkflowData, 'pullRequest'>> => {
   const jobsData = await getJobsData(token, workflowRunContext.workflow_run.id);
   const attachmentsData = await getAttachmentsData(token, workflowRunContext.workflow_run.id);
-  const environmentArtifactId = getEnvironmentAttachmentId(attachmentsData);
-  const environment = environmentArtifactId
-    ? await getEnvironment(token, environmentArtifactId)
-    : 'Unknown';
+  const workflowInfoArtifactId = getWorkflowInfoAttachmentId(attachmentsData);
+  const workflowInfoJson = workflowInfoArtifactId
+    ? await getWorkflowInfo(token, workflowInfoArtifactId)
+    : '{}';
+  const workflowInfo = JSON.parse(workflowInfoJson);
   return {
     attachmentsIds: mapAttachmentsData(attachmentsData),
     checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
     conclusion: workflowRunContext.workflow_run.conclusion,
-    environment,
+    environment: workflowInfo.environment || 'Unknown',
     jobsOutcome: mapJobsData(jobsData),
     name: workflowRunContext.workflow_run.name,
     repository: {
@@ -72,6 +73,7 @@ const getBaseContext = async (
     runId: workflowRunContext.workflow_run.id,
     sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
     url: workflowRunContext.workflow_run.html_url,
+    author_email: workflowInfo.author_email || 'Unknown',
   };
 };
 
@@ -79,7 +81,7 @@ const mapAttachmentsData = (attachments: ListWorkflowRunArtifacts): AttachmentsD
   const map = new Map<string, keyof AttachmentsData>([
     ['build-logs', 'buildLogsArtifactId'],
     ['test-logs', 'testLogsArtifactId'],
-    ['environment', 'environmentArtifactId'],
+    ['workflowInfo', 'workflowInfoArtifactId'],
   ]);
   return attachments.artifacts.reduce(
     (acc, artifact) => {
@@ -90,16 +92,16 @@ const mapAttachmentsData = (attachments: ListWorkflowRunArtifacts): AttachmentsD
     {
       buildLogsArtifactId: 0,
       testLogsArtifactId: 0,
-      environmentArtifactId: 0,
+      workflowInfoArtifactId: 0,
     }
   );
 };
 
-const getEnvironmentAttachmentId = (attachments: ListWorkflowRunArtifacts): number => {
-  const environmentAttachment = attachments.artifacts.find(
-    (artifact) => artifact.name === 'environment'
+const getWorkflowInfoAttachmentId = (attachments: ListWorkflowRunArtifacts): number => {
+  const workflowInfoAttachment = attachments.artifacts.find(
+    (artifact) => artifact.name === 'workflowInfo'
   );
-  return environmentAttachment ? environmentAttachment.id : 0;
+  return workflowInfoAttachment ? workflowInfoAttachment.id : 0;
 };
 
 const mapPullRequestData = (pullRequest: PullRequest | undefined): PullRequestData | undefined => {
@@ -132,16 +134,16 @@ const mapJobsData = (workflowJobs: ListJobsForWorkflowRun): JobsData => {
   );
 };
 
-const getEnvironment = async (token: string, environmentArtifactId: number): Promise<string> => {
+const getWorkflowInfo = async (token: string, artifactId: number): Promise<string> => {
   try {
-    const environmentArtifact = await getArtifact(token, environmentArtifactId);
-    const fileName = 'environment';
+    const environmentArtifact = await getArtifact(token, artifactId);
+    const fileName = 'workflowInfo';
 
     writeFile(`${fileName}.zip`, Buffer.from(environmentArtifact as ArrayBuffer));
     await unzipArtifact(fileName);
 
-    return readFile(`${fileName}.txt`);
+    return readFile(`${fileName}.json`);
   } catch (error) {
-    return 'Unknown';
+    return '{}';
   }
 };

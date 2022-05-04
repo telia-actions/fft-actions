@@ -5,7 +5,7 @@ import * as githubClient from '@src/utils/github-client';
 import { getWorkflowContext } from '../workflow-context';
 
 const mockedToken = 'token';
-const mockedEnvironment = 'dev-test';
+const mockedWorkflowInfo = { environment: 'dev-test', author_email: 'test@test.com' };
 const mockedBuffer = new ArrayBuffer(8);
 
 jest.mock('@actions/github', () => {
@@ -34,14 +34,14 @@ jest.mock('@src/utils/github-client');
 jest.mock('@src/utils/file-client');
 jest.mock('@src/utils/exec-client');
 
-jest.spyOn(fileClient, 'readFile').mockReturnValue(mockedEnvironment);
+jest.spyOn(fileClient, 'readFile').mockReturnValue(JSON.stringify(mockedWorkflowInfo));
 jest.spyOn(githubClient, 'getArtifact').mockResolvedValue(mockedBuffer);
 jest.spyOn(githubClient, 'getAttachmentsData').mockResolvedValue({
   total_count: 1,
   artifacts: [
     {
       id: 1,
-      name: 'environment',
+      name: 'workflowInfo',
     } as any,
   ],
 });
@@ -57,12 +57,12 @@ describe('getWorkflowContext method', () => {
     expect(payload).toStrictEqual({
       attachmentsIds: {
         buildLogsArtifactId: 0,
-        environmentArtifactId: 1,
+        workflowInfoArtifactId: 1,
         testLogsArtifactId: 0,
       },
       checkSuiteId: 1,
       conclusion: 'success',
-      environment: mockedEnvironment,
+      environment: mockedWorkflowInfo.environment,
       jobsOutcome: {
         failedJobSteps: [],
         failureDeployCount: 0,
@@ -77,6 +77,7 @@ describe('getWorkflowContext method', () => {
       runId: 1,
       sha: 'sha',
       url: 'url',
+      author_email: 'test@test.com',
     });
   });
 });

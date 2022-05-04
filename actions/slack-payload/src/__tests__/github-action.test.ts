@@ -8,7 +8,8 @@ jest.mock('@src/libs/workflow-context');
 jest.mock('@src/libs/slack-payload');
 
 const mockedPayload = 'Message to slack';
-const mockedWorkflowContext = {} as WorkflowData;
+const mockedEmail = 'Mock@test.com';
+const mockedWorkflowContext = { author_email: 'Mock@test.com' } as WorkflowData;
 const mockedToken = 'token';
 
 describe('github action', () => {
@@ -32,8 +33,9 @@ describe('github action', () => {
       expect(payloadSpy).toHaveBeenCalledTimes(1);
       expect(payloadSpy).toHaveBeenCalledWith(mockedWorkflowContext);
 
-      expect(setOutputSpy).toHaveBeenCalledTimes(1);
+      expect(setOutputSpy).toHaveBeenCalledTimes(2);
       expect(setOutputSpy).toHaveBeenCalledWith('payload', mockedPayload);
+      expect(setOutputSpy).toHaveBeenCalledWith('author_email', mockedEmail);
     });
   });
   describe('given that error occurs', () => {
