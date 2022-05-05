@@ -20,6 +20,9 @@ inputs:
   type:
     description: Environment type 'pull_request' or 'preview' allowed
     required: true
+outputs:
+  domain_name:
+    value: ${{ steps.terraform.outputs.domain_name }}
 runs:
   using: composite
   steps:
@@ -55,5 +58,10 @@ runs:
     - name: Terraform Apply
       if: ${{ inputs.applyChanges == 'true' }}
       run: terraform apply -auto-approve "plan"
+      shell: bash
+      working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
+    - name: Terraform output
+      if: ${{ inputs.applyChanges == 'true' }}
+      run: echo "::set-output name=domain_name::$(terraform output domain_name)"
       shell: bash
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
