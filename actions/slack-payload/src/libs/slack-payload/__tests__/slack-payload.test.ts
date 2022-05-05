@@ -27,7 +27,7 @@ const mockedWorkflowContext = {
     failureDeployCount: 0,
     failedJobSteps: [],
   },
-  author_email: 'test@test.ts',
+  author_email: 'noreply@telia.se',
 };
 
 describe('createPayload method', () => {

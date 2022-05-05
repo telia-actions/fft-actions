@@ -9918,15 +9918,14 @@ const getBaseContext = (token, workflowRunContext) => __awaiter(void 0, void 0, 
     const jobsData = yield (0, github_client_1.getJobsData)(token, workflowRunContext.workflow_run.id);
     const attachmentsData = yield (0, github_client_1.getAttachmentsData)(token, workflowRunContext.workflow_run.id);
     const workflowInfoArtifactId = getWorkflowInfoAttachmentId(attachmentsData);
-    const workflowInfoJson = workflowInfoArtifactId
+    const workflowInfo = workflowInfoArtifactId
         ? yield getWorkflowInfo(token, workflowInfoArtifactId)
-        : '{}';
-    const workflowInfo = JSON.parse(workflowInfoJson);
+        : addMissingWorkflowInfoProperties({});
     return {
         attachmentsIds: mapAttachmentsData(attachmentsData),
         checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
         conclusion: workflowRunContext.workflow_run.conclusion,
-        environment: workflowInfo.environment || 'Unknown',
+        environment: workflowInfo.environment,
         jobsOutcome: mapJobsData(jobsData),
         name: workflowRunContext.workflow_run.name,
         repository: {
@@ -9936,7 +9935,7 @@ const getBaseContext = (token, workflowRunContext) => __awaiter(void 0, void 0, 
         runId: workflowRunContext.workflow_run.id,
         sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
         url: workflowRunContext.workflow_run.html_url,
-        author_email: workflowInfo.author_email || 'Unknown',
+        author_email: workflowInfo.author_email,
     };
 });
 const mapAttachmentsData = (attachments) => {
@@ -9961,8 +9960,6 @@ const getWorkflowInfoAttachmentId = (attachments) => {
     return workflowInfoAttachment ? workflowInfoAttachment.id : 0;
 };
 const mapPullRequestData = (pullRequest) => {
-    if (!pullRequest)
-        return;
     return { title: pullRequest.title, url: pullRequest.html_url, number: pullRequest.number };
 };
 const mapJobsData = (workflowJobs) => {
@@ -9988,17 +9985,24 @@ const mapJobsData = (workflowJobs) => {
         failedJobSteps: [],
     });
 };
-const getWorkflowInfo = (token, artifactId) => __awaiter(void 0, void 0, void 0, function* () {
+const getArtifactContents = (token, artifactId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const environmentArtifact = yield (0, github_client_1.getArtifact)(token, artifactId);
+        const infoArtifact = yield (0, github_client_1.getArtifact)(token, artifactId);
         const fileName = 'workflowInfo';
-        (0, file_client_1.writeFile)(`${fileName}.zip`, Buffer.from(environmentArtifact));
+        (0, file_client_1.writeFile)(`${fileName}.zip`, Buffer.from(infoArtifact));
         yield (0, exec_client_1.unzipArtifact)(fileName);
-        return (0, file_client_1.readFile)(`${fileName}.json`);
+        return JSON.parse((0, file_client_1.readFile)(`${fileName}.json`));
     }
-    catch (error) {
-        return '{}';
+    catch (_a) {
+        return {};
     }
+});
+const addMissingWorkflowInfoProperties = (partialInfo) => {
+    return Object.assign({ environment: 'Unknown', author_email: 'Unknown' }, partialInfo);
+};
+const getWorkflowInfo = (token, artifactId) => __awaiter(void 0, void 0, void 0, function* () {
+    const workflowInfo = yield getArtifactContents(token, artifactId);
+    return addMissingWorkflowInfoProperties(workflowInfo);
 });
 
 

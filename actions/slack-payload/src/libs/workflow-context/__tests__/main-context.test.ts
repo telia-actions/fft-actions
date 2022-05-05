@@ -5,7 +5,8 @@ import * as githubClient from '@src/utils/github-client';
 import { getWorkflowContext } from '../workflow-context';
 
 const mockedToken = 'token';
-const mockedWorkflowInfo = { environment: 'dev-test', author_email: 'test@test.com' };
+const mockedWorkflowInfo = { environment: 'dev-test', author_email: 'noreply@telia.se' };
+const mockedWorkflowInfoOnFailure = { environment: 'Unknown', author_email: 'Unknown' };
 const mockedBuffer = new ArrayBuffer(8);
 
 jest.mock('@actions/github', () => {
@@ -77,7 +78,38 @@ describe('getWorkflowContext method', () => {
       runId: 1,
       sha: 'sha',
       url: 'url',
-      author_email: 'test@test.com',
+      author_email: mockedWorkflowInfo.author_email,
+    });
+  });
+
+  it('should fail', async () => {
+    jest.spyOn(fileClient, 'readFile').mockReturnValue('Bad JSON');
+    const payload = await getWorkflowContext(mockedToken);
+
+    expect(payload).toStrictEqual({
+      attachmentsIds: {
+        buildLogsArtifactId: 0,
+        workflowInfoArtifactId: 1,
+        testLogsArtifactId: 0,
+      },
+      checkSuiteId: 1,
+      conclusion: 'success',
+      environment: mockedWorkflowInfoOnFailure.environment,
+      jobsOutcome: {
+        failedJobSteps: [],
+        failureDeployCount: 0,
+        successDeployCount: 0,
+      },
+      name: 'name',
+      pullRequest: undefined,
+      repository: {
+        name: 'name',
+        url: 'url',
+      },
+      runId: 1,
+      sha: 'sha',
+      url: 'url',
+      author_email: mockedWorkflowInfoOnFailure.author_email,
     });
   });
 });

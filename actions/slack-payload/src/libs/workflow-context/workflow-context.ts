@@ -16,6 +16,11 @@ import { GithubStatus } from '@src/enums';
 import { readFile, writeFile } from '@src/utils/file-client';
 import { unzipArtifact } from '@src/utils/exec-client';
 
+interface WorkflowInfo {
+  environment: string;
+  author_email: string;
+}
+
 export const getWorkflowContext = async (token: string): Promise<WorkflowData> => {
   const workflowRunContext = context.payload as WorkflowRunEvent;
   const pullRequestNumber =
@@ -55,15 +60,14 @@ const getBaseContext = async (
   const jobsData = await getJobsData(token, workflowRunContext.workflow_run.id);
   const attachmentsData = await getAttachmentsData(token, workflowRunContext.workflow_run.id);
   const workflowInfoArtifactId = getWorkflowInfoAttachmentId(attachmentsData);
-  const workflowInfoJson = workflowInfoArtifactId
+  const workflowInfo = workflowInfoArtifactId
     ? await getWorkflowInfo(token, workflowInfoArtifactId)
-    : '{}';
-  const workflowInfo = JSON.parse(workflowInfoJson);
+    : addMissingWorkflowInfoProperties({});
   return {
     attachmentsIds: mapAttachmentsData(attachmentsData),
     checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
     conclusion: workflowRunContext.workflow_run.conclusion,
-    environment: workflowInfo.environment || 'Unknown',
+    environment: workflowInfo.environment,
     jobsOutcome: mapJobsData(jobsData),
     name: workflowRunContext.workflow_run.name,
     repository: {
@@ -73,7 +77,7 @@ const getBaseContext = async (
     runId: workflowRunContext.workflow_run.id,
     sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
     url: workflowRunContext.workflow_run.html_url,
-    author_email: workflowInfo.author_email || 'Unknown',
+    author_email: workflowInfo.author_email,
   };
 };
 
@@ -104,8 +108,7 @@ const getWorkflowInfoAttachmentId = (attachments: ListWorkflowRunArtifacts): num
   return workflowInfoAttachment ? workflowInfoAttachment.id : 0;
 };
 
-const mapPullRequestData = (pullRequest: PullRequest | undefined): PullRequestData | undefined => {
-  if (!pullRequest) return;
+const mapPullRequestData = (pullRequest: PullRequest): PullRequestData | undefined => {
   return { title: pullRequest.title, url: pullRequest.html_url, number: pullRequest.number };
 };
 
@@ -134,16 +137,28 @@ const mapJobsData = (workflowJobs: ListJobsForWorkflowRun): JobsData => {
   );
 };
 
-const getWorkflowInfo = async (token: string, artifactId: number): Promise<string> => {
+const getArtifactContents = async (
+  token: string,
+  artifactId: number
+): Promise<Record<string, unknown>> => {
   try {
-    const environmentArtifact = await getArtifact(token, artifactId);
+    const infoArtifact = await getArtifact(token, artifactId);
     const fileName = 'workflowInfo';
-
-    writeFile(`${fileName}.zip`, Buffer.from(environmentArtifact as ArrayBuffer));
+    writeFile(`${fileName}.zip`, Buffer.from(infoArtifact as ArrayBuffer));
     await unzipArtifact(fileName);
-
-    return readFile(`${fileName}.json`);
-  } catch (error) {
-    return '{}';
+    return JSON.parse(readFile(`${fileName}.json`));
+  } catch {
+    return {};
   }
+};
+const addMissingWorkflowInfoProperties = (partialInfo: Record<string, unknown>): WorkflowInfo => {
+  return {
+    environment: 'Unknown',
+    author_email: 'Unknown',
+    ...partialInfo,
+  };
+};
+const getWorkflowInfo = async (token: string, artifactId: number): Promise<WorkflowInfo> => {
+  const workflowInfo = await getArtifactContents(token, artifactId);
+  return addMissingWorkflowInfoProperties(workflowInfo);
 };
