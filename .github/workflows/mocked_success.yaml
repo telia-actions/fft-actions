@@ -12,13 +12,15 @@ jobs:
   upload_file:
     runs-on: ubuntu-latest
     steps:
-      - run: echo dev-test > environment.txt
-      - name: Upload file
+      - run: |
+          echo '{ "environment": "dev-test", "author_email": "test@test.com"  }' > workflowInfo.json
+          more workflowInfo.json
+      - name: Upload file Json
         uses: actions/upload-artifact@v2
         with:
           retention-days: 1
-          name: environment
-          path: environment.txt
+          name: workflowInfo
+          path: workflowInfo.json
   deploy:
     runs-on: ubuntu-latest
     strategy:
