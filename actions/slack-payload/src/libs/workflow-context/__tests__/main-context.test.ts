@@ -82,34 +82,15 @@ describe('getWorkflowContext method', () => {
     });
   });
 
-  it('should fail', async () => {
+  it('should list author and environment as "Unknown" when artifact contents are not valid JSON', async () => {
     jest.spyOn(fileClient, 'readFile').mockReturnValue('Bad JSON');
     const payload = await getWorkflowContext(mockedToken);
 
-    expect(payload).toStrictEqual({
-      attachmentsIds: {
-        buildLogsArtifactId: 0,
-        workflowInfoArtifactId: 1,
-        testLogsArtifactId: 0,
-      },
-      checkSuiteId: 1,
-      conclusion: 'success',
-      environment: mockedWorkflowInfoOnFailure.environment,
-      jobsOutcome: {
-        failedJobSteps: [],
-        failureDeployCount: 0,
-        successDeployCount: 0,
-      },
-      name: 'name',
-      pullRequest: undefined,
-      repository: {
-        name: 'name',
-        url: 'url',
-      },
-      runId: 1,
-      sha: 'sha',
-      url: 'url',
-      author_email: mockedWorkflowInfoOnFailure.author_email,
-    });
+    expect(payload).toEqual(
+      expect.objectContaining({
+        environment: mockedWorkflowInfoOnFailure.environment,
+        author_email: mockedWorkflowInfoOnFailure.author_email,
+      })
+    );
   });
 });

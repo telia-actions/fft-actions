@@ -108,7 +108,7 @@ const getWorkflowInfoAttachmentId = (attachments: ListWorkflowRunArtifacts): num
   return workflowInfoAttachment ? workflowInfoAttachment.id : 0;
 };
 
-const mapPullRequestData = (pullRequest: PullRequest): PullRequestData | undefined => {
+const mapPullRequestData = (pullRequest: PullRequest): PullRequestData => {
   return { title: pullRequest.title, url: pullRequest.html_url, number: pullRequest.number };
 };
 

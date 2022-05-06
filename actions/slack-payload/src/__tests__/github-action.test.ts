@@ -8,7 +8,7 @@ jest.mock('@src/libs/workflow-context');
 jest.mock('@src/libs/slack-payload');
 
 const mockedPayload = 'Message to slack';
-const mockedEmail = 'noreplay@telia.se';
+const mockedEmail = 'noreply@telia.se';
 const mockedWorkflowContext = { author_email: mockedEmail } as WorkflowData;
 const mockedToken = 'token';
 
