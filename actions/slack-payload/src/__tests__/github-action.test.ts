@@ -33,7 +33,6 @@ describe('github action', () => {
       expect(payloadSpy).toHaveBeenCalledTimes(1);
       expect(payloadSpy).toHaveBeenCalledWith(mockedWorkflowContext);
 
-      expect(setOutputSpy).toHaveBeenCalledTimes(2);
       expect(setOutputSpy).toHaveBeenCalledWith('payload', mockedPayload);
       expect(setOutputSpy).toHaveBeenCalledWith('author_email', mockedEmail);
     });
