@@ -22,7 +22,7 @@ inputs:
     required: true
 outputs:
   domain_name:
-    value: ${{ steps.terraform.outputs.domain_name }}
+    value: ${{ steps.terraform_output.outputs.domain_name }}
 runs:
   using: composite
   steps:
@@ -61,14 +61,8 @@ runs:
       shell: bash
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
     - name: Terraform output
+      id: terraform_output
       if: ${{ inputs.applyChanges == 'true' }}
-      run: |
-        terraform output domain_name
-        echo ---
-        terraform output -raw domain_name
-        echo ---
-        terraform output -json
-        echo ---
-        echo "::set-output name=domain_name::'test'"
+      run: echo "::set-output name=domain_name::$(terraform output -raw domain_name)"
       shell: bash
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
