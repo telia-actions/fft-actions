@@ -69,6 +69,6 @@ runs:
         echo ---
         terraform output -json
         echo ---
-        echo "::set-output name=domain_name::$(terraform output domain_name)"
+        echo "::set-output name=domain_name::test"
       shell: bash
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
