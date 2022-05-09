@@ -62,6 +62,6 @@ runs:
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
     - name: Terraform output
       if: ${{ inputs.applyChanges == 'true' }}
-      run: echo "::set-output name=domain_name::$(terraform output --raw domain_name)"
+      run: echo "::set-output name=domain_name::$(terraform output domain_name)"
       shell: bash
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
