@@ -20,13 +20,14 @@ const mockedWorkflowContext = {
   attachmentsIds: {
     buildLogsArtifactId: 0,
     testLogsArtifactId: 0,
-    environmentArtifactId: 0,
+    workflowInfoArtifactId: 0,
   },
   jobsOutcome: {
     successDeployCount: 0,
     failureDeployCount: 0,
     failedJobSteps: [],
   },
+  author_email: 'noreply@telia.se',
 };
 
 describe('createPayload method', () => {

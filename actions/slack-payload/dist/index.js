@@ -9619,9 +9619,11 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const workflowContext = yield (0, workflow_context_1.getWorkflowContext)(token);
         const payload = (0, slack_payload_1.createPayload)(workflowContext);
         (0, core_1.setOutput)('payload', payload);
+        (0, core_1.setOutput)('author_email', workflowContext.author_email);
     }
     catch (error) {
-        (0, core_1.setOutput)('payload', 'Failed to generate slack message payload - please contact @fft');
+        const errorPayload = (0, slack_payload_1.createErrorPayload)(error);
+        (0, core_1.setOutput)('payload', errorPayload);
     }
 });
 exports.run = run;
@@ -9660,7 +9662,7 @@ __exportStar(__nccwpck_require__(1329), exports);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getLogsAttachment = exports.getFailureStepAttachment = exports.getPackagesAttachment = exports.getPullRequestBlock = exports.getInformationBlock = exports.getHeaderBlock = void 0;
+exports.getErrorAttachment = exports.getErrorHeaderBlock = exports.getLogsAttachment = exports.getFailureStepAttachment = exports.getPackagesAttachment = exports.getPullRequestBlock = exports.getInformationBlock = exports.getHeaderBlock = void 0;
 const enums_1 = __nccwpck_require__(1511);
 const getHeaderBlock = (conclusion) => {
     const icon = conclusion === enums_1.GithubStatus.SUCCESS ? enums_1.SlackIcons.SUCCESS : enums_1.SlackIcons.FAILURE;
@@ -9750,6 +9752,24 @@ const getLogsAttachment = (url, checkSuiteId, buildArtifactId, testArtfactId) =>
     };
 };
 exports.getLogsAttachment = getLogsAttachment;
+const getErrorHeaderBlock = () => {
+    return {
+        type: 'header',
+        text: {
+            type: 'plain_text',
+            text: 'Failed to generate slack message payload - please contact @fft',
+        },
+    };
+};
+exports.getErrorHeaderBlock = getErrorHeaderBlock;
+const getErrorAttachment = (error) => {
+    return {
+        color: enums_1.Colors.FAILURE,
+        fallback: `${error}`,
+        text: `${error}`,
+    };
+};
+exports.getErrorAttachment = getErrorAttachment;
 
 
 /***/ }),
@@ -9785,7 +9805,7 @@ __exportStar(__nccwpck_require__(1304), exports);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createPayload = void 0;
+exports.createErrorPayload = exports.createPayload = void 0;
 const enums_1 = __nccwpck_require__(1511);
 const slack_message_1 = __nccwpck_require__(2116);
 const createPayload = (workflowData) => {
@@ -9813,6 +9833,18 @@ const createPayload = (workflowData) => {
     return JSON.stringify(payload);
 };
 exports.createPayload = createPayload;
+const createErrorPayload = (error) => {
+    const blocks = [];
+    const attachments = [];
+    blocks.push((0, slack_message_1.getErrorHeaderBlock)());
+    attachments.push((0, slack_message_1.getErrorAttachment)(error));
+    const payload = {
+        blocks,
+        attachments,
+    };
+    return JSON.stringify(payload);
+};
+exports.createErrorPayload = createErrorPayload;
 
 
 /***/ }),
@@ -9885,15 +9917,15 @@ const getContextWithoutPullRequest = (token, workflowRunContext) => __awaiter(vo
 const getBaseContext = (token, workflowRunContext) => __awaiter(void 0, void 0, void 0, function* () {
     const jobsData = yield (0, github_client_1.getJobsData)(token, workflowRunContext.workflow_run.id);
     const attachmentsData = yield (0, github_client_1.getAttachmentsData)(token, workflowRunContext.workflow_run.id);
-    const environmentArtifactId = getEnvironmentAttachmentId(attachmentsData);
-    const environment = environmentArtifactId
-        ? yield getEnvironment(token, environmentArtifactId)
-        : 'Unknown';
+    const workflowInfoArtifactId = getWorkflowInfoAttachmentId(attachmentsData);
+    const workflowInfo = workflowInfoArtifactId
+        ? yield getWorkflowInfo(token, workflowInfoArtifactId)
+        : addMissingWorkflowInfoProperties({});
     return {
         attachmentsIds: mapAttachmentsData(attachmentsData),
         checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
         conclusion: workflowRunContext.workflow_run.conclusion,
-        environment,
+        environment: workflowInfo.environment,
         jobsOutcome: mapJobsData(jobsData),
         name: workflowRunContext.workflow_run.name,
         repository: {
@@ -9903,13 +9935,14 @@ const getBaseContext = (token, workflowRunContext) => __awaiter(void 0, void 0, 
         runId: workflowRunContext.workflow_run.id,
         sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
         url: workflowRunContext.workflow_run.html_url,
+        author_email: workflowInfo.author_email,
     };
 });
 const mapAttachmentsData = (attachments) => {
     const map = new Map([
         ['build-logs', 'buildLogsArtifactId'],
         ['test-logs', 'testLogsArtifactId'],
-        ['environment', 'environmentArtifactId'],
+        ['workflowInfo', 'workflowInfoArtifactId'],
     ]);
     return attachments.artifacts.reduce((acc, artifact) => {
         const mappedValue = map.get(artifact.name);
@@ -9919,16 +9952,14 @@ const mapAttachmentsData = (attachments) => {
     }, {
         buildLogsArtifactId: 0,
         testLogsArtifactId: 0,
-        environmentArtifactId: 0,
+        workflowInfoArtifactId: 0,
     });
 };
-const getEnvironmentAttachmentId = (attachments) => {
-    const environmentAttachment = attachments.artifacts.find((artifact) => artifact.name === 'environment');
-    return environmentAttachment ? environmentAttachment.id : 0;
+const getWorkflowInfoAttachmentId = (attachments) => {
+    const workflowInfoAttachment = attachments.artifacts.find((artifact) => artifact.name === 'workflowInfo');
+    return workflowInfoAttachment ? workflowInfoAttachment.id : 0;
 };
 const mapPullRequestData = (pullRequest) => {
-    if (!pullRequest)
-        return;
     return { title: pullRequest.title, url: pullRequest.html_url, number: pullRequest.number };
 };
 const mapJobsData = (workflowJobs) => {
@@ -9954,17 +9985,24 @@ const mapJobsData = (workflowJobs) => {
         failedJobSteps: [],
     });
 };
-const getEnvironment = (token, environmentArtifactId) => __awaiter(void 0, void 0, void 0, function* () {
+const getArtifactContents = (token, artifactId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const environmentArtifact = yield (0, github_client_1.getArtifact)(token, environmentArtifactId);
-        const fileName = 'environment';
-        (0, file_client_1.writeFile)(`${fileName}.zip`, Buffer.from(environmentArtifact));
+        const infoArtifact = yield (0, github_client_1.getArtifact)(token, artifactId);
+        const fileName = 'workflowInfo';
+        (0, file_client_1.writeFile)(`${fileName}.zip`, Buffer.from(infoArtifact));
         yield (0, exec_client_1.unzipArtifact)(fileName);
-        return (0, file_client_1.readFile)(`${fileName}.txt`);
+        return JSON.parse((0, file_client_1.readFile)(`${fileName}.json`));
     }
-    catch (error) {
-        return 'Unknown';
+    catch (_a) {
+        return {};
     }
+});
+const addMissingWorkflowInfoProperties = (partialInfo) => {
+    return Object.assign({ environment: 'Unknown', author_email: 'Unknown' }, partialInfo);
+};
+const getWorkflowInfo = (token, artifactId) => __awaiter(void 0, void 0, void 0, function* () {
+    const workflowInfo = yield getArtifactContents(token, artifactId);
+    return addMissingWorkflowInfoProperties(workflowInfo);
 });
 
 
