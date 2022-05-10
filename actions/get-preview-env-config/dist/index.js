@@ -1572,7 +1572,7 @@ const run = () => {
         const previewEnvConfig = json_client_1.readJsonWithComments(configFilePath);
         const appsNameList = previewEnvConfig.apps.map((app) => app.name);
         core_1.setOutput('config', previewEnvConfig);
-        core_1.setOutput('appsNameList', appsNameList);
+        core_1.setOutput('appsNameList', JSON.stringify(appsNameList));
         if (staticAppName) {
             const appConfig = previewEnvConfig.apps.find((app) => app.name === staticAppName);
             core_1.setOutput('staticApp', appConfig);

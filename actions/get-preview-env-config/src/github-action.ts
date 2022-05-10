@@ -11,7 +11,7 @@ export const run = (): void => {
     const appsNameList = previewEnvConfig.apps.map((app) => app.name)
 
     setOutput('config', previewEnvConfig);
-    setOutput('appsNameList', appsNameList);
+    setOutput('appsNameList', JSON.stringify(appsNameList));
 
     if (staticAppName) {
       const appConfig = previewEnvConfig.apps.find((app) => app.name === staticAppName);
