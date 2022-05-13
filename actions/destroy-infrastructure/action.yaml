@@ -1,0 +1,24 @@
+name: "destroy infrastructure"
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare TF backend config and main.tf
+      run: |
+        echo bucket="\"$BUCKET\""      > backend.conf
+        echo key="\"$KEY\""           >> backend.conf
+        echo region="\"$REGION\""     >> backend.conf
+
+        echo "provider \"aws\" {
+          region = "\"$REGION\"" 
+        }" >> main.tf
+    
+        echo "terraform { 
+          backend \"s3\" {} 
+        }" >> main.tf
+      shell: bash
+    - name: Terraform Init
+      run: terraform init -backend-config=backend.conf
+      shell: bash
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve
+      shell: bash
