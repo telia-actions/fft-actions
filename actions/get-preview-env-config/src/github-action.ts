@@ -8,10 +8,8 @@ export const run = (): void => {
     const staticAppName = getInput('staticAppName');
 
     const previewEnvConfig: PreviewEnvConfig = readJsonWithComments(configFilePath);
-    const appsNameList = previewEnvConfig.apps.map((app) => app.name)
 
     setOutput('config', previewEnvConfig);
-    setOutput('appsNameList', appsNameList);
 
     if (staticAppName) {
       const appConfig = previewEnvConfig.apps.find((app) => app.name === staticAppName);
