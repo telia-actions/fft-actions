@@ -1,6 +1,6 @@
-name: "destroy infrastructure"
+name: destroy infrastructure
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Prepare TF backend config and main.tf
       run: |
