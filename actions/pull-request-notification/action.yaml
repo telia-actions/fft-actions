@@ -1,0 +1,59 @@
+name: "pull request notification"
+description: Github action to setup tse environment infrastructure
+inputs:
+  githubComment:
+    required: false
+  githubToken:
+    required: true
+  prNumber:
+    required: true
+  slackMessage:
+    required: true
+  slackToken:
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Look up GitHub user
+      id: github_user
+      uses: actions/github-script@v5
+      with:
+        github-token: ${{ inputs.githubToken }}
+        script: |
+          const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: ${{ inputs.prNumber }},
+          });
+
+          const { data: user } = await github.rest.users.getByUsername({
+            username: pullRequest.user.login
+          });
+
+          return user;
+    - name: Look up Slack user
+      id: slack_user
+      uses: telia-actions/look-up-slack-user@v8
+      with:
+        email: ${{ fromJson(steps.github_user.outputs.result).email }}
+        token: ${{ inputs.slackToken }}
+    - name: Post to a Slack user
+      uses: telia-actions/slack-github-action@v1.17.0
+      if: steps.slack_user.outputs.user != ''
+      with:
+        channel-id: ${{ fromJson(steps.slack_user.outputs.user).id }}
+        slack-message: ${{ inputs.slackMessage }}
+      env:
+        SLACK_BOT_TOKEN: ${{ inputs.slackToken }}
+    - name: Create PR comment
+      if: ${{ inputs.githubComment != '' }}
+      uses: actions/github-script@v5
+      with:
+        github-token: ${{ inputs.githubToken }}
+        script: |
+          return await github.rest.issues.createComment({
+            issue_number: ${{ inputs.prNumber }},
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: "${{ inputs.githubComment }}"
+          });
