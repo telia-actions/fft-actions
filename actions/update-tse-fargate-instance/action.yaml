@@ -1,4 +1,4 @@
-name: "update tse fargate task"
+name: ECS service update
 description: Update ecs service cluster and force new deployment
 inputs:
   awsAccsessKeyId:
