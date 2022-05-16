@@ -9588,7 +9588,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (0, core_1.getInput)('token');
         const fail_if_absent = (0, core_1.getInput)('fail_if_absent');
-        const fail_if_absent_array = fail_if_absent.replace(/\[|\]/g, '').split(',');
+        const fail_if_absent_array = fail_if_absent.replace(/\[|\]|\s+/g, '').split(',');
         const workflowInfo = yield (0, workflow_info_1.getWorkflowInfo)(token);
         console.log('fail_if_absent_array ', fail_if_absent_array);
         console.log('workflowInfo ', workflowInfo);
