@@ -1,5 +1,5 @@
 name: "update tse fargate task"
-description: Github action to setup tse environment infrastructure
+description: Update ecs service cluster and force new deployment
 inputs:
   awsAccsessKeyId:
     required: true
