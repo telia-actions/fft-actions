@@ -1,0 +1,19 @@
+name: Test Slack notification payload
+on:
+  workflow_run:
+    workflows: [Mocked failure, Mocked success]
+    types: [completed]
+jobs:
+  notify_slack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create payload for slack-github-action
+        id: workflowInfo
+        uses: telia-actions/fft-actions/actions/get-workflow-info@fft-26-download-parse-workflow-info
+        with:
+          fail_if_absent: '[environment, author_email]'
+      - name: Echo values
+        run: |
+          echo ${{ steps.workflowInfo.author_email }}
+          echo ${{ steps.workflowInfo.environment }}
+
