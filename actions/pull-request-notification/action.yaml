@@ -1,4 +1,4 @@
-name: "pull request notification"
+name: Pull request notification
 description: Github action to setup tse environment infrastructure
 inputs:
   githubComment:
