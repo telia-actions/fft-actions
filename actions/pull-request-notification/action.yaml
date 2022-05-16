@@ -1,5 +1,5 @@
 name: Pull request notification
-description: Github action to setup tse environment infrastructure
+description: Notify pull request author
 inputs:
   githubComment:
     required: false
