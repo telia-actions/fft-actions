@@ -9590,6 +9590,8 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const fail_if_absent = (0, core_1.getInput)('fail_if_absent');
         const fail_if_absent_array = fail_if_absent.replace(/\[|\]/g, '').split(',');
         const workflowInfo = yield (0, workflow_info_1.getWorkflowInfo)(token);
+        console.log('fail_if_absent_array ', fail_if_absent_array);
+        console.log('workflowInfo ', workflowInfo);
         fail_if_absent_array.forEach(it => {
             if (!(it in workflowInfo)) {
                 throw new Error(`${it} key does not exists`);

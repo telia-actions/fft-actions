@@ -9,6 +9,9 @@ export const run = async (): Promise<void> => {
 
     const workflowInfo = await getWorkflowInfo(token);
 
+    console.log('fail_if_absent_array ', fail_if_absent_array);
+    console.log('workflowInfo ', workflowInfo)
+
     fail_if_absent_array.forEach(it => {
       if (!(it in workflowInfo)) {
         throw new Error(`${it} key does not exists`);
