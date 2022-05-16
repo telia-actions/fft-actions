@@ -17,7 +17,7 @@ export const getAttachmentsData = async (
   return attachments.data;
 };
 
-export const w = async (token: string, artifactId: number): Promise<DownloadArtifact> => {
+export const getArtifact = async (token: string, artifactId: number): Promise<DownloadArtifact> => {
   const client = getOctokit(token);
   const artifact = await client.rest.actions.downloadArtifact({
     owner: context.repo.owner,
