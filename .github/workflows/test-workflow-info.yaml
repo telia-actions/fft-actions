@@ -14,6 +14,6 @@ jobs:
           fail_if_absent: '[environment, author_email]'
       - name: Echo values
         run: |
-          echo ${{ steps.workflowInfo.author_email }}
-          echo ${{ steps.workflowInfo.environment }}
+          echo ${{ steps.workflowInfo.outputs.author_email }}
+          echo ${{ steps.workflowInfo.outputs.environment }}
 
