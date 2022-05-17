@@ -7,9 +7,16 @@ jobs:
   notify_slack:
     runs-on: ubuntu-latest
     steps:
+      - name: Get workflow info
+        id: workflow_info
+        uses: telia-actions/fft-actions/actions/get-workflow-info@fft-26-download-parse-workflow-info
+        with:
+          fail_if_absent: '[environment]'
       - name: Create payload for slack-github-action
         id: helpers
         uses: telia-actions/fft-actions/actions/slack-payload@main
+        with:
+          environment: ${{ steps.workflow_info.outputs.environment }}
       - name: Post to a Slack channel
         uses: telia-actions/slack-github-action@v1.17.0
         with:
