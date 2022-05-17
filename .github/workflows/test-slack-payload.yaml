@@ -14,7 +14,7 @@ jobs:
           fail_if_absent: '[environment]'
       - name: Create payload for slack-github-action
         id: helpers
-        uses: telia-actions/fft-actions/actions/slack-payload@main
+        uses: telia-actions/fft-actions/actions/slack-payload@fft-26-slack-payload-environment-input
         with:
           environment: ${{ steps.workflow_info.outputs.environment }}
       - name: Post to a Slack channel
