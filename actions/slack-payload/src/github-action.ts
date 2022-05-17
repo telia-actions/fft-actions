@@ -5,10 +5,11 @@ import { getWorkflowContext } from '@src/libs/workflow-context';
 export const run = async (): Promise<void> => {
   try {
     const token = getInput('token');
+    const environment = getInput('environment');
+
     const workflowContext = await getWorkflowContext(token);
-    const payload = createPayload(workflowContext);
+    const payload = createPayload(workflowContext, environment);
     setOutput('payload', payload);
-    setOutput('author_email', workflowContext.author_email);
   } catch (error) {
     const errorPayload = createErrorPayload(error);
     setOutput('payload', errorPayload);

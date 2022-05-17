@@ -1,10 +1,5 @@
 import { context } from '@actions/github';
-import {
-  getArtifact,
-  getAttachmentsData,
-  getJobsData,
-  getPullRequestData,
-} from '@src/utils/github-client';
+import { getAttachmentsData, getJobsData, getPullRequestData } from '@src/utils/github-client';
 import { AttachmentsData, JobsData, PullRequestData, WorkflowData } from './types';
 import type { WorkflowRunEvent } from '@octokit/webhooks-types';
 import type {
@@ -13,13 +8,6 @@ import type {
   PullRequest,
 } from '@src/utils/github-client/types';
 import { GithubStatus } from '@src/enums';
-import { readFile, writeFile } from '@src/utils/file-client';
-import { unzipArtifact } from '@src/utils/exec-client';
-
-interface WorkflowInfo {
-  environment: string;
-  author_email: string;
-}
 
 export const getWorkflowContext = async (token: string): Promise<WorkflowData> => {
   const workflowRunContext = context.payload as WorkflowRunEvent;
@@ -59,15 +47,10 @@ const getBaseContext = async (
 ): Promise<Omit<WorkflowData, 'pullRequest'>> => {
   const jobsData = await getJobsData(token, workflowRunContext.workflow_run.id);
   const attachmentsData = await getAttachmentsData(token, workflowRunContext.workflow_run.id);
-  const workflowInfoArtifactId = getWorkflowInfoAttachmentId(attachmentsData);
-  const workflowInfo = workflowInfoArtifactId
-    ? await getWorkflowInfo(token, workflowInfoArtifactId)
-    : addMissingWorkflowInfoProperties({});
   return {
     attachmentsIds: mapAttachmentsData(attachmentsData),
     checkSuiteId: workflowRunContext.workflow_run.check_suite_id,
     conclusion: workflowRunContext.workflow_run.conclusion,
-    environment: workflowInfo.environment,
     jobsOutcome: mapJobsData(jobsData),
     name: workflowRunContext.workflow_run.name,
     repository: {
@@ -77,7 +60,6 @@ const getBaseContext = async (
     runId: workflowRunContext.workflow_run.id,
     sha: workflowRunContext.workflow_run.head_sha.substring(0, 8),
     url: workflowRunContext.workflow_run.html_url,
-    author_email: workflowInfo.author_email,
   };
 };
 
@@ -99,13 +81,6 @@ const mapAttachmentsData = (attachments: ListWorkflowRunArtifacts): AttachmentsD
       workflowInfoArtifactId: 0,
     }
   );
-};
-
-const getWorkflowInfoAttachmentId = (attachments: ListWorkflowRunArtifacts): number => {
-  const workflowInfoAttachment = attachments.artifacts.find(
-    (artifact) => artifact.name === 'workflowInfo'
-  );
-  return workflowInfoAttachment ? workflowInfoAttachment.id : 0;
 };
 
 const mapPullRequestData = (pullRequest: PullRequest): PullRequestData => {
@@ -135,30 +110,4 @@ const mapJobsData = (workflowJobs: ListJobsForWorkflowRun): JobsData => {
       failedJobSteps: [],
     }
   );
-};
-
-const getArtifactContents = async (
-  token: string,
-  artifactId: number
-): Promise<Record<string, unknown>> => {
-  try {
-    const infoArtifact = await getArtifact(token, artifactId);
-    const fileName = 'workflowInfo';
-    writeFile(`${fileName}.zip`, Buffer.from(infoArtifact as ArrayBuffer));
-    await unzipArtifact(fileName);
-    return JSON.parse(readFile(`${fileName}.json`));
-  } catch {
-    return {};
-  }
-};
-const addMissingWorkflowInfoProperties = (partialInfo: Record<string, unknown>): WorkflowInfo => {
-  return {
-    environment: 'Unknown',
-    author_email: 'Unknown',
-    ...partialInfo,
-  };
-};
-const getWorkflowInfo = async (token: string, artifactId: number): Promise<WorkflowInfo> => {
-  const workflowInfo = await getArtifactContents(token, artifactId);
-  return addMissingWorkflowInfoProperties(workflowInfo);
 };

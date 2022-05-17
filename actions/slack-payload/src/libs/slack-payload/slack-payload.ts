@@ -11,7 +11,7 @@ import {
 } from '@src/libs/slack-message';
 import type { WorkflowData } from '@src/libs/workflow-context/types';
 
-export const createPayload = (workflowData: WorkflowData): string => {
+export const createPayload = (workflowData: WorkflowData, environment: string): string => {
   const blocks = [];
   const attachments = [];
 
@@ -22,7 +22,7 @@ export const createPayload = (workflowData: WorkflowData): string => {
       workflowData.repository.name,
       workflowData.url,
       workflowData.name,
-      workflowData.environment
+      environment
     )
   );
   if (workflowData.pullRequest) {

@@ -1,13 +1,8 @@
 import '@actions/github';
-import '@src/utils/exec-client';
-import * as fileClient from '@src/utils/file-client';
 import * as githubClient from '@src/utils/github-client';
 import { getWorkflowContext } from '../workflow-context';
 
 const mockedToken = 'token';
-const mockedWorkflowInfo = { environment: 'dev-test', author_email: 'noreply@telia.se' };
-const mockedWorkflowInfoOnFailure = { environment: 'Unknown', author_email: 'Unknown' };
-const mockedBuffer = new ArrayBuffer(8);
 
 jest.mock('@actions/github', () => {
   return {
@@ -32,11 +27,6 @@ jest.mock('@actions/github', () => {
 });
 
 jest.mock('@src/utils/github-client');
-jest.mock('@src/utils/file-client');
-jest.mock('@src/utils/exec-client');
-
-jest.spyOn(fileClient, 'readFile').mockReturnValue(JSON.stringify(mockedWorkflowInfo));
-jest.spyOn(githubClient, 'getArtifact').mockResolvedValue(mockedBuffer);
 jest.spyOn(githubClient, 'getAttachmentsData').mockResolvedValue({
   total_count: 1,
   artifacts: [
@@ -63,7 +53,6 @@ describe('getWorkflowContext method', () => {
       },
       checkSuiteId: 1,
       conclusion: 'success',
-      environment: mockedWorkflowInfo.environment,
       jobsOutcome: {
         failedJobSteps: [],
         failureDeployCount: 0,
@@ -78,19 +67,6 @@ describe('getWorkflowContext method', () => {
       runId: 1,
       sha: 'sha',
       url: 'url',
-      author_email: mockedWorkflowInfo.author_email,
     });
-  });
-
-  it('should list author and environment as "Unknown" when artifact contents are not valid JSON', async () => {
-    jest.spyOn(fileClient, 'readFile').mockReturnValue('Bad JSON');
-    const payload = await getWorkflowContext(mockedToken);
-
-    expect(payload).toEqual(
-      expect.objectContaining({
-        environment: mockedWorkflowInfoOnFailure.environment,
-        author_email: mockedWorkflowInfoOnFailure.author_email,
-      })
-    );
   });
 });
