@@ -9590,11 +9590,11 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const fail_if_absent = (0, core_1.getInput)('fail_if_absent');
         const fail_if_absent_array = fail_if_absent.replace(/\[|\]|\s+/g, '').split(',');
         const workflowInfo = yield (0, workflow_info_1.getWorkflowInfo)(token);
-        fail_if_absent_array.forEach(it => {
+        for (const it of fail_if_absent_array) {
             if (!(it in workflowInfo)) {
                 throw new Error(`${it} key does not exists in workflowInfo`);
             }
-        });
+        }
         (0, core_1.setOutput)('author_email', workflowInfo.author_email);
         (0, core_1.setOutput)('environment', workflowInfo.environment);
     }
@@ -9656,7 +9656,7 @@ const getWorkflowInfo = (token) => __awaiter(void 0, void 0, void 0, function* (
     const workflowRunContext = github_1.context.payload;
     const attachmentsData = yield (0, github_client_1.getAttachmentsData)(token, workflowRunContext.workflow_run.id);
     const workflowInfoArtifactId = getWorkflowInfoAttachmentId(attachmentsData);
-    const workflowInfo = yield getArtifactContents(token, workflowInfoArtifactId);
+    const workflowInfo = workflowInfoArtifactId ? yield getArtifactContents(token, workflowInfoArtifactId) : {};
     return addMissingWorkflowInfoProperties(workflowInfo);
 });
 exports.getWorkflowInfo = getWorkflowInfo;

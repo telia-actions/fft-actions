@@ -15,6 +15,9 @@ npm-debug.log*
 # Optional eslint cache
 .eslintcache
 
+# Jest coverage folder
+.coverage
+
 # Optional REPL history
 .node_repl_history
 

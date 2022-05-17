@@ -15,11 +15,10 @@ export const getWorkflowInfo = async (token: string): Promise<WorkflowInfo> => {
   const workflowRunContext = context.payload as WorkflowRunEvent;
   const attachmentsData = await getAttachmentsData(token, workflowRunContext.workflow_run.id);
   const workflowInfoArtifactId = getWorkflowInfoAttachmentId(attachmentsData);
-
-  const workflowInfo = await getArtifactContents(token, workflowInfoArtifactId);
+  
+  const workflowInfo = workflowInfoArtifactId ? await getArtifactContents(token, workflowInfoArtifactId) : {};
   return addMissingWorkflowInfoProperties(workflowInfo);
 };
-
 
 const getWorkflowInfoAttachmentId = (attachments: ListWorkflowRunArtifacts): number => {
   const workflowInfoAttachment = attachments.artifacts.find(

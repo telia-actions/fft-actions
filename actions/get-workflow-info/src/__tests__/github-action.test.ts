@@ -1,63 +1,81 @@
-// import * as actionsCore from '@actions/core';
-// import * as payload from '@src/libs/slack-payload';
-// import * as context from '@src/libs/parse-workflowInfo';
-// import { WorkflowData } from '@src/libs/parse-workflowInfo/types';
-// import { run } from '../github-action';
+import * as actionsCore from '@actions/core';
+import { when } from 'jest-when';
+import * as workflowInfo from '@src/libs/workflow-info';
+import { WorkflowInfo } from '@src/libs/workflow-info/types';
+import { run } from '../github-action';
 
-// jest.mock('@src/libs/workflow-context');
-// jest.mock('@src/libs/slack-payload');
+jest.mock('@src/libs/workflow-info');
 
-// const mockedPayload = 'Message to slack';
-// const mockedEmail = 'noreply@telia.se';
-// const mockedWorkflowContext = { author_email: mockedEmail } as WorkflowData;
-// const mockedToken = 'token';
+const mockedEmail = 'noreply@telia.se';
+const mockedEnvironment = 'dev'
+const mockedWorkflowInfo: WorkflowInfo = { author_email: mockedEmail, environment: mockedEnvironment }
+const mockedToken = 'token';
+const mockedFailIfAbsent = '[author_email, environment, newAttribute]';
+const mockedFailIfAbsentCorrect = '[author_email, environment]';
 
-// describe('github action', () => {
-//   describe('given that there is no error', () => {
-//     it('should set payload as github action output', async () => {
-//       const getInputSpy = jest.spyOn(actionsCore, 'getInput').mockReturnValue(mockedToken);
-//       const setOutputSpy = jest.spyOn(actionsCore, 'setOutput').mockImplementation();
-//       const payloadSpy = jest.spyOn(payload, 'createPayload').mockReturnValue(mockedPayload);
-//       const contextSpy = jest
-//         .spyOn(context, 'getWorkflowContext')
-//         .mockResolvedValue(mockedWorkflowContext);
+describe('github action', () => {
+    describe('given that there is no error', () => {
+        it('should set workflowInfo as github action outputs', async () => {
+            const getInputSpy = jest.spyOn(actionsCore, 'getInput');
+            const setFailedSpy = jest.spyOn(actionsCore, 'setFailed');
+            const setOutputSpy = jest.spyOn(actionsCore, 'setOutput');
 
-//       await run();
+            when(getInputSpy)
+                .calledWith('token')
+                .mockReturnValue(mockedToken)
+                .calledWith('fail_if_absent')
+                .mockReturnValue(mockedFailIfAbsentCorrect)
 
-//       expect(getInputSpy).toHaveBeenCalledTimes(1);
-//       expect(getInputSpy).toHaveBeenCalledWith('token');
+            jest.spyOn(workflowInfo, 'getWorkflowInfo').mockResolvedValue(mockedWorkflowInfo);
 
-//       expect(contextSpy).toHaveBeenCalledTimes(1);
-//       expect(contextSpy).toHaveBeenCalledWith(mockedToken);
+            await run();
 
-//       expect(payloadSpy).toHaveBeenCalledTimes(1);
-//       expect(payloadSpy).toHaveBeenCalledWith(mockedWorkflowContext);
+            expect(setFailedSpy).toHaveBeenCalledTimes(0);
+            expect(setOutputSpy).toHaveBeenCalledTimes(2);
 
-//       expect(setOutputSpy).toHaveBeenCalledWith('payload', mockedPayload);
-//       expect(setOutputSpy).toHaveBeenCalledWith('author_email', mockedEmail);
-//     });
-//   });
-//   describe('given that error occurs', () => {
-//     it('should format error payload', async () => {
-//       const mockedErrorPayload = 'Error message to slack';
-//       const mockedError = 'mockedError';
+            expect(setOutputSpy).toHaveBeenCalledWith('environment', mockedEnvironment);
+            expect(setOutputSpy).toHaveBeenCalledWith('author_email', mockedEmail);
+        });
+    });
+    describe('given that error occurs', () => {
+        it('should display error message when error occour', async () => {
+            const mockedError = 'Hello Error';
+            const setFailedSpy = jest.spyOn(actionsCore, 'setFailed');
+            const setOuputSpy = jest.spyOn(actionsCore, 'setOutput');
 
-//       const setOutputSpy = jest.spyOn(actionsCore, 'setOutput').mockImplementation();
-//       const payloadSpy = jest
-//         .spyOn(payload, 'createErrorPayload')
-//         .mockReturnValue(mockedErrorPayload);
+            jest.spyOn(workflowInfo, 'getWorkflowInfo').mockImplementation(() => {
+                throw new Error(mockedError);
+            });
 
-//       jest.spyOn(payload, 'createPayload').mockImplementation(() => {
-//         throw mockedError;
-//       });
+            await run();
 
-//       await run();
+            expect(setFailedSpy).toHaveBeenCalledTimes(1);
+            expect(setFailedSpy).toHaveBeenCalledWith(mockedError);
 
-//       expect(setOutputSpy).toHaveBeenCalledTimes(1);
-//       expect(setOutputSpy).toHaveBeenCalledWith('payload', mockedErrorPayload);
+            expect(setOuputSpy).toHaveBeenCalledTimes(0);
+        });
 
-//       expect(payloadSpy).toHaveBeenCalledTimes(1);
-//       expect(payloadSpy).toHaveBeenCalledWith(mockedError);
-//     });
-//   });
-// });
+        it('should display error message when fail_if_absent keys are not present in workflowInfo Json', async () => {
+            const mockedError = "newAttribute key does not exists in workflowInfo";
+
+            const getInputSpy = jest.spyOn(actionsCore, 'getInput');
+            const setFailedSpy = jest.spyOn(actionsCore, 'setFailed');
+            const setOuputSpy = jest.spyOn(actionsCore, 'setOutput');
+
+            when(getInputSpy)
+                .calledWith('token')
+                .mockReturnValue(mockedToken)
+                .calledWith('fail_if_absent')
+                .mockReturnValue(mockedFailIfAbsent)
+
+            jest.spyOn(workflowInfo, 'getWorkflowInfo').mockResolvedValue(mockedWorkflowInfo)
+
+            await run();
+
+            expect(setFailedSpy).toHaveBeenCalledTimes(1);
+            expect(setFailedSpy).toHaveBeenCalledWith(mockedError);
+
+            expect(setOuputSpy).toHaveBeenCalledTimes(0);
+        });
+    });
+});
