@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Create payload for slack-github-action
         id: workflowInfo
-        uses: telia-actions/fft-actions/actions/get-workflow-info@fft-26-download-parse-workflow-info
+        uses: telia-actions/fft-actions/actions/get-workflow-info@main
         with:
           fail_if_absent: '["environment", "author_email"]'
       - name: Echo values
