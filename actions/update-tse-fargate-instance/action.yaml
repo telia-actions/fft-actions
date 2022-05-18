@@ -1,0 +1,21 @@
+name: ECS service update
+description: Update ecs service cluster and force new deployment
+inputs:
+  awsAccsessKeyId:
+    required: true
+  awsSecretAccessKey:
+    required: true
+  awsSessionToken:
+    required: true
+  envName:
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Update
+      shell: bash
+      run: aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service ${{ inputs.envName }} --force-new-deployment --region eu-north-1
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.awsAccsessKeyId }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.awsSecretAccessKey }}
+        AWS_SESSION_TOKEN: ${{ inputs.awsSessionToken }}
