@@ -11,7 +11,7 @@ jobs:
         id: workflowInfo
         uses: telia-actions/fft-actions/actions/get-workflow-info@fft-26-download-parse-workflow-info
         with:
-          fail_if_absent: '[environment, author_email]'
+          fail_if_absent: ${{ toJson('[environment, author_email]') }}
       - name: Echo values
         run: |
           echo ${{ steps.workflowInfo.outputs.author_email }}
