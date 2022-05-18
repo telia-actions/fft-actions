@@ -38,23 +38,6 @@ describe('github action', () => {
         });
     });
     describe('given that error occurs', () => {
-        it('should display error message when error occour', async () => {
-            const mockedError = 'Hello Error';
-            const setFailedSpy = jest.spyOn(actionsCore, 'setFailed');
-            const setOuputSpy = jest.spyOn(actionsCore, 'setOutput');
-
-            jest.spyOn(workflowInfo, 'getWorkflowInfo').mockImplementation(() => {
-                throw new Error(mockedError);
-            });
-
-            await run();
-
-            expect(setFailedSpy).toHaveBeenCalledTimes(1);
-            expect(setFailedSpy).toHaveBeenCalledWith(mockedError);
-
-            expect(setOuputSpy).toHaveBeenCalledTimes(0);
-        });
-
         it('should display error message when fail_if_absent keys are not present in workflowInfo Json', async () => {
             const mockedError = "newAttribute key does not exists in workflowInfo";
 

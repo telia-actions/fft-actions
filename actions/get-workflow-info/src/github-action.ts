@@ -6,8 +6,6 @@ export const run = async (): Promise<void> => {
     const token = getInput('token');
     const fail_if_absent = getInput('fail_if_absent');
 
-    //const fail_if_absent_array = fail_if_absent.replace(/\[|\]|\s+/g, '').split(',');
-
     const workflowInfo = await getWorkflowInfo(token);
 
     for (const it of JSON.parse(fail_if_absent)) {
