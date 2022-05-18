@@ -4,7 +4,7 @@ on:
     workflows: [Mocked failure, Mocked success]
     types: [completed]
 jobs:
-  notify_slack:
+  get_workflow_info:
     runs-on: ubuntu-latest
     steps:
       - name: Create payload for slack-github-action
