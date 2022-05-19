@@ -2,7 +2,7 @@ name: Setup Rush / Tests
 on:
   pull_request:
     types: [opened, synchronized]
-  workflow_dispath:
+  workflow_dispatch:
 jobs:
   setup:
     # Install Rush to ensure it is cached
