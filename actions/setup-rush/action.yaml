@@ -1,5 +1,10 @@
 name: Setup Rush
 description: Set up Rush, using actions/cache to speed it up
+intputs:
+  working-directory:
+    description: The directory containing rush.json etc.
+    required: false
+    default: $GITHUB_WORKSPACE
 outputs:
   requested-rush-version:
     description: The Rush version specified in rush.json
@@ -19,21 +24,24 @@ runs:
     - name: Read rush.json
       id: rush_json
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
         echo "::set-output name=rush-version::$(grep -F '"rushVersion":' rush.json | cut -f4 -d'"')"
     - name: Restore Rush from cache
       id: restore_cache
       uses: actions/cache@v2
       with:
-        path: ./common/temp/install-run
+        path: ${{ inputs.working-directory }}/common/temp/install-run
         key: ${{ runner.os }}-rush-${{ steps.rush_json.outputs.rush-version }}
     - name: Install Rush
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
         node common/scripts/install-run-rush.js -h > install-log.txt
     - name: Check logs for action results
       id: check_logs
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
         echo "::set-output name=rush-version::$(grep -F 'Rush Multi-Project Build Tool' install-log.txt | cut -f5 -d' ')"
         echo "::set-output name=used-cache::$(grep -q -F 'Installing @microsoft/rush' install-log.txt && echo false || echo true)"

@@ -10,10 +10,12 @@ jobs:
     steps:
       - name: Install Rush v5.46.1 to populate cache
         uses: ./actions/setup-rush
-        working-directory: tests/setup-rush/v5.46.1
+        with:
+          working-directory: tests/setup-rush/v5.46.1
       - name: Install Rush v5.60.0 to populate cache
         uses: ./actions/setup-rush
-        working-directory: tests/setup-rush/v5.60.0
+        with:
+          working-directory: tests/setup-rush/v5.60.0
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -22,8 +24,9 @@ jobs:
     steps:
       - name: Install Rush from cache
         id: install_rush
-        working-directory: tests/setup-rush/v${{ matrix.version }}
         uses: ./actions/setup-rush
+        with:
+          working-directory: tests/setup-rush/v${{ matrix.version }}
       - name: Fail if Rush was not present in cache
         if: ${{ steps.install_rush.outputs.cache-hit != 'true' }}
         working-directory: tests/setup-rush/v${{ matrix.version }}
