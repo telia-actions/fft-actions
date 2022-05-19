@@ -1,14 +1,13 @@
 import * as actionsCore from '@actions/core';
 import { when } from 'jest-when';
 import * as workflowInfo from '@src/libs/workflow-info';
-import { WorkflowInfo } from '@src/libs/workflow-info/types';
 import { run } from '../github-action';
 
 jest.mock('@src/libs/workflow-info');
 
 const mockedEmail = 'noreply@telia.se';
 const mockedEnvironment = 'dev'
-const mockedWorkflowInfo: WorkflowInfo = { author_email: mockedEmail, environment: mockedEnvironment }
+const mockedWorkflowInfo = { author_email: mockedEmail, environment: mockedEnvironment }
 const mockedToken = 'token';
 const mockedFailIfAbsent = '["author_email", "environment", "newAttribute"]';
 const mockedFailIfAbsentCorrect = '["author_email", "environment"]';

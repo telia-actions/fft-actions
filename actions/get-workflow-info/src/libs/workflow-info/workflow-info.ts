@@ -3,7 +3,6 @@ import {
   getArtifact,
   getAttachmentsData,
 } from '@src/utils/github-client';
-import { WorkflowInfo } from './types';
 import type { WorkflowRunEvent } from '@octokit/webhooks-types';
 import type {
   ListWorkflowRunArtifacts,
@@ -11,13 +10,12 @@ import type {
 import { readFile, writeFile } from '@src/utils/file-client';
 import { unzipArtifact } from '@src/utils/exec-client';
 
-export const getWorkflowInfo = async (token: string): Promise<WorkflowInfo> => {
+export const getWorkflowInfo = async (token: string): Promise<Record<string, unknown>> => {
   const workflowRunContext = context.payload as WorkflowRunEvent;
   const attachmentsData = await getAttachmentsData(token, workflowRunContext.workflow_run.id);
   const workflowInfoArtifactId = getWorkflowInfoAttachmentId(attachmentsData);
   
-  const workflowInfo = workflowInfoArtifactId ? await getArtifactContents(token, workflowInfoArtifactId) : {};
-  return addMissingWorkflowInfoProperties(workflowInfo);
+  return workflowInfoArtifactId ? await getArtifactContents(token, workflowInfoArtifactId) : {};
 };
 
 const getWorkflowInfoAttachmentId = (attachments: ListWorkflowRunArtifacts): number => {
@@ -40,11 +38,4 @@ const getArtifactContents = async (
   } catch {
     return {};
   }
-};
-const addMissingWorkflowInfoProperties = (partialInfo: Record<string, unknown>): WorkflowInfo => {
-  return {
-    environment: null,
-    author_email: null,
-    ...partialInfo,
-  };
 };

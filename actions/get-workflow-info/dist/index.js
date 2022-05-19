@@ -9655,8 +9655,7 @@ const getWorkflowInfo = (token) => __awaiter(void 0, void 0, void 0, function* (
     const workflowRunContext = github_1.context.payload;
     const attachmentsData = yield (0, github_client_1.getAttachmentsData)(token, workflowRunContext.workflow_run.id);
     const workflowInfoArtifactId = getWorkflowInfoAttachmentId(attachmentsData);
-    const workflowInfo = workflowInfoArtifactId ? yield getArtifactContents(token, workflowInfoArtifactId) : {};
-    return addMissingWorkflowInfoProperties(workflowInfo);
+    return workflowInfoArtifactId ? yield getArtifactContents(token, workflowInfoArtifactId) : {};
 });
 exports.getWorkflowInfo = getWorkflowInfo;
 const getWorkflowInfoAttachmentId = (attachments) => {
@@ -9675,9 +9674,6 @@ const getArtifactContents = (token, artifactId) => __awaiter(void 0, void 0, voi
         return {};
     }
 });
-const addMissingWorkflowInfoProperties = (partialInfo) => {
-    return Object.assign({ environment: null, author_email: null }, partialInfo);
-};
 
 
 /***/ }),

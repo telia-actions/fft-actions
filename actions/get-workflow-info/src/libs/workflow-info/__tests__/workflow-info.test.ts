@@ -58,20 +58,17 @@ describe('getWorkflowInfo method', () => {
     });
   });
 
-  it('should list author and environment as "Unknown" when artifact contents are not valid JSON', async () => {
+  it('should return empty object when artifact contents are not valid JSON', async () => {
     jest.spyOn(fileClient, 'readFile').mockReturnValue('Bad JSON');
     const workflowInfo = await getWorkflowInfo(mockedToken);
 
     expect(workflowInfo).toEqual(
-      expect.objectContaining({
-        environment: mockedWorkflowInfoOnFailure.environment,
-        author_email: mockedWorkflowInfoOnFailure.author_email,
-      })
+      expect.objectContaining({})
     );
   });
 
 
-  it('should list author and environment as "Unknown" when workflowInfo attachment is not found', async () => {
+  it('should return empty object when workflowInfo attachment is not found', async () => {
     jest.spyOn(githubClient, 'getAttachmentsData').mockResolvedValue({
       total_count: 1,
       artifacts: [
@@ -83,10 +80,7 @@ describe('getWorkflowInfo method', () => {
     });
     const workflowInfo = await getWorkflowInfo(mockedToken);
 
-    expect(workflowInfo).toStrictEqual({
-      environment: mockedWorkflowInfoOnFailure.environment,
-      author_email: mockedWorkflowInfoOnFailure.author_email,
-    });
+    expect(workflowInfo).toStrictEqual({});
   });
 });
 

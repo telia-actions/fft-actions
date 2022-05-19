@@ -9,8 +9,10 @@ inputs:
     description: Fail if any key in "fail_if_absent" is missing.from the workflow info JSON
     required: false
 outputs:
-  payload:
-    description: Get workflow info
+  environment:
+    description: environment
+  author_email:
+    description: author_email
 runs:
   using: node16
   main: dist/index.js
