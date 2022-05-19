@@ -1,0 +1,50 @@
+name: Setup Rush / Tests
+on:
+  pull_request:
+    types: [opened, synchronized]
+  workflow_dispath:
+jobs:
+  setup:
+    # Install Rush to ensure it is cached
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Rush v5.46.1 to populate cache
+        uses: ./actions/setup-rush
+        working-dir: tests/setup-rush/v5.46.1
+      - name: Install Rush v5.60.0 to populate cache
+        uses: ./actions/setup-rush
+        working-dir: tests/setup-rush/v5.60.0
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ["5.46.1", "5.60.0"]
+    steps:
+      - name: Install Rush from cache
+        id: install_rush
+        working-dir: tests/setup-rush/v${{ matrix.version }}
+        uses: ./actions/setup-rush
+      - name: Fail if Rush was not present in cache
+        if: ${{ steps.install_rush.outputs.cache-hit != 'true' }}
+        working-dir: tests/setup-rush/v${{ matrix.version }}
+        run: |
+          echo "Rush could not be found in the GitHub cache"
+          exit 1
+      - name: Fail if the wrong version of Rush was detected
+        if: ${{ steps.install_rush.outputs.requested-rush-version != '5.46.1' }}
+        working-dir: tests/setup-rush/v${{ matrix.version }}
+        run: |
+          echo "The wrong version of Rush was detected"
+          exit 1
+      - name: Fail if the wrong version of Rush was installed
+        if: ${{ steps.install_rush.outputs.actual-rush-version != '5.46.1' }}
+        working-dir: tests/setup-rush/v${{ matrix.version }}
+        run: |
+          echo "The wrong version of Rush was installed"
+          exit 1
+      - name: Fail if Rush was re-installed despite being restored from cache
+        if: ${{ steps.install_rush.outputs.used-cache != 'true' }}
+        working-dir: tests/setup-rush/v${{ matrix.version }}
+        run: |
+          echo "Rush was re-installed unnecessarily"
+          exit 1
