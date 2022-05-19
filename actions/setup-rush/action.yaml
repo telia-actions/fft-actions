@@ -1,6 +1,6 @@
 name: Setup Rush
 description: Set up Rush, using actions/cache to speed it up
-intputs:
+inputs:
   working-directory:
     description: The directory containing rush.json etc.
     required: false
