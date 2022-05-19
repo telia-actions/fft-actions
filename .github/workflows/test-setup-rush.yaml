@@ -20,6 +20,7 @@ jobs:
           working-directory: tests/setup-rush/v5.60.0
   test:
     runs-on: ubuntu-latest
+    needs: [setup]
     strategy:
       matrix:
         version: ["5.46.1", "5.60.0"]
