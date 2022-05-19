@@ -8,6 +8,8 @@ jobs:
     # Install Rush to ensure it is cached
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
       - name: Install Rush v5.46.1 to populate cache
         uses: ./actions/setup-rush
         with:
@@ -22,6 +24,8 @@ jobs:
       matrix:
         version: ["5.46.1", "5.60.0"]
     steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
       - name: Install Rush from cache
         id: install_rush
         uses: ./actions/setup-rush
