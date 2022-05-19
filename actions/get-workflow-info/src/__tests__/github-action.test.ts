@@ -10,8 +10,8 @@ const mockedEmail = 'noreply@telia.se';
 const mockedEnvironment = 'dev'
 const mockedWorkflowInfo: WorkflowInfo = { author_email: mockedEmail, environment: mockedEnvironment }
 const mockedToken = 'token';
-const mockedFailIfAbsent = '[author_email, environment, newAttribute]';
-const mockedFailIfAbsentCorrect = '[author_email, environment]';
+const mockedFailIfAbsent = '["author_email", "environment", "newAttribute"]';
+const mockedFailIfAbsentCorrect = '["author_email", "environment"]';
 
 describe('github action', () => {
     describe('given that there is no error', () => {

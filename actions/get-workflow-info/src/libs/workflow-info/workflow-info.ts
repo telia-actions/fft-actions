@@ -43,8 +43,8 @@ const getArtifactContents = async (
 };
 const addMissingWorkflowInfoProperties = (partialInfo: Record<string, unknown>): WorkflowInfo => {
   return {
-    environment: 'Unknown',
-    author_email: 'Unknown',
+    environment: null,
+    author_email: null,
     ...partialInfo,
   };
 };

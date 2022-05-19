@@ -9676,7 +9676,7 @@ const getArtifactContents = (token, artifactId) => __awaiter(void 0, void 0, voi
     }
 });
 const addMissingWorkflowInfoProperties = (partialInfo) => {
-    return Object.assign({ environment: 'Unknown', author_email: 'Unknown' }, partialInfo);
+    return Object.assign({ environment: null, author_email: null }, partialInfo);
 };
 
 

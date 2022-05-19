@@ -7,7 +7,7 @@ import { getWorkflowInfo } from '../workflow-info';
 
 const mockedToken = 'token';
 const mockedWorkflowInfo = { environment: 'dev-test', author_email: 'noreply@telia.se' };
-const mockedWorkflowInfoOnFailure = { environment: 'Unknown', author_email: 'Unknown' };
+const mockedWorkflowInfoOnFailure = { environment: null, author_email: null };
 const mockedBuffer = new ArrayBuffer(8);
 
 jest.mock('@actions/github', () => {
