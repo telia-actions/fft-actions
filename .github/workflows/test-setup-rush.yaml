@@ -1,7 +1,7 @@
 name: Setup Rush / Tests
 on:
   pull_request:
-    types: [opened, synchronized]
+    types: [opened, synchronize]
   workflow_dispatch:
 jobs:
   setup:
