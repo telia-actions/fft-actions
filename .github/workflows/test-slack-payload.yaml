@@ -11,7 +11,7 @@ jobs:
         id: workflow_info
         uses: telia-actions/fft-actions/actions/get-workflow-info@main
         with:
-          fail_if_absent: '[environment]'
+          fail_if_absent: '["environment"]'
       - name: Create payload for slack-github-action
         id: helpers
         uses: telia-actions/fft-actions/actions/slack-payload@main
