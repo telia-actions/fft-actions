@@ -39,13 +39,13 @@ jobs:
           echo "Rush could not be found in the GitHub cache"
           exit 1
       - name: Fail if the wrong version of Rush was detected
-        if: ${{ steps.install_rush.outputs.requested-rush-version != '5.46.1' }}
+        if: ${{ steps.install_rush.outputs.requested-rush-version != matrix.version }}
         working-directory: tests/setup-rush/v${{ matrix.version }}
         run: |
           echo "The wrong version of Rush was detected"
           exit 1
       - name: Fail if the wrong version of Rush was installed
-        if: ${{ steps.install_rush.outputs.actual-rush-version != '5.46.1' }}
+        if: ${{ steps.install_rush.outputs.actual-rush-version != matrix.version }}
         working-directory: tests/setup-rush/v${{ matrix.version }}
         run: |
           echo "The wrong version of Rush was installed"
