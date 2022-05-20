@@ -4,7 +4,7 @@ inputs:
   working-directory:
     description: The directory containing rush.json etc.
     required: false
-    default: ""
+    default: "."
 outputs:
   requested-rush-version:
     description: The Rush version specified in rush.json
@@ -32,7 +32,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: ${{ inputs.working-directory }}/common/temp/install-run
-        key: ${{ runner.os }}-rush-${{ steps.rush_json.outputs.rush-version }}
+        key: ${{ runner.os }}-rush-v${{ steps.rush_json.outputs.rush-version }}
     - name: Install Rush
       shell: bash
       working-directory: ${{ inputs.working-directory }}
