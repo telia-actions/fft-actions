@@ -2,6 +2,10 @@ name: Setup Rush / Tests
 on:
   pull_request:
     types: [opened, synchronize]
+    paths:
+      - actions/setup-rush
+      - .gitHub/workflows/test-setup-rush.yaml
+      - tests/setup-rush
   workflow_dispatch:
 jobs:
   setup:
