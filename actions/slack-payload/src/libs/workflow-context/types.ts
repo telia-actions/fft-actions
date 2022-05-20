@@ -1,5 +1,4 @@
 export type WorkflowData = {
-  environment: string;
   checkSuiteId: number;
   name: string;
   conclusion: string | null;
@@ -13,7 +12,6 @@ export type WorkflowData = {
   attachmentsIds: AttachmentsData;
   jobsOutcome: JobsData;
   pullRequest: PullRequestData | undefined;
-  author_email: string;
 };
 
 export type PullRequestData = {

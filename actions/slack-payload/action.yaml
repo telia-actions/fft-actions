@@ -1,10 +1,13 @@
 name: Create slack message payload
-description: Upload to generic JFrog Artifactory repository
+description: Create slack message payload
 inputs:
   token:
     description: Github token
     required: false
     default: ${{ github.token }}
+  environment:
+    description: environment
+    required: true
 outputs:
   payload:
     description: Slack message payload  

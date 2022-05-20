@@ -1,11 +1,8 @@
 import '@actions/github';
-import '@src/utils/exec-client';
-import '@src/utils/file-client';
 import * as githubClient from '@src/utils/github-client';
 import { getWorkflowContext } from '../workflow-context';
 
 const mockedToken = 'token';
-const mockedBuffer = new ArrayBuffer(8);
 const mockedPrNumber = 1;
 const mockedTitle = 'title';
 const mockedUrl = 'url';
@@ -33,10 +30,6 @@ jest.mock('@actions/github', () => {
 });
 
 jest.mock('@src/utils/github-client');
-jest.mock('@src/utils/file-client');
-jest.mock('@src/utils/exec-client');
-
-jest.spyOn(githubClient, 'getArtifact').mockResolvedValue(mockedBuffer);
 jest.spyOn(githubClient, 'getAttachmentsData').mockResolvedValue({
   total_count: 1,
   artifacts: [],

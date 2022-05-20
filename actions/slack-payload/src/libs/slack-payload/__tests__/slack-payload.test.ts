@@ -6,7 +6,6 @@ jest.mock('@src/libs/slack-message');
 
 const mockedWorkflowContext = {
   conclusion: 'any',
-  environment: 'preview-1',
   checkSuiteId: 1,
   url: 'url',
   name: 'name',
@@ -27,15 +26,16 @@ const mockedWorkflowContext = {
     failureDeployCount: 0,
     failedJobSteps: [],
   },
-  author_email: 'noreply@telia.se',
 };
+
+const mockedEnvironemnt = 'dev';
 
 describe('createPayload method', () => {
   it('should return header and information blocks of slack message payload', () => {
     const headerPayloadSpy = jest.spyOn(slackMessage, 'getHeaderBlock');
     const informationPayloadSpy = jest.spyOn(slackMessage, 'getInformationBlock');
 
-    createPayload(mockedWorkflowContext);
+    createPayload(mockedWorkflowContext, mockedEnvironemnt);
 
     expect(headerPayloadSpy).toHaveBeenCalledTimes(1);
     expect(headerPayloadSpy).toHaveBeenCalledWith(mockedWorkflowContext.conclusion);
@@ -46,7 +46,7 @@ describe('createPayload method', () => {
       mockedWorkflowContext.repository.name,
       mockedWorkflowContext.url,
       mockedWorkflowContext.name,
-      mockedWorkflowContext.environment
+      mockedEnvironemnt
     );
   });
   it('should only contain header and information blocks of slack message payload', () => {
@@ -55,7 +55,7 @@ describe('createPayload method', () => {
     const stepFailuresPayloadSpy = jest.spyOn(slackMessage, 'getFailureStepAttachment');
     const logPayloadSpy = jest.spyOn(slackMessage, 'getLogsAttachment');
 
-    createPayload(mockedWorkflowContext);
+    createPayload(mockedWorkflowContext, mockedEnvironemnt);
 
     expect(pullRequestPayloadSpy).toHaveBeenCalledTimes(0);
     expect(packagesPayloadSpy).toHaveBeenCalledTimes(0);
@@ -71,10 +71,13 @@ describe('createPayload method', () => {
         number: 1,
       };
 
-      createPayload({
-        ...mockedWorkflowContext,
-        pullRequest: mockedPullRequestContext,
-      });
+      createPayload(
+        {
+          ...mockedWorkflowContext,
+          pullRequest: mockedPullRequestContext,
+        },
+        mockedEnvironemnt
+      );
 
       expect(pullRequestPayloadSpy).toHaveBeenCalledTimes(1);
       expect(pullRequestPayloadSpy).toHaveBeenCalledWith(
@@ -95,10 +98,13 @@ describe('createPayload method', () => {
         failedJobSteps: [],
       };
 
-      createPayload({
-        ...mockedWorkflowContext,
-        jobsOutcome: mockedJobsOutcome,
-      });
+      createPayload(
+        {
+          ...mockedWorkflowContext,
+          jobsOutcome: mockedJobsOutcome,
+        },
+        mockedEnvironemnt
+      );
 
       expect(packagesPayloadSpy).toHaveBeenCalledTimes(1);
       expect(packagesPayloadSpy).toHaveBeenCalledWith(
@@ -118,10 +124,13 @@ describe('createPayload method', () => {
         failedJobSteps: [],
       };
 
-      createPayload({
-        ...mockedWorkflowContext,
-        jobsOutcome: mockedJobsOutcome,
-      });
+      createPayload(
+        {
+          ...mockedWorkflowContext,
+          jobsOutcome: mockedJobsOutcome,
+        },
+        mockedEnvironemnt
+      );
 
       expect(packagesPayloadSpy).toHaveBeenCalledTimes(1);
       expect(packagesPayloadSpy).toHaveBeenCalledWith(
@@ -142,10 +151,13 @@ describe('createPayload method', () => {
         failedJobSteps: ['build'],
       };
 
-      createPayload({
-        ...mockedWorkflowContext,
-        jobsOutcome: mockedJobsOutcome,
-      });
+      createPayload(
+        {
+          ...mockedWorkflowContext,
+          jobsOutcome: mockedJobsOutcome,
+        },
+        mockedEnvironemnt
+      );
 
       expect(stepFailuresPayloadSpy).toHaveBeenCalledTimes(1);
       expect(stepFailuresPayloadSpy).toHaveBeenCalledWith(mockedJobsOutcome.failedJobSteps);
