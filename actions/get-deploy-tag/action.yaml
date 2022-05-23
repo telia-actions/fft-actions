@@ -15,4 +15,4 @@ runs:
       id: tag
       shell: bash
       run: |
-        echo "::set-output name=tag::${{ github.event.number || inputs.environment }}"
+        echo "::set-output name=tag::${{ github.event.number ? format('pr-{0}', github.event.number) : inputs.environment }}"
