@@ -1,0 +1,11 @@
+name: Upload Packages to S3
+inputs:
+  rush-projects:
+    description: A JSON array of { packageName, projectFolder} objects to upload
+    required: true
+  s3-address:
+    description: bucket-name/optional/path/prefix
+    required: true
+runs:
+  using: node16
+  main: dist/index.js
