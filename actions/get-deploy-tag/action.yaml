@@ -19,4 +19,4 @@ runs:
       id: tag
       shell: bash
       run: |
-        echo "::set-output name=tag::${{ inputs.pr_number && format('pr-{0}', inputs.pr_number) || inputs.environment }}"
+        echo "::set-output name=tag::${{ inputs.pr_number && format('pr-{0}', inputs.pr_number) || inputs.deploy_environment }}"
