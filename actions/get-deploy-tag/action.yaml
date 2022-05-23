@@ -1,9 +1,13 @@
 name: Get deploy tag
 description: Return deploy tag
 inputs:
-  environment:
+  deploy_environment:
     description: "environment"
     required: true
+  pr_number:
+    description: "Pull request number"
+    default: ${{ github.event.number }}
+    required: false
 outputs:
   tag:
     description: deploy tag
@@ -15,4 +19,4 @@ runs:
       id: tag
       shell: bash
       run: |
-        echo "::set-output name=tag::${{ github.event.number && format('pr-{0}', github.event.number) || inputs.environment }}"
+        echo "::set-output name=tag::${{ inputs.pr_number && format('pr-{0}', inputs.pr_number) || inputs.environment }}"
