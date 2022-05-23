@@ -1,0 +1,22 @@
+name: Get deploy tag
+description: Return deploy tag
+inputs:
+  deploy_environment:
+    description: "environment"
+    required: true
+  pr_number:
+    description: "Pull request number"
+    default: ${{ github.event.number }}
+    required: false
+outputs:
+  tag:
+    description: deploy tag
+    value: ${{ steps.tag.outputs.tag }}
+runs:
+  using: composite
+  steps:
+    - name: Create tag
+      id: tag
+      shell: bash
+      run: |
+        echo "::set-output name=tag::${{ inputs.pr_number && format('pr-{0}', inputs.pr_number) || inputs.deploy_environment }}"

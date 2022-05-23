@@ -11,11 +11,10 @@ jobs:
     steps:
       - name: Get tag
         id: tag
-        uses: telia-actions/fft-actions/actions/get-deploy-tag@fft-29-create-tag-action
+        uses: telia-actions/fft-actions/actions/get-deploy-tag@main
         with:
           deploy_environment: dev
           pr_number: ${{ github.event.number }}
       - name: Echo value
         run: |
           echo ${{ steps.tag.outputs.tag }}
-
