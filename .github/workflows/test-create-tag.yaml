@@ -1,0 +1,20 @@
+name: Test WofklowInfo
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches: [main]
+jobs:
+  get_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tag
+        id: tag
+        uses: telia-actions/fft-actions/actions/get-deploy-tag@fft-29-create-tag-action
+        with:
+          environment: dev
+      - name: Echo value
+        run: |
+          echo ${{ steps.tag.outputs.tag }}
+
