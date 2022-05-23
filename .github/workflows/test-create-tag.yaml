@@ -1,4 +1,4 @@
-name: Test WofklowInfo
+name: Test create tag action
 on:
   workflow_dispatch:
   pull_request:
