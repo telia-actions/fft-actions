@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Get tag
         id: tag
-        uses: telia-actions/fft-actions/actions/get-deploy-tag@fft-29-create-tag-action
+        uses: telia-actions/fft-actions/actions/get-deploy-tag@main
         with:
           environment: dev
       - name: Echo value
