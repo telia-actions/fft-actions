@@ -13,7 +13,8 @@ jobs:
         id: tag
         uses: telia-actions/fft-actions/actions/get-deploy-tag@fft-29-create-tag-action
         with:
-          environment: dev
+          deploy_environment: dev
+          pr_number: ${{ github.event.number }}
       - name: Echo value
         run: |
           echo ${{ steps.tag.outputs.tag }}
