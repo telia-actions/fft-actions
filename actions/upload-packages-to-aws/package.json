@@ -1,0 +1,41 @@
+{
+  "name": "@telia/upload-packages-to-aws",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build src/index.ts",
+    "format": "prettier . --check",
+    "format:fix": "prettier . --check --write",
+    "lint": "eslint **/*.ts --cache",
+    "lint:fix": "eslint **/*.ts --fix --cache",
+    "test": "jest --runInBand"
+  },
+  "keywords": [],
+  "author": "Telia Company",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/exec": "^1.1.0",
+    "npm-packlist": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "@types/jest-when": "^3.5.0",
+    "@types/node": "^17.0.19",
+    "@types/npm-packlist": "^1.1.2",
+    "@typescript-eslint/parser": "^5.12.1",
+    "@vercel/ncc": "^0.33.3",
+    "eslint": "^8.9.0",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-github": "^4.3.5",
+    "eslint-plugin-jest": "^26.1.1",
+    "jest": "^27.5.1",
+    "jest-preset-typescript": "^1.2.0",
+    "jest-when": "^3.5.1",
+    "prettier": "^2.5.1",
+    "ts-jest": "^27.1.3",
+    "ts-node": "^10.5.0",
+    "typescript": "^4.5.5"
+  }
+}
