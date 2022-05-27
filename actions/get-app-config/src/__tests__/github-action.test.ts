@@ -8,8 +8,9 @@ jest.mock('@actions/core');
 jest.mock('@src/util/json-client');
 
 describe('github action', () => {
-  const configFilePath = 'configFilePath';
-  const staticAppName = '';
+  const appName = '';
+  const configDir = 'configDir';
+  const environment = 'environment';
 
   const setOutputSpy = jest.spyOn(actionsCore, 'setOutput');
   const setFailedSpy = jest.spyOn(actionsCore, 'setFailed');
@@ -18,23 +19,28 @@ describe('github action', () => {
 
   beforeEach(() => {
     when(getInputSpy)
-      .calledWith('configFilePath')
-      .mockReturnValue(configFilePath)
-      .calledWith('staticAppName')
-      .mockReturnValue(staticAppName);
+      .calledWith('appName')
+      .mockReturnValue(appName)
+      .calledWith('configDir')
+      .mockReturnValue(configDir)
+      .calledWith('environment')
+      .mockReturnValue(environment);
 
     readJsonWithCommentsSpy.mockReturnValue(config);
   });
 
   it('should set full config output', () => {
+    const configFilePath = `${configDir}/app-configuration/${environment}.json`;
+
     run();
 
     expect(readJsonWithCommentsSpy).toHaveBeenCalledTimes(1);
     expect(readJsonWithCommentsSpy).toHaveBeenCalledWith(configFilePath);
 
-    expect(getInputSpy).toHaveBeenCalledTimes(2);
-    expect(getInputSpy).toHaveBeenCalledWith('configFilePath');
-    expect(getInputSpy).toHaveBeenCalledWith('staticAppName');
+    expect(getInputSpy).toHaveBeenCalledTimes(3);
+    expect(getInputSpy).toHaveBeenCalledWith('appName');
+    expect(getInputSpy).toHaveBeenCalledWith('configDir');
+    expect(getInputSpy).toHaveBeenCalledWith('environment');
 
     expect(setOutputSpy).toHaveBeenCalledTimes(1);
     expect(setOutputSpy).toHaveBeenCalledWith('config', config);
@@ -43,15 +49,15 @@ describe('github action', () => {
   });
 
   it('should set static app config output', () => {
-    const appName = 'app3';
+    const app = 'app3';
 
-    when(getInputSpy).calledWith('staticAppName').mockReturnValue(appName);
+    when(getInputSpy).calledWith('appName').mockReturnValue(app);
 
     run();
 
     expect(setOutputSpy).toHaveBeenCalledTimes(2);
     expect(setOutputSpy).toHaveBeenCalledWith('config', config);
-    expect(setOutputSpy).toHaveBeenCalledWith('staticApp', {
+    expect(setOutputSpy).toHaveBeenCalledWith('app', {
       name: 'app3',
       health_check: '/app3',
       port: 3002,

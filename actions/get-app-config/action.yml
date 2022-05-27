@@ -1,0 +1,21 @@
+name: Get app env config
+description: Get application config for provided environment
+inputs:
+  appName:
+    description: Application name to get specific configuration.
+    required: false
+  configDir:
+    description: Directory containing valid app config files.
+    required: false
+    default: './static/configuration'
+  environment:
+    description: Which config to read.
+    required: true
+outputs:
+  config:
+    description: Full configuration
+  app:
+    description: Configuration for specific app
+runs:
+  using: node12
+  main: dist/index.js

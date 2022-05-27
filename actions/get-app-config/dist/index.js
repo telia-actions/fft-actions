@@ -1567,13 +1567,15 @@ const core_1 = __webpack_require__(186);
 const json_client_1 = __webpack_require__(434);
 const run = () => {
     try {
-        const configFilePath = core_1.getInput('configFilePath');
-        const staticAppName = core_1.getInput('staticAppName');
-        const previewEnvConfig = json_client_1.readJsonWithComments(configFilePath);
-        core_1.setOutput('config', previewEnvConfig);
-        if (staticAppName) {
-            const appConfig = previewEnvConfig.apps.find((app) => app.name === staticAppName);
-            core_1.setOutput('staticApp', appConfig);
+        const appName = core_1.getInput('appName');
+        const configDir = core_1.getInput('configDir');
+        const environment = core_1.getInput('environment');
+        const configFilePath = `${configDir}/app-configuration/${environment}.json`;
+        const environmentConfig = json_client_1.readJsonWithComments(configFilePath);
+        core_1.setOutput('config', environmentConfig);
+        if (appName) {
+            const appConfig = environmentConfig.apps.find((app) => app.name === appName);
+            core_1.setOutput('app', appConfig);
         }
     }
     catch (error) {
