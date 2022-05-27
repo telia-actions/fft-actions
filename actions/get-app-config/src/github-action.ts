@@ -8,7 +8,7 @@ export const run = (): void => {
     const configDir = getInput('configDir');
     const environment = getInput('environment');
 
-    const configFilePath = `${configDir}/app-configuration/${environment}.json`;
+    const configFilePath = `${configDir}/${environment}.json`;
 
     const environmentConfig: EnvironmentConfig = readJsonWithComments(configFilePath);
 

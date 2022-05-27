@@ -1570,7 +1570,7 @@ const run = () => {
         const appName = core_1.getInput('appName');
         const configDir = core_1.getInput('configDir');
         const environment = core_1.getInput('environment');
-        const configFilePath = `${configDir}/app-configuration/${environment}.json`;
+        const configFilePath = `${configDir}/${environment}.json`;
         const environmentConfig = json_client_1.readJsonWithComments(configFilePath);
         core_1.setOutput('config', environmentConfig);
         if (appName) {
