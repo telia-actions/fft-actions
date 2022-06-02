@@ -29,7 +29,7 @@ runs:
         echo "::set-output name=rush-version::$(grep -F '"rushVersion":' rush.json | cut -f4 -d'"')"
     - name: Restore Rush from cache
       id: restore_cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ inputs.working-directory }}/common/temp/install-run
         key: ${{ runner.os }}-rush-v${{ steps.rush_json.outputs.rush-version }}
