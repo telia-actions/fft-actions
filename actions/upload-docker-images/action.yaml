@@ -1,0 +1,37 @@
+name: Upload docker images
+description: Uploads NextJs Apps docker images to artifactory
+inputs:
+  apps:
+    description: Array of NextJs apps
+    required: true
+  ifImageMissing:
+    description: Action when image is missing (ignore | warning | error)
+    required: false
+    default: warning
+  localTag:
+    description: local tag name
+    required: false
+    default: latest
+  remoteTag:
+    description: remote tag name i.e pr-1234
+    required: true
+  registry:
+    description: Registry to upload images to
+    required: false
+    default: tsefe-docker.jfrog.teliacompany.io
+runs:
+  using: "composite"
+  steps:
+      - name: Upload NextJs images
+        id: nextjs_images
+        uses: actions/github-script@v5
+        env:
+          apps: ${{ inputs.apps }}
+          remoteTag: ${{ inputs.remoteTag }}
+          localTag: ${{ inputs.localTag }}
+          registry: ${{ inputs.registry }}
+          action: ${{ inputs.ifImageMissing }}
+        with:
+          script: |
+            const { uploadImages } = require('./script.js')
+            uploadImages(core, process.env)
