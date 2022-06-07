@@ -1,0 +1,103 @@
+name: Pull request infrastructure
+description: Create tse infrastructure for pull request
+inputs:
+  aws_accsess_key_id:
+    required: true
+  aws_secret_access_key:
+    required: true
+  aws_session_token:
+    required: true
+  git_token:
+    required: true
+  pr_number:
+    required: true
+  send_notification:
+    default: true
+    required: false
+  slack_token:
+    required: false
+outputs:
+  deployed_apps:
+    value: ${{ steps.filtered_apps.outputs.config }}
+  domain_name:
+    value: ${{ steps.setup-tse-env.outputs.domain_name }}
+runs:
+  using: composite
+  steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v2
+      with:
+        ref: refs/pull/${{ inputs.pr_number }}/merge
+        fetch-depth: 2
+    - name: Fetch main branch
+      shell: bash
+      run: git fetch origin main
+    - name: Setup node
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+    - name: Setup Rush
+      uses: telia-actions/fft-actions/actions/setup-rush@main
+    - name: Get config
+      id: config
+      uses: telia-actions/fft-actions/actions/get-app-config@main
+      with:
+        environment: pr
+    - name: Show changed projects
+      shell: bash
+      run: node common/scripts/install-run-rush.js --quiet list --only git:origin/main --json
+    - name: Get changed projects
+      shell: bash
+      id: changed_projects
+      run: |
+        node common/scripts/install-run-rush.js --quiet list --only git:origin/main --json > list.json
+        content=`cat ./list.json`
+
+        content="${content//'%'/'%25'}"
+        content="${content//$'\n'/'%0A'}"
+        content="${content//$'\r'/'%0D'}"
+
+        echo "::set-output name=list::$content"
+    - name: Filter changed nextApps
+      uses: actions/github-script@v5
+      id: filtered_apps
+      with:
+        script: |
+          const config = ${{ steps.config.outputs.config }};
+          const { projects } = ${{ steps.changed_projects.outputs.list }};
+
+          config.apps = config.apps.filter(({ name }) => projects.some(project => `@telia/${name}` === project.name));
+
+          core.setOutput("config", config);
+          core.setOutput("has_changes", config.apps.length !== 0);
+          if (config.apps.length === 0) {
+            core.warning("No apps were changed, skipping infrastructure creation");
+          }
+    - name: Content to file
+      shell: bash
+      if: steps.filtered_apps.outputs.has_changes == 'true'
+      run: echo ${{ toJson(steps.filtered_apps.outputs.config) }} > config.json
+    - uses: telia-actions/fft-actions/actions/setup-tse-env@main
+      if: steps.filtered_apps.outputs.has_changes == 'true'
+      id: setup-tse-env
+      with:
+        applyChanges: true
+        awsAccsessKeyId: ${{ inputs.aws_accsess_key_id }}
+        awsSecretAccessKey: ${{ inputs.aws_secret_access_key }}
+        awsSessionToken: ${{ inputs.aws_session_token }}
+        envName: pr-${{ inputs.pr_number }}
+        gitToken: ${{ inputs.git_token }}
+        terraformParameters: config.json
+        type: pull_request
+    - uses: telia-actions/fft-actions/actions/pull-request-notification@main
+      if: inputs.send_notification == 'true' && steps.filtered_apps.outputs.has_changes == 'true'
+      with:
+        githubComment: "Pull request environment has been created - [${{ steps.setup-tse-env.outputs.domain_name }}](https://${{ steps.setup-tse-env.outputs.domain_name }})"
+        githubToken: ${{ inputs.git_token }}
+        prNumber: ${{ steps.variables.outputs.pr_number }}
+        slackMessage: "Pull request environment has been created - ${{ steps.setup-tse-env.outputs.domain_name }}"
+        slackToken: ${{ inputs.slack_token }}
+    - name: Add annotation
+      shell: bash
+      if: steps.filtered_apps.outputs.has_changes == 'true'
+      run: echo "::notice ::Pull request environment has been created - ${{ steps.setup-tse-env.outputs.domain_name }}"
