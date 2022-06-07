@@ -4,7 +4,7 @@ inputs:
   apps:
     description: Array of NextJs apps
     required: true
-  ifImageMissing:
+  actionIfMissing:
     description: Action when image is missing (ignore | warning | error)
     required: false
     default: warning
@@ -15,23 +15,10 @@ inputs:
   remoteTag:
     description: remote tag name i.e pr-1234
     required: true
-  registry:
+  registryUrl:
     description: Registry to upload images to
     required: false
     default: tsefe-docker.jfrog.teliacompany.io
 runs:
-  using: "composite"
-  steps:
-      - name: Upload NextJs images
-        id: nextjs_images
-        uses: actions/github-script@v5
-        env:
-          apps: ${{ inputs.apps }}
-          remoteTag: ${{ inputs.remoteTag }}
-          localTag: ${{ inputs.localTag }}
-          registry: ${{ inputs.registry }}
-          action: ${{ inputs.ifImageMissing }}
-        with:
-          script: |
-            const { uploadImages } = require('./script.js')
-            uploadImages(core, process.env)
+  using: node16
+  main: dist/index.js
