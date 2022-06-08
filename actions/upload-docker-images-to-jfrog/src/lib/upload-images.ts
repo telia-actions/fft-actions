@@ -26,8 +26,8 @@ export async function uploadImages({
         await exec("docker", ["images", "-q", imageName], options)
   
         if (imageId !== "") {
-            await exec("docker", ["tag", imageName, `${registryUrl}/${name}:${remoteTag}`]);
-            await exec("docker", ["push", `${registryUrl}/${name}:${remoteTag}`]);
+            await exec("docker", ["tag", imageName, `${registryUrl}/${app}:${remoteTag}`]);
+            await exec("docker", ["push", `${registryUrl}/${app}:${remoteTag}`]);
         } else {
             switch(actionIfMissing) {
                 case "warning":
