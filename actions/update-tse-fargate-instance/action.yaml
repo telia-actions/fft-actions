@@ -1,68 +1,21 @@
 name: ECS service update
-description: Force ECS services to pull updated images and redeploy
+description: Update ecs service cluster and force new deployment
 inputs:
   awsAccsessKeyId:
-    required: false
+    required: true
   awsSecretAccessKey:
-    required: false
+    required: true
   awsSessionToken:
-    required: false
+    required: true
   envName:
-    required: false
-  aws_access_key_id:
-    required: false
-  aws_secret_access_key:
     required: true
-  aws_session_token:
-    required: true
-  env_name:
-    required: true
-  service_names:
-    required: false
-    default: '[ "${{ inputs.envName }}" ]'
-  region:
-    required: false
-    default: eu-north-1
-  dry_run:
-    required: false
-    default: false
 runs:
   using: composite
   steps:
-    - name: Normalize inputs
-      id: normalize
-      shell: bash
-      run: |
-        echo "::set-output name=aws_access_key_id::${{ inputs.awsAccsessKeyId || inputs.aws_access_key_id }}"
-        echo "::set-output name=aws_secret_access_key::${{ inputs.awsAccsessKeyId || inputs.aws_secret_access_key }}"
-        echo "::set-output name=aws_session_token::${{ inputs.awsSessionToken || inputs.aws_session_token }}"
-        echo "::set-output name=env_name::${{ inputs.envName || inputs.env_name }}"
-    - name: Set environment
-      shell: bash
-      run: |
-        echo "AWS_ACCESS_KEY_ID=${{ steps.normalize.outputs.aws_access_key_id }}" >> $GITHUB_ENV
-        echo "AWS_SECRET_ACCESS_KEY=${{ steps.normalize.outputs.aws_secret_access_key }}" >> $GITHUB_ENV
-        echo "AWS_SESSION_TOKEN=${{ steps.normalize.outputs.aws_session_token }}" >> $GITHUB_ENV
-    - name: Dry-run
-      if: inputs.dry_run != 'false'
-      shell: bash
-      run: |
-        echo "Updating images:"
-        echo "(Dry-run because inputs.dry_run is not false)"
-        echo "//${{ steps.normalize.outputs.service_names }}//"
-        # for service_name in service_names {
-        #  aws ecs update-service --cluster ${{ steps.normalize.outputs.envName }}-cluster --service <service_name> --force-new-deployment --region ${{ inputs.region}}
-        #}
     - name: Update
-      if: inputs.dry_run == 'false'
       shell: bash
-      run:
-        echo "Updating images:"
-        echo "//${{ inputs.service_names }}//"
-        # for service_name in service_names {
-        #  aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service ${{ service_name }} --force-new-deployment --region ${{ inputs.region}}
-        #}
+      run: aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service ${{ inputs.envName }} --force-new-deployment --region eu-north-1
       env:
-        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        AWS_SESSION_TOKEN: ${{ inputs.aws_session_token }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.awsAccsessKeyId }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.awsSecretAccessKey }}
+        AWS_SESSION_TOKEN: ${{ inputs.awsSessionToken }}
