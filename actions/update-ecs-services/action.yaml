@@ -20,6 +20,13 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Parse service names
+      id: services
+      shell: bash
+      run: |
+        pattern="[,[\]\n]"
+        services="(${inputs.service_names//${pattern}/})"
+        echo "::set-output name=services::${services}"
     - name: Dry-run
       if: inputs.dry_run != 'false'
       shell: bash
@@ -27,9 +34,14 @@ runs:
         echo "Updating images:"
         echo "(Dry-run because inputs.dry_run is not false)"
         echo "//${{ inputs.service_names }}//"
-        # for service_name in service_names {
-        #  aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service <service_name> --force-new-deployment --region ${{ inputs.region}}
-        #}
+        echo "//${{ steps.services.outputs.services }}//"
+        services=${{ steps.services.outputs.services }}
+        echo "$services"
+        for service in ${services[@]}
+        do
+          echo "Updating service: ${service}"
+        done
+        # aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service <service_name> --force-new-deployment --region ${{ inputs.region}}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
@@ -37,9 +49,10 @@ runs:
     - name: Update
       if: inputs.dry_run == 'false'
       shell: bash
-      run:
+      run: |
         echo "Updating images:"
         echo "//${{ inputs.service_names }}//"
+        echo "//${{ steps.services.outputs.services }}//"
         # for service_name in service_names {
         #  aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service ${{ service_name }} --force-new-deployment --region ${{ inputs.region}}
         #}
@@ -47,3 +60,4 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_SESSION_TOKEN: ${{ inputs.aws_session_token }}
+//for asd in ${test[@]}; do echo /$asd/; done
