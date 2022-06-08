@@ -20,6 +20,9 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Start group
+      shell: bash
+      run: echo "::group::Update services"
     - name: Parse service names
       id: services
       shell: bash
@@ -37,7 +40,7 @@ runs:
         echo "### :rocket: Updated services (dry-run=${{ inputs.dry_run}})" >> $GITHUB_STEP_SUMMARY
         for service in ${services[@]}
         do
-          echo "::group::Updating service: ${service}"
+          echo "::group::Updating ${service}"
           command="aws ecs update-service --cluster ${{ inputs.env_name }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
           if [ ${{ inputs.dry_run }} == "false" ];
           then
@@ -52,3 +55,6 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_SESSION_TOKEN: ${{ inputs.aws_session_token }}
+    - name: End group
+      shell: bash
+      run: echo "::endgroup::"
