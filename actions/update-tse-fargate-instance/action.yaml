@@ -19,7 +19,7 @@ inputs:
     required: true
   service_names:
     required: false
-    default: [ ${{ inputs.envName }} ]
+    default: '[ "${{ inputs.envName }}" ]'
   region:
     required: false
     default: eu-north-1
