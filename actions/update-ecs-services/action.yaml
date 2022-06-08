@@ -1,15 +1,15 @@
 name: ECS service update
 description: Force ECS services to pull updated images and redeploy
 inputs:
-  aws_access_key_id:
+  aws-access-key-id:
     required: true
-  aws_secret_access_key:
+  aws-secret-access-key:
     required: true
-  aws_session_token:
+  aws-session-token:
     required: true
-  env_name:
+  env-name:
     required: true
-  service_names:
+  service-names:
     required: true
     description: |
       A stringified (JSON) array of service names.
@@ -17,7 +17,7 @@ inputs:
   region:
     required: false
     default: eu-north-1
-  dry_run:
+  dry-run:
     required: false
     default: false
 runs:
@@ -27,7 +27,7 @@ runs:
       id: services
       shell: bash
       run: |
-        inputs='${{inputs.service_names}}'
+        inputs='${{inputs.service-names}}'
         pattern="[,[\]\n]"
         services="(${inputs//${pattern}/})"
         echo "::set-output name=services::${services}"
@@ -35,12 +35,12 @@ runs:
       shell: bash
       run: |
         services=${{ steps.services.outputs.services }}
-        echo "### :rocket: Updated services (dry-run=${{ inputs.dry_run}})" >> $GITHUB_STEP_SUMMARY
+        echo "### :rocket: Updated services (dry-run=${{ inputs.dry-run}})" >> $GITHUB_STEP_SUMMARY
         for service in ${services[@]}
         do
           echo "::group::Updating ${service}"
-          command="aws ecs update-service --cluster ${{ inputs.env_name }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
-          if [ ${{ inputs.dry_run }} == "false" ];
+          command="aws ecs update-service --cluster ${{ inputs.env-name }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
+          if [ ${{ inputs.dry-run }} == "false" ];
           then
             $command
           else
@@ -50,6 +50,6 @@ runs:
           echo "::endgroup::"
         done
       env:
-        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        AWS_SESSION_TOKEN: ${{ inputs.aws_session_token }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+        AWS_SESSION_TOKEN: ${{ inputs.aws-session-token }}
