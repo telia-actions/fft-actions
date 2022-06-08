@@ -1,14 +1,7 @@
 import { exec } from '@actions/exec';
 import { error, warning } from '@actions/core';
-import type { AppsInput } from '@src/types';
+import type { Inputs } from '@src/types';
 
-export interface UploadImagesToJfrog {
-    apps: AppsInput[];
-    localTag: string;
-    remoteTag: string;
-    registryUrl: string;
-    actionIfMissing: string;
-  }
 
 export async function uploadImages({
     apps,
@@ -16,7 +9,7 @@ export async function uploadImages({
     remoteTag,
     registryUrl,
     actionIfMissing
-  }: UploadImagesToJfrog): Promise<void> {
+  }: Inputs): Promise<void> {
     for (const app of apps) {
         const name = app.name
         const imageName = `${name}:${localTag}`
