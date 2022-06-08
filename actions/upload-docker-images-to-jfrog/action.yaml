@@ -4,18 +4,18 @@ inputs:
   apps:
     description: Array of NextJs apps
     required: true
-  actionIfMissing:
+  action-if-missing:
     description: Action when image is missing (ignore | warning | error)
     required: false
     default: warning
-  localTag:
+  local-tag:
     description: local tag name
     required: false
     default: latest
-  remoteTag:
+  remote-tag:
     description: remote tag name i.e pr-1234
     required: true
-  registryUrl:
+  registry-url:
     description: Registry to upload images to
     required: false
     default: tsefe-docker.jfrog.teliacompany.io

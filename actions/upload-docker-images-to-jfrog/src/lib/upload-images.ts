@@ -11,8 +11,7 @@ export async function uploadImages({
     actionIfMissing
   }: Inputs): Promise<void> {
     for (const app of apps) {
-        const name = app.name
-        const imageName = `${name}:${localTag}`
+        const imageName = `${app}:${localTag}`
   
         let imageId = "";
   
@@ -32,10 +31,10 @@ export async function uploadImages({
         } else {
             switch(actionIfMissing) {
                 case "warning":
-                  warning(`${app.name} image is not created`)
+                  warning(`${app} image is not created`)
                   break;
                 case "error":
-                  error(`${app.name} image is not created`)
+                  error(`${app} image is not created`)
                   break;
                 default:
               }
