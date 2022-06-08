@@ -26,6 +26,7 @@ jobs:
           aws_session_token: "SESSION"
           env_name: "environment"
           service_names: '["service-1", "service-2"]'
+          dry_run: true
       - name: Check if credentials have leaked
         run: |
           echo $AWS_ACCESS_KEY_ID
