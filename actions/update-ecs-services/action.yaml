@@ -20,9 +20,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Start group
-      shell: bash
-      run: echo "::group::Update services"
     - name: Parse service names
       id: services
       shell: bash
@@ -44,7 +41,7 @@ runs:
           command="aws ecs update-service --cluster ${{ inputs.env_name }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
           if [ ${{ inputs.dry_run }} == "false" ];
           then
-            echo $(command)
+            $command
           else
             echo "[dry-run] $command"
           fi
@@ -55,6 +52,3 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
         AWS_SESSION_TOKEN: ${{ inputs.aws_session_token }}
-    - name: End group
-      shell: bash
-      run: echo "::endgroup::"
