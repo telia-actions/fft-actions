@@ -1,0 +1,55 @@
+name: ECS service update
+description: Force ECS services to pull updated images and redeploy
+inputs:
+  aws_access_key_id:
+    required: true
+  aws_secret_access_key:
+    required: true
+  aws_session_token:
+    required: true
+  env_name:
+    required: true
+  service_names:
+    required: true
+    description: |
+      A stringified (JSON) array of service names.
+      If you are passing a literal array in YAML, make sure to add quotes so that it is actually a string.
+  region:
+    required: false
+    default: eu-north-1
+  dry_run:
+    required: false
+    default: false
+runs:
+  using: composite
+  steps:
+    - name: Parse service names
+      id: services
+      shell: bash
+      run: |
+        inputs='${{inputs.service_names}}'
+        pattern="[,[\]\n]"
+        services="(${inputs//${pattern}/})"
+        echo "::set-output name=services::${services}"
+    - name: Update services
+      shell: bash
+      run: |
+        services=${{ steps.services.outputs.services }}
+        echo "### :rocket: Updated services (dry-run=${{ inputs.dry_run}})" >> $GITHUB_STEP_SUMMARY
+        for service in ${services[@]}
+        do
+          echo "::group::Updating ${service}"
+          command="aws ecs update-service --cluster ${{ inputs.env_name }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
+          if [ ${{ inputs.dry_run }} == "false" ];
+          then
+            $command
+          else
+            echo "[dry-run] $command"
+          fi
+          echo "* ${service}" >> $GITHUB_STEP_SUMMARY
+          echo "::endgroup::"
+        done
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        AWS_SESSION_TOKEN: ${{ inputs.aws_session_token }}
