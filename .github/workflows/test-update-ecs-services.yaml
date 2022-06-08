@@ -19,7 +19,7 @@ jobs:
           echo $AWS_SESSION_TOKEN
           # IF...
       - name: Do a dry-run
-        uses: ./actions/update-tse-fargate-instance
+        uses: ./actions/update-ecs-services
         with:
           aws_access_key_id: "ACCESS_KEY"
           aws_secret_access_key: "SECRET_KEY"
