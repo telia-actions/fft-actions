@@ -17,15 +17,19 @@ inputs:
   dry_run:
     required: false
     default: false
+env:
+  AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+  AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+  AWS_SESSION_TOKEN: ${{ inputs.aws_session_token }}
 runs:
   using: composite
   steps:
-    - name: Set environment
+    - name: Checking env
       shell: bash
       run: |
-        echo "AWS_ACCESS_KEY_ID=${{ inputs.aws_access_key_id }}" >> $GITHUB_ENV
-        echo "AWS_SECRET_ACCESS_KEY=${{ inputs.aws_secret_access_key }}" >> $GITHUB_ENV
-        echo "AWS_SESSION_TOKEN=${{ inputs.aws_session_token }}" >> $GITHUB_ENV
+        echo $AWS_ACCESS_KEY_ID
+        echo $AWS_SECRET_ACCESS_KEY
+        echo $AWS_SESSION_TOKEN
     - name: Dry-run
       if: inputs.dry_run != 'false'
       shell: bash
@@ -45,7 +49,3 @@ runs:
         # for service_name in service_names {
         #  aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service ${{ service_name }} --force-new-deployment --region ${{ inputs.region}}
         #}
-      env:
-        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        AWS_SESSION_TOKEN: ${{ inputs.aws_session_token }}
