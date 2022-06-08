@@ -2913,8 +2913,8 @@ function uploadImages({ apps, localTag, remoteTag, registryUrl, actionIfMissing 
             };
             yield (0, exec_1.exec)("docker", ["images", "-q", imageName], options);
             if (imageId !== "") {
-                yield (0, exec_1.exec)("docker", ["tag", imageName, `${registryUrl}/${name}:${remoteTag}`]);
-                yield (0, exec_1.exec)("docker", ["push", `${registryUrl}/${name}:${remoteTag}`]);
+                yield (0, exec_1.exec)("docker", ["tag", imageName, `${registryUrl}/${app}:${remoteTag}`]);
+                yield (0, exec_1.exec)("docker", ["push", `${registryUrl}/${app}:${remoteTag}`]);
             }
             else {
                 switch (actionIfMissing) {
