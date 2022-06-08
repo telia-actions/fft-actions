@@ -24,10 +24,12 @@ runs:
       id: services
       shell: bash
       run: |
+        echo "::group::Parse inputs"
         inputs='${{inputs.service_names}}'
         pattern="[,[\]\n]"
         services="(${inputs//${pattern}/})"
         echo "::set-output name=services::${services}"
+        echo "::endgroup::"
     - name: Update services
       shell: bash
       run: |
@@ -35,7 +37,7 @@ runs:
         echo "### :rocket: Updated services (dry-run=${{ inputs.dry_run}})" >> $GITHUB_STEP_SUMMARY
         for service in ${services[@]}
         do
-          echo "Updating service: ${service}"
+          echo "::group::Updating service: ${service}"
           command="aws ecs update-service --cluster ${{ inputs.env_name }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
           if [ ${{ inputs.dry_run }} == "false" ];
           then
@@ -43,7 +45,8 @@ runs:
           else
             echo "[dry-run] $command"
           fi
-            echo "* ${service}" >> $GITHUB_STEP_SUMMARY
+          echo "* ${service}" >> $GITHUB_STEP_SUMMARY
+          echo "::endgroup::"
         done
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
