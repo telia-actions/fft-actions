@@ -21,11 +21,3 @@ jobs:
           env_name: "environment"
           service_names: '["service-1", "service-2"]'
           dry_run: true
-      - name: Do a "real" run (but the services don't exist and we have no credentials)
-        uses: ./actions/update-ecs-services
-        with:
-          aws_access_key_id: "ACCESS_KEY"
-          aws_secret_access_key: "SECRET_KEY"
-          aws_session_token: "SESSION"
-          env_name: "environment"
-          service_names: '["service-1", "service-2"]'

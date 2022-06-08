@@ -24,12 +24,10 @@ runs:
       id: services
       shell: bash
       run: |
-        echo "::group::Parse inputs"
         inputs='${{inputs.service_names}}'
         pattern="[,[\]\n]"
         services="(${inputs//${pattern}/})"
         echo "::set-output name=services::${services}"
-        echo "::endgroup::"
     - name: Update services
       shell: bash
       run: |
