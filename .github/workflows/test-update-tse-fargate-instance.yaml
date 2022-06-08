@@ -38,7 +38,7 @@ jobs:
           aws_secret_access_key: "SECRET_KEY"
           aws_session_token: "SESSION"
           env_name: "environment"
-          service_names: ${{ toJson(["service-1", "service-2"]) }}
+          service_names: '["service-1", "service-2"]'
       - name: Check if credentials have leaked (2)
         shell: bash
         run: |
