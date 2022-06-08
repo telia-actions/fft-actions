@@ -11,6 +11,9 @@ inputs:
     required: true
   service_names:
     required: true
+    description: |
+      A stringified (JSON) array of service names.
+      If you are passing a literal array in YAML, make sure to add quotes so that it is actually a string.
   region:
     required: false
     default: eu-north-1
