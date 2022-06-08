@@ -24,9 +24,9 @@ runs:
       id: services
       shell: bash
       run: |
-        echo $INPUT_SERVICE_NAMES
+        echo $INPUTS_SERVICE_NAMES
         pattern="[,[\]\n]"
-        services="(${INPUT_SERVICE_NAMES//${pattern}/})"
+        services="(${INPUTS_SERVICE_NAMES//${pattern}/})"
         echo "::set-output name=services::${services}"
     - name: Dry-run
       if: inputs.dry_run != 'false'
