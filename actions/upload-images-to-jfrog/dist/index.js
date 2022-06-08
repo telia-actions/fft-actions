@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 241:
+/***/ 351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -135,7 +135,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
-const command_1 = __nccwpck_require__(241);
+const command_1 = __nccwpck_require__(351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(278);
 const os = __importStar(__nccwpck_require__(37));
@@ -748,7 +748,7 @@ const os = __importStar(__nccwpck_require__(37));
 const events = __importStar(__nccwpck_require__(361));
 const child = __importStar(__nccwpck_require__(81));
 const path = __importStar(__nccwpck_require__(17));
-const io = __importStar(__nccwpck_require__(351));
+const io = __importStar(__nccwpck_require__(436));
 const ioUtil = __importStar(__nccwpck_require__(962));
 const timers_1 = __nccwpck_require__(512);
 /* eslint-disable @typescript-eslint/unbound-method */
@@ -2194,7 +2194,7 @@ exports.getCmdPath = getCmdPath;
 
 /***/ }),
 
-/***/ 351:
+/***/ 436:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -2838,44 +2838,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
-const exec_1 = __nccwpck_require__(514);
 const core_1 = __nccwpck_require__(186);
-const get_inputs_1 = __nccwpck_require__(967);
+const lib_1 = __nccwpck_require__(791);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { apps, remoteTag, localTag, registryUrl, actionIfMissing } = (0, get_inputs_1.getInputs)();
-            for (const app of apps) {
-                const name = app.name;
-                const imageName = `${name}:${localTag}`;
-                let imageId = "";
-                const options = {
-                    listeners: {
-                        stdout: (data) => {
-                            imageId += data.toString();
-                        }
-                    }
-                };
-                yield (0, exec_1.exec)("docker", ["images", "-q", imageName], options);
-                if (imageId !== "") {
-                    yield (0, exec_1.exec)("docker", ["tag", imageName, `${registryUrl}/${name}:${remoteTag}`]);
-                    yield (0, exec_1.exec)("docker", ["push", `${registryUrl}/${name}:${remoteTag}`]);
-                }
-                else {
-                    switch (actionIfMissing) {
-                        case "warning":
-                            // code block
-                            (0, core_1.warning)(`${app.name} image is not created`);
-                            break;
-                        case "error":
-                            // code block
-                            (0, core_1.error)(`${app.name} image is not created`);
-                            break;
-                        default:
-                        // code block
-                    }
-                }
-            }
+            const apps = JSON.parse((0, core_1.getInput)('apps'));
+            const remoteTag = (0, core_1.getInput)('remoteTag');
+            const localTag = (0, core_1.getInput)('localTag');
+            const registryUrl = (0, core_1.getInput)('registryUrl');
+            const actionIfMissing = (0, core_1.getInput)('actionIfMissing');
+            yield (0, lib_1.uploadImages)({ apps, localTag, remoteTag, registryUrl, actionIfMissing });
         }
         catch (error) {
             (0, core_1.setFailed)(error);
@@ -2887,29 +2860,78 @@ exports.run = run;
 
 /***/ }),
 
-/***/ 967:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ 791:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getInputs = void 0;
+__exportStar(__nccwpck_require__(946), exports);
+
+
+/***/ }),
+
+/***/ 946:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.uploadImages = void 0;
+const exec_1 = __nccwpck_require__(514);
 const core_1 = __nccwpck_require__(186);
-function getInputs() {
-    const apps = JSON.parse((0, core_1.getInput)('apps'));
-    const remoteTag = (0, core_1.getInput)('remoteTag');
-    const localTag = (0, core_1.getInput)('localTag');
-    const registryUrl = (0, core_1.getInput)('registryUrl');
-    const actionIfMissing = (0, core_1.getInput)('actionIfMissing');
-    return {
-        apps,
-        remoteTag,
-        localTag,
-        registryUrl,
-        actionIfMissing,
-    };
+function uploadImages({ apps, localTag, remoteTag, registryUrl, actionIfMissing }) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const app of apps) {
+            const name = app.name;
+            const imageName = `${name}:${localTag}`;
+            let imageId = "";
+            const options = {
+                listeners: {
+                    stdout: (data) => {
+                        imageId += data.toString();
+                    }
+                }
+            };
+            yield (0, exec_1.exec)("docker", ["images", "-q", imageName], options);
+            if (imageId !== "") {
+                yield (0, exec_1.exec)("docker", ["tag", imageName, `${registryUrl}/${name}:${remoteTag}`]);
+                yield (0, exec_1.exec)("docker", ["push", `${registryUrl}/${name}:${remoteTag}`]);
+            }
+            else {
+                switch (actionIfMissing) {
+                    case "warning":
+                        (0, core_1.warning)(`${app.name} image is not created`);
+                        break;
+                    case "error":
+                        (0, core_1.error)(`${app.name} image is not created`);
+                        break;
+                    default:
+                }
+            }
+        }
+    });
 }
-exports.getInputs = getInputs;
+exports.uploadImages = uploadImages;
 
 
 /***/ }),
