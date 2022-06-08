@@ -2844,10 +2844,10 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const apps = JSON.parse((0, core_1.getInput)('apps'));
-            const remoteTag = (0, core_1.getInput)('remoteTag');
-            const localTag = (0, core_1.getInput)('localTag');
-            const registryUrl = (0, core_1.getInput)('registryUrl');
-            const actionIfMissing = (0, core_1.getInput)('actionIfMissing');
+            const remoteTag = (0, core_1.getInput)('remote-tag');
+            const localTag = (0, core_1.getInput)('local-tag');
+            const registryUrl = (0, core_1.getInput)('registry-url');
+            const actionIfMissing = (0, core_1.getInput)('action-if-missing');
             yield (0, lib_1.uploadImages)({ apps, localTag, remoteTag, registryUrl, actionIfMissing });
         }
         catch (error) {
@@ -2902,8 +2902,7 @@ const core_1 = __nccwpck_require__(186);
 function uploadImages({ apps, localTag, remoteTag, registryUrl, actionIfMissing }) {
     return __awaiter(this, void 0, void 0, function* () {
         for (const app of apps) {
-            const name = app.name;
-            const imageName = `${name}:${localTag}`;
+            const imageName = `${app}:${localTag}`;
             let imageId = "";
             const options = {
                 listeners: {
@@ -2920,10 +2919,10 @@ function uploadImages({ apps, localTag, remoteTag, registryUrl, actionIfMissing 
             else {
                 switch (actionIfMissing) {
                     case "warning":
-                        (0, core_1.warning)(`${app.name} image is not created`);
+                        (0, core_1.warning)(`${app} image is not created`);
                         break;
                     case "error":
-                        (0, core_1.error)(`${app.name} image is not created`);
+                        (0, core_1.error)(`${app} image is not created`);
                         break;
                     default:
                 }
