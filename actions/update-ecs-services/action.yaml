@@ -28,35 +28,22 @@ runs:
         pattern="[,[\]\n]"
         services="(${inputs//${pattern}/})"
         echo "::set-output name=services::${services}"
-    - name: Dry-run
+    - name: Update services
       if: inputs.dry_run != 'false'
       shell: bash
       run: |
-        echo "Updating images:"
-        echo "(Dry-run because inputs.dry_run is not false)"
-        echo "//${{ inputs.service_names }}//"
-        echo "//${{ steps.services.outputs.services }}//"
         services=${{ steps.services.outputs.services }}
-        echo "$services"
         for service in ${services[@]}
         do
           echo "Updating service: ${service}"
+          command="aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
+          if [ dry_run ? ];
+          then
+            echo "[dry-run] $command"
+          else
+            echo $(command)
+          fi
         done
-        # aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service <service_name> --force-new-deployment --region ${{ inputs.region}}
-      env:
-        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
-        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
-        AWS_SESSION_TOKEN: ${{ inputs.aws_session_token }}
-    - name: Update
-      if: inputs.dry_run == 'false'
-      shell: bash
-      run: |
-        echo "Updating images:"
-        echo "//${{ inputs.service_names }}//"
-        echo "//${{ steps.services.outputs.services }}//"
-        # for service_name in service_names {
-        #  aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service < service_name > --force-new-deployment --region ${{ inputs.region}}
-        #}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
