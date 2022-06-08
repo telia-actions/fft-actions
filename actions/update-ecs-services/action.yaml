@@ -29,7 +29,6 @@ runs:
         services="(${inputs//${pattern}/})"
         echo "::set-output name=services::${services}"
     - name: Update services
-      if: inputs.dry_run != 'false'
       shell: bash
       run: |
         services=${{ steps.services.outputs.services }}
@@ -37,11 +36,11 @@ runs:
         do
           echo "Updating service: ${service}"
           command="aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
-          if [ dry_run ? ];
+          if [ ${{ inputs.dry_run }} == "false" ];
           then
-            echo "[dry-run] $command"
-          else
             echo $(command)
+          else
+            echo "[dry-run] $command"
           fi
         done
       env:
