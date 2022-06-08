@@ -1,0 +1,48 @@
+name: ECS service update / Tests
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - actions/update-tse-fargate-instance/*
+      - tests/update-tse-fargate-instance/*
+      - .github/workflows/test-update-tse-fargate-instance.yaml
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - name: Check that credentials are empty
+        run: |
+          echo $AWS_ACCESS_KEY_ID
+          echo $AWS_SECRET_ACCESS_KEY
+          echo $AWS_SESSION_TOKEN
+          # IF...
+      - name: Do a dry-run with old inputs
+        uses: ./actions/update-tse-fargate-instance
+        with:
+          awsAccsessKeyId: "ACCESS_KEY"
+          awsSecretAccessKey: "SECRET_KEY"
+          awsSessionToken: "SESSION"
+          envName: "environment"
+      - name: Check if credentials have leaked (1)
+        run: |
+          echo $AWS_ACCESS_KEY_ID
+          echo $AWS_SECRET_ACCESS_KEY
+          echo $AWS_SESSION_TOKEN
+          # IF...
+      - name: Do a dry-run with new inputs
+        uses: ./actions/update-tse-fargate-instance
+        with:
+          aws_access_key_id: "ACCESS_KEY"
+          aws_secret_access_key: "SECRET_KEY"
+          aws_session_token: "SESSION"
+          env_name: "environment"
+          service_names: ["service-1", "service-2"]
+      - name: Check if credentials have leaked (2)
+        run: |
+          echo $AWS_ACCESS_KEY_ID
+          echo $AWS_SECRET_ACCESS_KEY
+          echo $AWS_SESSION_TOKEN
+          # IF...
