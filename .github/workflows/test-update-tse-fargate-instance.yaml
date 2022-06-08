@@ -3,8 +3,7 @@ on:
   pull_request:
     types: [opened, synchronize]
     paths:
-      - actions/update-tse-fargate-instance/*
-      - tests/update-tse-fargate-instance/*
+      - actions/update-tse-fargate-instance/**
       - .github/workflows/test-update-tse-fargate-instance.yaml
   workflow_dispatch:
 jobs:
@@ -39,8 +38,9 @@ jobs:
           aws_secret_access_key: "SECRET_KEY"
           aws_session_token: "SESSION"
           env_name: "environment"
-          service_names: ["service-1", "service-2"]
+          service_names: ${{ toJson(["service-1", "service-2"]) }}
       - name: Check if credentials have leaked (2)
+        shell: bash
         run: |
           echo $AWS_ACCESS_KEY_ID
           echo $AWS_SECRET_ACCESS_KEY
