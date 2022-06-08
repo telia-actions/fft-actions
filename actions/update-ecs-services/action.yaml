@@ -54,7 +54,7 @@ runs:
         echo "//${{ inputs.service_names }}//"
         echo "//${{ steps.services.outputs.services }}//"
         # for service_name in service_names {
-        #  aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service ${{ service_name }} --force-new-deployment --region ${{ inputs.region}}
+        #  aws ecs update-service --cluster ${{ inputs.envName }}-cluster --service < service_name > --force-new-deployment --region ${{ inputs.region}}
         #}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
