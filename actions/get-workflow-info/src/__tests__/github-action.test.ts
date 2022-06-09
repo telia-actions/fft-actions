@@ -22,7 +22,7 @@ describe('github action', () => {
             when(getInputSpy)
                 .calledWith('token')
                 .mockReturnValue(mockedToken)
-                .calledWith('fail_if_absent')
+                .calledWith('fail-if-absent')
                 .mockReturnValue(mockedFailIfAbsentCorrect)
 
             jest.spyOn(workflowInfo, 'getWorkflowInfo').mockResolvedValue(mockedWorkflowInfo);
@@ -37,7 +37,7 @@ describe('github action', () => {
         });
     });
     describe('given that error occurs', () => {
-        it('should display error message when fail_if_absent keys are not present in workflowInfo Json', async () => {
+        it('should display error message when fail-if-absent keys are not present in workflowInfo Json', async () => {
             const mockedError = "newAttribute key does not exists in workflowInfo";
 
             const getInputSpy = jest.spyOn(actionsCore, 'getInput');
@@ -47,7 +47,7 @@ describe('github action', () => {
             when(getInputSpy)
                 .calledWith('token')
                 .mockReturnValue(mockedToken)
-                .calledWith('fail_if_absent')
+                .calledWith('fail-if-absent')
                 .mockReturnValue(mockedFailIfAbsent)
 
             jest.spyOn(workflowInfo, 'getWorkflowInfo').mockResolvedValue(mockedWorkflowInfo)

@@ -1567,8 +1567,8 @@ const core_1 = __webpack_require__(186);
 const json_client_1 = __webpack_require__(434);
 const run = () => {
     try {
-        const appName = core_1.getInput('appName');
-        const configDir = core_1.getInput('configDir');
+        const appName = core_1.getInput('app-name');
+        const configDir = core_1.getInput('config-dir');
         const environment = core_1.getInput('environment');
         const configFilePath = `${configDir}/${environment}.json`;
         const environmentConfig = json_client_1.readJsonWithComments(configFilePath);

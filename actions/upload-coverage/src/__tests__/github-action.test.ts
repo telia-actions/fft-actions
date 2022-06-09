@@ -27,13 +27,13 @@ describe('github action', () => {
 
   beforeEach(() => {
     when(getInputSpy)
-      .calledWith('rushProjects')
+      .calledWith('rush-projects')
       .mockReturnValue(JSON.stringify(rushProjects))
       .calledWith('region')
       .mockReturnValue(region)
-      .calledWith('secretArn')
+      .calledWith('secret-arn')
       .mockReturnValue(secretArn)
-      .calledWith('resourceArn')
+      .calledWith('resource-arn')
       .mockReturnValue(resourceArn)
       .calledWith('database')
       .mockReturnValue(database)
@@ -46,11 +46,11 @@ describe('github action', () => {
 
     expect(getInputSpy).toHaveBeenCalledTimes(6);
     expect(getInputSpy).toHaveBeenCalledWith('region');
-    expect(getInputSpy).toHaveBeenCalledWith('secretArn');
-    expect(getInputSpy).toHaveBeenCalledWith('resourceArn');
+    expect(getInputSpy).toHaveBeenCalledWith('secret-arn');
+    expect(getInputSpy).toHaveBeenCalledWith('resource-arn');
     expect(getInputSpy).toHaveBeenCalledWith('database');
     expect(getInputSpy).toHaveBeenCalledWith('table');
-    expect(getInputSpy).toHaveBeenCalledWith('rushProjects');
+    expect(getInputSpy).toHaveBeenCalledWith('rush-projects');
 
     expect(writeCoverageToRdsSpy).toHaveBeenCalledTimes(1);
     expect(writeCoverageToRdsSpy).toHaveBeenCalledWith({

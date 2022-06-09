@@ -1,17 +1,17 @@
 name: Upload coverage
 description: Collect and upload test coverage data
 inputs:
-  rushProjects:
+  rush-projects:
     description: A JSON array of { packageName, projectFolder } objects to collect coverage from
     required: true
   region:
     description: AWS region
     required: false
     default: eu-west-1
-  secretArn:
+  secret-arn:
     description: AWS secret arn
     required: true
-  resourceArn:
+  resource-arn:
     description: AWS RDS cluster arn
     required: true
   database:

@@ -1,14 +1,14 @@
 name: "rush publish"
 inputs:
-  authorName:
+  author-name:
     required: true
-  authorEmail:
+  author-email:
     required: true
-  npmUsername:
+  npm-username:
     required: true
-  npmPassword:
+  npm-password:
     required: true
-  targetBranch:
+  target-branch:
     required: false
     default: main
 runs:
@@ -16,16 +16,16 @@ runs:
   steps:
     - name: Setup git user
       run: |
-        git config --local user.name "${{ inputs.authorName }}"
-        git config --local user.email "${{ inputs.authorEmail }}"
+        git config --local user.name "${{ inputs.author-name }}"
+        git config --local user.email "${{ inputs.author-email }}"
       shell: bash
     - name: Get npm auth
       id: npm_auth
-      run: echo "::set-output name=token::$(echo ${{ inputs.npmUsername }}:${{ inputs.npmPassword }} | base64 -w 0)"
+      run: echo "::set-output name=token::$(echo ${{ inputs.npm-username }}:${{ inputs.npm-password }} | base64 -w 0)"
       shell: bash
     - name: Publish
       run: |
-        node common/scripts/install-run-rush.js version --bump --target-branch ${{ inputs.targetBranch }}
+        node common/scripts/install-run-rush.js version --bump --target-branch ${{ inputs.target-branch }}
         node common/scripts/install-run-rush.js publish --publish --include-all
       shell: bash
       env:
