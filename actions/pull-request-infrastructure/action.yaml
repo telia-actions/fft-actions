@@ -94,7 +94,7 @@ runs:
       with:
         githubComment: "Pull request environment has been created - [${{ steps.setup-tse-env.outputs.domain_name }}](https://${{ steps.setup-tse-env.outputs.domain_name }})"
         githubToken: ${{ inputs.git_token }}
-        prNumber: ${{ steps.variables.outputs.pr_number }}
+        prNumber: ${{ inputs.pr_number }}
         slackMessage: "Pull request environment has been created - ${{ steps.setup-tse-env.outputs.domain_name }}"
         slackToken: ${{ inputs.slack_token }}
     - name: Add annotation
