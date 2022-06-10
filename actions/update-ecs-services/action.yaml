@@ -30,7 +30,7 @@ runs:
         inputs='${{inputs.service-names}}'
         pattern="[[\]\n]"
         services="(${inputs//${pattern}/})"
-        IFS=',' read -a servicesArray <<< $services
+        IFS=',' read -ra servicesArray <<< $services
         echo "::set-output name=services::${servicesArray}"
     - name: Update services
       shell: bash
@@ -38,6 +38,7 @@ runs:
         services=${{ steps.services.outputs.services }}
         echo "### :rocket: Updated services (dry-run=${{ inputs.dry-run}})" >> $GITHUB_STEP_SUMMARY
 
+        
         for service in ${services[@]}
         do
           echo "::group::Updating ${service}"

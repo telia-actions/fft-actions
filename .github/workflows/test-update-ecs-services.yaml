@@ -15,9 +15,9 @@ jobs:
       - name: Do a dry-run
         uses: ./actions/update-ecs-services
         with:
-          aws_access_key_id: "ACCESS_KEY"
-          aws_secret_access_key: "SECRET_KEY"
-          aws_session_token: "SESSION"
-          env_name: "environment"
-          service_names: '["service-1", "service-2"]'
-          dry_run: true
+          aws-access-key-d: "ACCESS_KEY"
+          aws-secret-access_key: "SECRET_KEY"
+          aws-session-token: "SESSION"
+          env-name: "environment"
+          service-names: '["service-1", "service-2"]'
+          dry-run: true
