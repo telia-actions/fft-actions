@@ -10,7 +10,7 @@ inputs:
   repository:
     description: Repository, e.g. 'teliasaurus'
     default: ${{ github.event.repository.name }}
-  pullRequestNumber:
+  pull-request-number:
     description: Pull request number
     default: ${{ github.event.number }}
 runs:

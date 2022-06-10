@@ -6,7 +6,7 @@ export const run = async (): Promise<void> => {
     const token = getInput('token');
     const owner = getInput('owner');
     const repository = getInput('repository');
-    const pullRequestNumber = getInput('pullRequestNumber');
+    const pullRequestNumber = getInput('pull-request-number');
 
     await validatePrTitle({
       token,

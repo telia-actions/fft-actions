@@ -25237,11 +25237,11 @@ const write_coverage_to_rds_1 = __webpack_require__(1184);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const region = core_1.getInput('region');
-        const secretArn = core_1.getInput('secretArn');
-        const resourceArn = core_1.getInput('resourceArn');
+        const secretArn = core_1.getInput('secret-arn');
+        const resourceArn = core_1.getInput('resource-arn');
         const database = core_1.getInput('database');
         const table = core_1.getInput('table');
-        const rushProjectsInput = core_1.getInput('rushProjects');
+        const rushProjectsInput = core_1.getInput('rush-projects');
         const rushProjects = JSON.parse(rushProjectsInput);
         yield write_coverage_to_rds_1.writeCoverageToRds({
             database,

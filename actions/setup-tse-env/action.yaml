@@ -1,20 +1,20 @@
 name: "setup tse env"
 description: Github action to setup tse environment infrastructure
 inputs:
-  applyChanges:
+  apply-changes:
     description: Should changes be applied, aletnatively dry-run
     required: false
-  awsAccsessKeyId:
+  aws-accsess-key-id:
     required: true
-  awsSecretAccessKey:
+  aws-secret-access-key:
     required: true
-  awsSessionToken:
+  aws-session-token:
     required: true
-  envName:
+  env-name:
     required: true
-  gitToken:
+  git-token:
     required: true
-  terraformParameters:
+  terraform-parameters:
     description: Additional terraform parameters
     required: true
   type:
@@ -29,9 +29,9 @@ runs:
     - name: Set env vars
       shell: bash
       run: |
-        echo "AWS_ACCESS_KEY_ID=${{ inputs.awsAccsessKeyId }}" >> $GITHUB_ENV
-        echo "AWS_SECRET_ACCESS_KEY=${{ inputs.awsSecretAccessKey }}" >> $GITHUB_ENV
-        echo "AWS_SESSION_TOKEN=${{ inputs.awsSessionToken }}" >> $GITHUB_ENV
+        echo "AWS_ACCESS_KEY_ID=${{ inputs.aws-accsess-key-id }}" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=${{ inputs.aws-secret-access-key }}" >> $GITHUB_ENV
+        echo "AWS_SESSION_TOKEN=${{ inputs.aws-session-token }}" >> $GITHUB_ENV
     - name: Variables
       shell: bash
       id: variables
@@ -39,30 +39,30 @@ runs:
     - name: Checkout repository code
       uses: actions/checkout@v2
       with:
-        token: ${{ inputs.gitToken }}
+        token: ${{ inputs.git-token }}
         repository: telia-company/fft-aws-infrastructure
         path: fft-aws-infrastructure
     - name: Copy config
-      run: mv ${{ inputs.terraformParameters }} ${{ steps.variables.outputs.terraform_working_dir }}
+      run: mv ${{ inputs.terraform-parameters }} ${{ steps.variables.outputs.terraform_working_dir }}
       shell: bash
     - name: Terraform Init
-      run: terraform init -backend-config="key=pipeline/tse/${{ inputs.type }}/${{ inputs.envName }}.tfstate"
+      run: terraform init -backend-config="key=pipeline/tse/${{ inputs.type }}/${{ inputs.env-name }}.tfstate"
       shell: bash
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
     - name: Terraform plan
       env:
-        TF_VAR_env_name: ${{ inputs.envName }}
-      run: terraform plan -var-file="${{ inputs.terraformParameters }}" -out plan
+        TF_VAR_env_name: ${{ inputs.env-name }}
+      run: terraform plan -var-file="${{ inputs.terraform-parameters }}" -out plan
       shell: bash
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
     - name: Terraform Apply
-      if: ${{ inputs.applyChanges == 'true' }}
+      if: ${{ inputs.apply-changes == 'true' }}
       run: terraform apply -auto-approve "plan"
       shell: bash
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}
     - name: Terraform output
       id: terraform_output
-      if: ${{ inputs.applyChanges == 'true' }}
+      if: ${{ inputs.apply-changes == 'true' }}
       run: echo "::set-output name=domain_name::$(terraform output -raw domain_name)"
       shell: bash
       working-directory: ${{ steps.variables.outputs.terraform_working_dir }}

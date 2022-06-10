@@ -8369,7 +8369,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const token = core_1.getInput('token');
         const owner = core_1.getInput('owner');
         const repository = core_1.getInput('repository');
-        const pullRequestNumber = core_1.getInput('pullRequestNumber');
+        const pullRequestNumber = core_1.getInput('pull-request-number');
         yield validate_pr_title_1.validatePrTitle({
             token,
             owner,

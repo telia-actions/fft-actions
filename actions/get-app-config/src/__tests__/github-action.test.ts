@@ -19,9 +19,9 @@ describe('github action', () => {
 
   beforeEach(() => {
     when(getInputSpy)
-      .calledWith('appName')
+      .calledWith('app-name')
       .mockReturnValue(appName)
-      .calledWith('configDir')
+      .calledWith('config-dir')
       .mockReturnValue(configDir)
       .calledWith('environment')
       .mockReturnValue(environment);
@@ -38,8 +38,8 @@ describe('github action', () => {
     expect(readJsonWithCommentsSpy).toHaveBeenCalledWith(configFilePath);
 
     expect(getInputSpy).toHaveBeenCalledTimes(3);
-    expect(getInputSpy).toHaveBeenCalledWith('appName');
-    expect(getInputSpy).toHaveBeenCalledWith('configDir');
+    expect(getInputSpy).toHaveBeenCalledWith('app-name');
+    expect(getInputSpy).toHaveBeenCalledWith('config-dir');
     expect(getInputSpy).toHaveBeenCalledWith('environment');
 
     expect(setOutputSpy).toHaveBeenCalledTimes(1);
