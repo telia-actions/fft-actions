@@ -5,11 +5,11 @@ import { writeCoverageToRds } from '@src/lib/write-coverage-to-rds';
 export const run = async (): Promise<void> => {
   try {
     const region = getInput('region');
-    const secretArn = getInput('secretArn');
-    const resourceArn = getInput('resourceArn');
+    const secretArn = getInput('secret-arn');
+    const resourceArn = getInput('resource-arn');
     const database = getInput('database');
     const table = getInput('table');
-    const rushProjectsInput = getInput('rushProjects');
+    const rushProjectsInput = getInput('rush-projects');
     const rushProjects: RushPackage[] = JSON.parse(rushProjectsInput);
 
     await writeCoverageToRds({

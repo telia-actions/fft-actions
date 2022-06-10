@@ -4,7 +4,7 @@ import { getWorkflowInfo } from '@src/libs/workflow-info';
 export const run = async (): Promise<void> => {
   try {
     const token = getInput('token');
-    const fail_if_absent = getInput('fail_if_absent');
+    const fail_if_absent = getInput('fail-if-absent');
 
     const workflowInfo = await getWorkflowInfo(token);
 

@@ -9587,7 +9587,7 @@ const workflow_info_1 = __nccwpck_require__(4381);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (0, core_1.getInput)('token');
-        const fail_if_absent = (0, core_1.getInput)('fail_if_absent');
+        const fail_if_absent = (0, core_1.getInput)('fail-if-absent');
         const workflowInfo = yield (0, workflow_info_1.getWorkflowInfo)(token);
         for (const it of JSON.parse(fail_if_absent)) {
             if (!(it in workflowInfo)) {

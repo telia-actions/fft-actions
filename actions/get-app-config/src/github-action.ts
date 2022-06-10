@@ -4,8 +4,8 @@ import { readJsonWithComments } from '@src/util/json-client';
 
 export const run = (): void => {
   try {
-    const appName = getInput('appName');
-    const configDir = getInput('configDir');
+    const appName = getInput('app-name');
+    const configDir = getInput('config-dir');
     const environment = getInput('environment');
 
     const configFilePath = `${configDir}/${environment}.json`;

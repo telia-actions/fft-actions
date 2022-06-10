@@ -24,7 +24,7 @@ describe('github action', () => {
       .mockReturnValue(owner)
       .calledWith('repository')
       .mockReturnValue(repository)
-      .calledWith('pullRequestNumber')
+      .calledWith('pull-request-number')
       .mockReturnValue(pullRequestNumber);
   });
 
@@ -35,7 +35,7 @@ describe('github action', () => {
     expect(getInputSpy).toHaveBeenCalledWith('token');
     expect(getInputSpy).toHaveBeenCalledWith('owner');
     expect(getInputSpy).toHaveBeenCalledWith('repository');
-    expect(getInputSpy).toHaveBeenCalledWith('pullRequestNumber');
+    expect(getInputSpy).toHaveBeenCalledWith('pull-request-number');
 
     expect(validatePrTitleSpy).toHaveBeenCalledTimes(1);
     expect(validatePrTitleSpy).toHaveBeenCalledWith({

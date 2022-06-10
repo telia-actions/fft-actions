@@ -5,13 +5,13 @@ inputs:
     description: Github token
     required: false
     default: ${{ github.token }}
-  fail_if_absent:
-    description: Fail if any key in "fail_if_absent" is missing.from the workflow info JSON
+  fail-if-absent:
+    description: Fail if any key in "fail-if-absent" is missing.from the workflow info JSON
     required: false
 outputs:
   environment:
     description: environment
-  author_email:
+  author-email:
     description: author_email
 runs:
   using: node16
