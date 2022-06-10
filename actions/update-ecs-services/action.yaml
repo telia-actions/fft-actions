@@ -31,7 +31,7 @@ runs:
         patternBrackets="[[\]\n]"
         patternComma="[,]"
         services="(${inputs//${patternBrackets}/})"
-        servicesArray="(${$services//${patternComma}/ /})"
+        servicesArray="(${services//${patternComma}/ /})"
         
         echo "::set-output name=services::${servicesArray}"
     - name: Update services
