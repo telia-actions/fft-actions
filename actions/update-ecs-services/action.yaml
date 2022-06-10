@@ -30,15 +30,15 @@ runs:
         inputs='${{inputs.service-names}}'
         pattern="[[\]\n]"
         services="(${inputs//${pattern}/})"
-        echo "::set-output name=services::${services}"
+        IFS=',' read -a servicesArray <<< $services
+        echo "::set-output name=services::${servicesArray}"
     - name: Update services
       shell: bash
       run: |
         services=${{ steps.services.outputs.services }}
         echo "### :rocket: Updated services (dry-run=${{ inputs.dry-run}})" >> $GITHUB_STEP_SUMMARY
 
-        IFS=',' read -ra servicesArray <<< $services
-        for service in ${servicesArray[@]}
+        for service in ${services[@]}
         do
           echo "::group::Updating ${service}"
           command="aws ecs update-service --cluster ${{ inputs.env-name }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
