@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Get tag
         id: tag
-        uses: telia-actions/fft-actions/actions/get-deploy-tag@main
+        uses: telia-actions/fft-actions/actions/get-deploy-tag@f159d20f61878cb220b514e9a585838df28b9487
         with:
           deploy_environment: dev
           pr_number: ${{ github.event.number }}
