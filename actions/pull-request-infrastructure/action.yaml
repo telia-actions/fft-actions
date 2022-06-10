@@ -37,10 +37,10 @@ runs:
       with:
         node-version: 14
     - name: Setup Rush
-      uses: telia-actions/fft-actions/actions/setup-rush@f159d20f61878cb220b514e9a585838df28b9487
+      uses: telia-actions/fft-actions/actions/setup-rush@main
     - name: Get config
       id: config
-      uses: telia-actions/fft-actions/actions/get-app-config@f159d20f61878cb220b514e9a585838df28b9487
+      uses: telia-actions/fft-actions/actions/get-app-config@main
       with:
         environment: pr
     - name: Show changed projects
@@ -77,7 +77,7 @@ runs:
       shell: bash
       if: steps.filtered_apps.outputs.has_changes == 'true'
       run: echo ${{ toJson(steps.filtered_apps.outputs.config) }} > config.json
-    - uses: telia-actions/fft-actions/actions/setup-tse-env@f159d20f61878cb220b514e9a585838df28b9487
+    - uses: telia-actions/fft-actions/actions/setup-tse-env@main
       if: steps.filtered_apps.outputs.has_changes == 'true'
       id: setup-tse-env
       with:
