@@ -42,14 +42,15 @@ runs:
         for service in ${services[@]}
         do
           echo "::group::Updating ${service}"
-          command="aws ecs update-service --cluster ${{ inputs.env-name }}-cluster --service ${{ inputs.env-name }}-$service --force-new-deployment --region ${{ inputs.region}}"
+          serviceName=${{ inputs.env-name }}-$service
+          command="aws ecs update-service --cluster ${{ inputs.env-name }}-cluster --service $serviceName --force-new-deployment --region ${{ inputs.region}}"
           if [ ${{ inputs.dry-run }} == "false" ];
           then
             $command
           else
             echo "[dry-run] $command"
           fi
-          echo "* ${service}" >> $GITHUB_STEP_SUMMARY
+          echo "* ${serviceName}" >> $GITHUB_STEP_SUMMARY
           echo "::endgroup::"
         done
       env:
