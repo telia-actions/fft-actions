@@ -42,7 +42,7 @@ runs:
         for service in ${services[@]}
         do
           echo "::group::Updating ${service}"
-          command="aws ecs update-service --cluster ${{ inputs.env-name }}-cluster --service $service --force-new-deployment --region ${{ inputs.region}}"
+          command="aws ecs update-service --cluster ${{ inputs.env-name }}-cluster --service ${{ inputs.env-name }}-$service --force-new-deployment --region ${{ inputs.region}}"
           if [ ${{ inputs.dry-run }} == "false" ];
           then
             $command
