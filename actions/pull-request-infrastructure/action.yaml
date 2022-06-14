@@ -42,7 +42,7 @@ runs:
       id: config
       uses: telia-actions/fft-actions/actions/get-app-config@main
       with:
-        environment: pr
+        environment: dev
     - name: Show changed projects
       shell: bash
       run: node common/scripts/install-run-rush.js --quiet list --only git:origin/main --json
