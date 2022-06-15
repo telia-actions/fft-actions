@@ -12,8 +12,8 @@ jest.mock('@src/util/npm');
 
 describe('github action', () => {
   const rushProject: ProjectInput = {
-    packageName: 'packageName1',
-    projectFolder: 'projectFolder1',
+    name: 'name1',
+    path: 'path1',
   };
 
   const files = ['file1', 'file2'];
@@ -25,23 +25,23 @@ describe('github action', () => {
   const filesToPackSpy = jest.spyOn(packlist, 'filesToPack');
 
   it('should run upload packages to AWS', async () => {
-    const s3TargetPath = 's3://' + path.join(s3Address, rushProject.packageName, '*');
+    const s3TargetPath = 's3://' + path.join(s3Address, rushProject.name, '*');
 
     filesToPackSpy.mockResolvedValue(files);
 
     await uploadPackageToAws({ rushProject, s3Address });
 
     expect(filesToPackSpy).toHaveBeenCalledTimes(1);
-    expect(filesToPackSpy).toHaveBeenCalledWith(rushProject.projectFolder);
+    expect(filesToPackSpy).toHaveBeenCalledWith(rushProject.path);
 
     expect(copyFileSpy).toHaveBeenCalledTimes(2);
     expect(copyFileSpy).toHaveBeenCalledWith(
-      path.resolve(rushProject.projectFolder, files[0]),
-      path.resolve(rushProject.projectFolder, TEMP_FOLDER, files[0])
+      path.resolve(rushProject.path, files[0]),
+      path.resolve(rushProject.path, TEMP_FOLDER, files[0])
     );
     expect(copyFileSpy).toHaveBeenCalledWith(
-      path.resolve(rushProject.projectFolder, files[1]),
-      path.resolve(rushProject.projectFolder, TEMP_FOLDER, files[1])
+      path.resolve(rushProject.path, files[1]),
+      path.resolve(rushProject.path, TEMP_FOLDER, files[1])
     );
 
     expect(execSpy).toHaveBeenCalledTimes(2);
@@ -49,11 +49,11 @@ describe('github action', () => {
       'aws',
       ['s3', 'sync', TEMP_FOLDER, s3TargetPath, '--no-progress'],
       {
-        cwd: rushProject.projectFolder,
+        cwd: rushProject.path,
       }
     );
     expect(execSpy).toHaveBeenCalledWith('rm', ['-rf', TEMP_FOLDER], {
-      cwd: rushProject.projectFolder,
+      cwd: rushProject.path,
     });
   });
 });

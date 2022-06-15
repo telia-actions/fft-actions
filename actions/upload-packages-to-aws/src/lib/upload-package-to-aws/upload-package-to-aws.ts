@@ -15,22 +15,22 @@ export async function uploadPackageToAws({
   rushProject,
   s3Address,
 }: UploadPackageToAwsInputs): Promise<void> {
-  const files = await filesToPack(rushProject.projectFolder);
+  const files = await filesToPack(rushProject.path);
 
   files.forEach((file) => {
-    const sourceFile = path.resolve(rushProject.projectFolder, file);
-    const targetFile = path.resolve(rushProject.projectFolder, TEMP_FOLDER, file);
+    const sourceFile = path.resolve(rushProject.path, file);
+    const targetFile = path.resolve(rushProject.path, TEMP_FOLDER, file);
 
     copyFile(sourceFile, targetFile);
   });
 
-  const s3TargetPath = 's3://' + path.join(s3Address, rushProject.packageName, '*');
+  const s3TargetPath = 's3://' + path.join(s3Address, rushProject.name, '*');
 
   await exec('aws', ['s3', 'sync', TEMP_FOLDER, s3TargetPath, '--no-progress'], {
-    cwd: rushProject.projectFolder,
+    cwd: rushProject.path,
   });
 
   await exec('rm', ['-rf', TEMP_FOLDER], {
-    cwd: rushProject.projectFolder,
+    cwd: rushProject.path,
   });
 }

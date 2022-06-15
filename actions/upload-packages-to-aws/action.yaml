@@ -1,7 +1,7 @@
 name: Upload Packages to S3
 inputs:
   rush-projects:
-    description: A JSON array of { packageName, projectFolder} objects to upload
+    description: A JSON array of { name, path } objects to upload
     required: true
   s3-address:
     description: bucket-name/optional/path/prefix
