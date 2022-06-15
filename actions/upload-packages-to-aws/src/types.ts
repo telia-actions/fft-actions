@@ -1,4 +1,4 @@
 export interface ProjectInput {
-  packageName: string;
-  projectFolder: string;
+  name: string;
+  path: string;
 }

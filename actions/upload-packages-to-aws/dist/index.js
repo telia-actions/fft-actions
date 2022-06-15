@@ -7412,18 +7412,18 @@ const npm_1 = __nccwpck_require__(7327);
 exports.TEMP_FOLDER = 'temp';
 function uploadPackageToAws({ rushProject, s3Address, }) {
     return __awaiter(this, void 0, void 0, function* () {
-        const files = yield (0, npm_1.filesToPack)(rushProject.projectFolder);
+        const files = yield (0, npm_1.filesToPack)(rushProject.path);
         files.forEach((file) => {
-            const sourceFile = path_1.default.resolve(rushProject.projectFolder, file);
-            const targetFile = path_1.default.resolve(rushProject.projectFolder, exports.TEMP_FOLDER, file);
+            const sourceFile = path_1.default.resolve(rushProject.path, file);
+            const targetFile = path_1.default.resolve(rushProject.path, exports.TEMP_FOLDER, file);
             (0, fs_1.copyFile)(sourceFile, targetFile);
         });
-        const s3TargetPath = 's3://' + path_1.default.join(s3Address, rushProject.packageName, '*');
+        const s3TargetPath = 's3://' + path_1.default.join(s3Address, rushProject.name, '*');
         yield (0, exec_1.exec)('aws', ['s3', 'sync', exports.TEMP_FOLDER, s3TargetPath, '--no-progress'], {
-            cwd: rushProject.projectFolder,
+            cwd: rushProject.path,
         });
         yield (0, exec_1.exec)('rm', ['-rf', exports.TEMP_FOLDER], {
-            cwd: rushProject.projectFolder,
+            cwd: rushProject.path,
         });
     });
 }
@@ -7509,8 +7509,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.filesToPack = void 0;
 const npm_packlist_1 = __importDefault(__nccwpck_require__(1933));
-function filesToPack(projectFolder) {
-    return (0, npm_packlist_1.default)({ path: projectFolder });
+function filesToPack(path) {
+    return (0, npm_packlist_1.default)({ path: path });
 }
 exports.filesToPack = filesToPack;
 

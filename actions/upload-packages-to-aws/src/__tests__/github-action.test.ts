@@ -10,12 +10,12 @@ jest.mock('@src/lib/upload-package-to-aws');
 describe('github action', () => {
   const rushProjects: ProjectInput[] = [
     {
-      packageName: 'packageName1',
-      projectFolder: 'projectFolder1',
+      name: 'name1',
+      path: 'path1',
     },
     {
-      packageName: 'packageName2',
-      projectFolder: 'projectFolder2',
+      name: 'name2',
+      path: 'path2',
     },
   ];
 
