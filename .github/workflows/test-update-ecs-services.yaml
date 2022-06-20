@@ -19,5 +19,5 @@ jobs:
           aws-secret-access-key: "SECRET_KEY"
           aws-session-token: "SESSION"
           env-name: "environment"
-          service-names: '["service-1", "service-2"]'
+          service-names: '["service-1", "service-2", "service-with-an-n"]'
           dry-run: true
