@@ -31,14 +31,10 @@ runs:
         patternBracketsAndSpace="[[\] ]"
         patternNewline=$'\n'
         patternComma=","
-        echo $inputs
         tmpBracketsAndSpace="${inputs//${patternBracketsAndSpace}/}"
-        echo $tmpBracketsAndSpace
         tmpNewline="${tmpBracketsAndSpace//${patternNewline}/}"
-        echo $tmpNewline
         servicesArray="(${tmpNewline//${patternComma}/ })"
-        echo $servicesArray
-        
+
         echo "::set-output name=services::${servicesArray}"
     - name: Update services
       shell: bash
