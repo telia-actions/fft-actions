@@ -12,12 +12,25 @@ jobs:
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v2
-      - name: Do a dry-run
+      - name: Base case
         uses: ./actions/update-ecs-services
         with:
           aws-access-key-id: "ACCESS_KEY"
           aws-secret-access-key: "SECRET_KEY"
           aws-session-token: "SESSION"
           env-name: "environment"
-          service-names: '["service-1", "service-2", "service-with-an-n"]'
+          service-names: '["service-1","service-2"]'
+          dry-run: true
+      - name: Whitespace in array and N in service names
+        uses: ./actions/update-ecs-services
+        with:
+          aws-access-key-id: "ACCESS_KEY"
+          aws-secret-access-key: "SECRET_KEY"
+          aws-session-token: "SESSION"
+          env-name: "environment"
+          service-names: |
+            [
+              "service-name-1",
+              "service-name-2"
+            ]
           dry-run: true
