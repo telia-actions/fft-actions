@@ -34,7 +34,7 @@ runs:
         echo $inputs
         tmpBracketsAndSpace="${inputs//${patternBracketsAndSpace}/}"
         echo $tmpBracketsAndSpace
-        tmpNewline="${tmpBrackets//${patternNewline}/}"
+        tmpNewline="${tmpBracketsAndSpace//${patternNewline}/}"
         echo $tmpNewline
         servicesArray="(${tmpNewline//${patternComma}/ })"
         echo $servicesArray
