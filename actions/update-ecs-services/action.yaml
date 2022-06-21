@@ -28,11 +28,13 @@ runs:
       shell: bash
       run: |
         inputs='${{inputs.service-names}}'
-        patternBrackets="[[\]\n]"
-        patternComma="[,]"
-        services="(${inputs//${patternBrackets}/})"
-        servicesArray="${services//${patternComma}/ }"
-        
+        patternBracketsAndSpace="[[\] ]"
+        patternNewline=$'\n'
+        patternComma=","
+        tmpBracketsAndSpace="${inputs//${patternBracketsAndSpace}/}"
+        tmpNewline="${tmpBracketsAndSpace//${patternNewline}/}"
+        servicesArray="(${tmpNewline//${patternComma}/ })"
+
         echo "::set-output name=services::${servicesArray}"
     - name: Update services
       shell: bash
